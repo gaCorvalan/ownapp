@@ -1,6 +1,6 @@
 # Ownapp · Calculadora del súper
 
-Primera entrega de una app de herramientas personales, hecha con Expo SDK 54, React Native y TypeScript. La interfaz usa «a mano» como nombre provisional.
+Primera entrega de una app de herramientas personales, hecha con Expo SDK 57, React Native y TypeScript. La interfaz usa «a mano» como nombre provisional.
 
 ## Ejecutar
 
@@ -9,7 +9,7 @@ pnpm install
 pnpm web
 ```
 
-Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible con SDK 54. También están disponibles `pnpm android` y `pnpm ios` si tenés el entorno nativo configurado. Esta entrega no solicita permisos de cámara ni requiere backend.
+Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible con SDK 57. También están disponibles `pnpm android` y `pnpm ios` si tenés el entorno nativo configurado. Esta entrega no solicita permisos de cámara ni requiere backend.
 
 ## Qué podés probar
 
