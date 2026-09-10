@@ -9,7 +9,7 @@ pnpm install
 pnpm web
 ```
 
-Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible con SDK 57. También están disponibles `pnpm android` y `pnpm ios` si tenés el entorno nativo configurado. Esta entrega no solicita permisos de cámara ni requiere backend.
+Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible con SDK 57. También están disponibles `pnpm android` y `pnpm ios` si tenés el entorno nativo configurado. La captura de etiquetas solicita permiso de cámara y no requiere backend.
 
 ## Qué podés probar
 
@@ -18,6 +18,7 @@ Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible c
 - Vaciar la compra con confirmación.
 - Recuperar la compra después de cerrar y volver a abrir la app.
 - Simular una lectura y confirmar el precio antes de sumarlo.
+- Capturar y descartar una foto de una etiqueta, sin interpretar todavía su contenido.
 - Elegir explícitamente entre precio regular y precio condicionado a una tarjeta.
 - Resolver una lectura fallida con carga manual.
 
@@ -49,9 +50,9 @@ AsyncStorage guarda una única compra bajo `ownapp.supermarket.shopping.v1`, loc
 Simular lectura → bloques de texto → candidatos → elección/confirmación → ítem de compra
 ```
 
-`extractPriceCandidates` reconoce importes con símbolo `$` y descarta bloques que indican precios de referencia por kilo/litro. Conserva el contexto de cada candidato. Con varios candidatos no selecciona ninguno automáticamente. La confirmación se consume una sola vez para impedir duplicados por doble toque.
+`extractPriceCandidates` reconoce importes con símbolo `$` y descarta bloques que indican precios de referencia por kilo/litro. Conserva el contexto de cada candidato. Con varios candidatos no selecciona ninguno automáticamente. La confirmación se consume una sola vez para impedir duplicados por doble toque. La cámara se usa sólo para obtener una vista previa y una foto temporal: no se entrega a ese flujo ni modifica la compra.
 
-Estas reglas son deliberadamente limitadas a los ejemplos: no representan todavía un intérprete fiable de etiquetas reales. La próxima entrega debe conectar capturas reales a un adaptador de OCR y ampliar los bloques con sus coordenadas. El reducer, la lista, el formulario y el cálculo del total se reutilizan.
+Estas reglas son deliberadamente limitadas a los ejemplos: no representan todavía un intérprete fiable de etiquetas reales. La próxima entrega debe conectar la foto temporal a un adaptador de OCR y ampliar los bloques con sus coordenadas. El reducer, la lista, el formulario y el cálculo del total se reutilizan.
 
 ## Verificación
 
@@ -75,5 +76,6 @@ Recorrido manual sugerido:
 6. Probar promoción: exige elegir entre $ 5.800,00 y $ 4.640,00.
 7. Probar sin lectura: ofrece reintento y carga manual.
 8. Cancelar el vaciado, luego confirmarlo y recargar: la compra queda vacía.
+9. En un teléfono físico, permitir la cámara, capturar y descartar una etiqueta. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
 
 También conviene verificar teclado, áreas seguras, tamaño de texto y persistencia en un teléfono físico antes de la siguiente entrega.

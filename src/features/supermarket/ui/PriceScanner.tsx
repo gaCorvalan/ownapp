@@ -4,6 +4,7 @@ import { usePriceScanner } from '../application/usePriceScanner';
 import { formatMoney } from '../domain/price';
 import { scanScenarios } from '../infrastructure/mockTextRecognizer';
 import { ActionButton, colors, common } from './primitives';
+import { LabelCamera } from './LabelCamera';
 
 export function PriceScanner({ onAdd, onManual, full }: { onAdd: (priceCents: number) => void; onManual: () => void; full: boolean }) {
   const scanner = usePriceScanner();
@@ -12,7 +13,12 @@ export function PriceScanner({ onAdd, onManual, full }: { onAdd: (priceCents: nu
       <Text accessibilityRole="header" style={common.title}>Escáner de precios</Text>
       <View style={styles.badge}><View style={styles.dot} /><Text style={styles.badgeText}>DEMO</Text></View>
     </View>
-    <Text style={common.body}>Probá cómo funciona con etiquetas de ejemplo. La cámara todavía no está activa.</Text>
+    <Text style={common.body}>Capturá una etiqueta para revisarla o probá el flujo completo con ejemplos simulados.</Text>
+    <LabelCamera />
+    <View style={styles.simulatedHeader}>
+      <Text accessibilityRole="header" style={styles.simulatedTitle}>Lecturas simuladas</Text>
+      <Text style={common.body}>Estas siguen disponibles mientras preparamos el reconocimiento de texto.</Text>
+    </View>
     <View style={styles.scenarios}>
       {scanScenarios.map(option => <Pressable key={option.id} accessibilityRole="radio"
         accessibilityState={{ checked: scanner.scenario === option.id, disabled: scanner.status === 'reading' }}
@@ -79,6 +85,8 @@ const styles = StyleSheet.create({
   badge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FBF1DA', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#9C6F20' },
   badgeText: { fontSize: 10, letterSpacing: 1.3, fontWeight: '700', color: '#7C591C' },
+  simulatedHeader: { gap: 4 },
+  simulatedTitle: { fontSize: 16, lineHeight: 22, fontWeight: '700', color: colors.ink },
   scenarios: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, backgroundColor: colors.background, padding: 4, borderRadius: 14 },
   scenario: { flex: 1, minWidth: 75, minHeight: 44, paddingHorizontal: 5, paddingVertical: 10, justifyContent: 'center', alignItems: 'center', borderRadius: 10 },
   activeScenario: { backgroundColor: colors.surface },

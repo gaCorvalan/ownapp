@@ -48,6 +48,8 @@ export function SupermarketScreen() {
               <TotalBar {...session.totals} />
               <ShoppingList items={session.items} dispatch={session.dispatch} full={full}
                 onAdd={() => setEditor({ item: null })} onEdit={item => setEditor({ item })} onClear={() => setConfirmClear(true)} />
+              <PriceScanner full={full} onManual={() => setEditor({ item: null })}
+                onAdd={priceCents => addItem({ name: '', priceCents, quantity: 1 })} />
               <View accessibilityLiveRegion="polite" style={styles.storage}>
                 <Ionicons name={session.saveState === 'error' ? 'alert-circle-outline' : 'phone-portrait-outline'} size={15} color={colors.muted} />
                 <Text style={styles.storageText}>{session.saveState === 'saved' ? 'Compra guardada en este dispositivo' : session.saveState === 'saving' ? 'Guardando compra…' : 'No se guardaron los últimos cambios.'}</Text>
@@ -55,8 +57,6 @@ export function SupermarketScreen() {
               {session.saveState === 'error' && <ActionButton label="Reintentar guardado" variant="secondary" onPress={session.retrySave} />}
             </View>
             <View style={[styles.right, wide && { flex: 1 }]}>
-              <PriceScanner full={full} onManual={() => setEditor({ item: null })}
-                onAdd={priceCents => addItem({ name: '', priceCents, quantity: 1 })} />
               <View style={styles.tip}><Ionicons name="bulb-outline" size={20} color={colors.primary} /><Text style={[common.body, { flex: 1 }]}>¿Llevás más de uno? Cambiá la cantidad en la lista. No hace falta volver a escanear.</Text></View>
             </View>
           </View>

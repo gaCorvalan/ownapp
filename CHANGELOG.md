@@ -14,6 +14,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
   y lectura fallida. Cada precio requiere confirmación antes de sumarse.
 - Eliminación de productos y vaciado de la compra con confirmación.
 - Interfaz adaptable a pantallas móviles y de escritorio.
+- Captura temporal de etiquetas con cámara, marco de encuadre, vista previa y descarte, sin OCR ni alta automática de productos.
 
 ### Changed
 
