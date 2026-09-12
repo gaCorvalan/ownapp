@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AppState, Linking, StyleSheet, Text, View } from 'react-native';
 import { ActionButton, colors, common } from './primitives';
 
-export function LabelCamera() {
+export function LabelCamera({ onRecognize, isReading }: { onRecognize: (photoUri: string) => void; isReading: boolean }) {
   const [permission, requestPermission] = useCameraPermissions();
   const camera = useRef<CameraView>(null);
   const [isForeground, setIsForeground] = useState(AppState.currentState === 'active');
@@ -40,7 +40,8 @@ export function LabelCamera() {
     return <View style={styles.capture}>
       <Text accessibilityRole="header" style={styles.sectionTitle}>Etiqueta capturada</Text>
       <Image source={{ uri: capturedUri }} contentFit="cover" style={styles.image} accessibilityLabel="Foto de la etiqueta capturada" />
-      <Text style={common.body}>La imagen se guarda temporalmente mientras está abierta esta pantalla. Todavía no analizamos su texto.</Text>
+      <Text style={common.body}>La imagen queda temporalmente en este dispositivo. Revisá que el precio esté nítido antes de leerla.</Text>
+      <ActionButton label={isReading ? 'Leyendo etiqueta…' : 'Leer etiqueta'} icon="scan-outline" disabled={isReading} onPress={() => onRecognize(capturedUri)} />
       <ActionButton label="Descartar foto" icon="trash-outline" variant="secondary" onPress={() => {
         setCapturedUri(null);
         setMountError(null);

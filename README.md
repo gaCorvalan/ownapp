@@ -18,7 +18,7 @@ Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible c
 - Vaciar la compra con confirmación.
 - Recuperar la compra después de cerrar y volver a abrir la app.
 - Simular una lectura y confirmar el precio antes de sumarlo.
-- Capturar y descartar una foto de una etiqueta, sin interpretar todavía su contenido.
+- Capturar una etiqueta y leer su texto localmente en el teléfono para detectar precios.
 - Elegir explícitamente entre precio regular y precio condicionado a una tarjeta.
 - Resolver una lectura fallida con carga manual.
 
@@ -37,7 +37,8 @@ src/features/supermarket/
   domain/shopping.ts                  Ítems, acciones, validación y totales
   domain/price.ts                     Conversión de importes y candidatos de precio
   infrastructure/shoppingStorage.ts  AsyncStorage, formato versionado y escrituras ordenadas
-  infrastructure/mockTextRecognizer.ts  Tres respuestas de ejemplo
+  infrastructure/localTextRecognizer.ts Adaptador OCR local (Vision/ML Kit)
+  infrastructure/mockTextRecognizer.ts  Tres respuestas de ejemplo para web
 ```
 
 El estado de la compra se administra con `useReducer`; los totales se derivan de los ítems y los importes se almacenan en centavos enteros. El dominio no depende de React ni de APIs del teléfono. Los componentes muestran datos y emiten acciones; los hooks coordinan el flujo.
@@ -47,12 +48,14 @@ AsyncStorage guarda una única compra bajo `ownapp.supermarket.shopping.v1`, loc
 ## Flujo del escáner
 
 ```text
-Simular lectura → bloques de texto → candidatos → elección/confirmación → ítem de compra
+Foto o simulación → bloques de texto → candidatos → elección/confirmación → ítem de compra
 ```
 
-`extractPriceCandidates` reconoce importes con símbolo `$` y descarta bloques que indican precios de referencia por kilo/litro. Conserva el contexto de cada candidato. Con varios candidatos no selecciona ninguno automáticamente. La confirmación se consume una sola vez para impedir duplicados por doble toque. La cámara se usa sólo para obtener una vista previa y una foto temporal: no se entrega a ese flujo ni modifica la compra.
+La foto capturada se entrega al OCR local: Vision en iOS y ML Kit en Android. El reconocimiento se hace en el dispositivo; la foto no se envía a un servidor y queda temporalmente mientras la pantalla está abierta. El OCR devuelve bloques de texto con sus coordenadas. `extractPriceCandidates` reconoce importes con símbolo `$` y descarta bloques que indican precios de referencia por kilo/litro. Conserva el contexto de cada candidato. Con varios candidatos no selecciona ninguno automáticamente. La confirmación se consume una sola vez para impedir duplicados por doble toque.
 
-Estas reglas son deliberadamente limitadas a los ejemplos: no representan todavía un intérprete fiable de etiquetas reales. La próxima entrega debe conectar la foto temporal a un adaptador de OCR y ampliar los bloques con sus coordenadas. El reducer, la lista, el formulario y el cálculo del total se reutilizan.
+Estas reglas son deliberadamente limitadas: el OCR extrae texto, pero no es un intérprete fiable de cualquier etiqueta real. El reducer, la lista, el formulario y el cálculo del total se reutilizan.
+
+El OCR requiere una development build o una compilación de producción instalada en un teléfono; no funciona dentro de Expo Go ni en la versión web. En web permanecen disponibles las lecturas simuladas.
 
 ## Verificación
 
@@ -76,6 +79,6 @@ Recorrido manual sugerido:
 6. Probar promoción: exige elegir entre $ 5.800,00 y $ 4.640,00.
 7. Probar sin lectura: ofrece reintento y carga manual.
 8. Cancelar el vaciado, luego confirmarlo y recargar: la compra queda vacía.
-9. En un teléfono físico, permitir la cámara, capturar y descartar una etiqueta. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
+9. En un teléfono físico con una development build, permitir la cámara, capturar una etiqueta nítida, tocar «Leer etiqueta», elegir el precio detectado y confirmarlo. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
 
 También conviene verificar teclado, áreas seguras, tamaño de texto y persistencia en un teléfono físico antes de la siguiente entrega.

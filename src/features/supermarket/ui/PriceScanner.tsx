@@ -13,8 +13,8 @@ export function PriceScanner({ onAdd, onManual, full }: { onAdd: (priceCents: nu
       <Text accessibilityRole="header" style={common.title}>Escáner de precios</Text>
       <View style={styles.badge}><View style={styles.dot} /><Text style={styles.badgeText}>DEMO</Text></View>
     </View>
-    <Text style={common.body}>Capturá una etiqueta para revisarla o probá el flujo completo con ejemplos simulados.</Text>
-    <LabelCamera />
+      <Text style={common.body}>Capturá una etiqueta para leer su precio en este dispositivo, o probá ejemplos simulados.</Text>
+    <LabelCamera onRecognize={photoUri => void scanner.scanPhoto(photoUri)} isReading={scanner.status === 'reading'} />
     <View style={styles.simulatedHeader}>
       <Text accessibilityRole="header" style={styles.simulatedTitle}>Lecturas simuladas</Text>
       <Text style={common.body}>Estas siguen disponibles mientras preparamos el reconocimiento de texto.</Text>
@@ -44,7 +44,7 @@ export function PriceScanner({ onAdd, onManual, full }: { onAdd: (priceCents: nu
       </View>
     </View>
     <View accessibilityLiveRegion="polite" style={{ gap: 12 }}>
-      {scanner.status === 'reading' && <View style={common.row}><ActivityIndicator color={colors.primary} /><Text style={common.body}>Leyendo etiqueta de ejemplo…</Text></View>}
+      {scanner.status === 'reading' && <View style={common.row}><ActivityIndicator color={colors.primary} /><Text style={common.body}>Leyendo texto de la etiqueta…</Text></View>}
       {scanner.status === 'result' && <>
         <Text style={styles.resultTitle}>{scanner.candidates.length === 1 ? 'Precio detectado. ¿Lo agregamos?' : 'Hay dos precios. Elegí el que te corresponde.'}</Text>
         {scanner.candidates.map(candidate => <Pressable key={candidate.id} accessibilityRole="radio"

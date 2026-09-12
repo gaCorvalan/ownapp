@@ -24,6 +24,13 @@ test('promoción conserva ambas alternativas y sus condiciones', () => {
   assert.deepEqual(extractPriceCandidates([{ text: '$ —,—' }]), []);
 });
 
+test('los bloques del OCR pueden incluir coordenadas sin acoplar el precio al proveedor', () => {
+  const candidates = extractPriceCandidates([
+    { text: '$ 3.450,00', bounds: { x: 12, y: 24, width: 130, height: 32 } },
+  ]);
+  assert.deepEqual(candidates.map(value => value.priceCents), [345000]);
+});
+
 const item = { id: 'one', name: 'Yerba', priceCents: 345050, quantity: 1 };
 test('agregar, cambiar cantidad, editar, eliminar y vaciar recalculan el total', () => {
   let items = shoppingReducer([], { type: 'add', item });

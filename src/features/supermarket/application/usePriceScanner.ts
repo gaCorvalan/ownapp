@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { extractPriceCandidates, type PriceCandidate } from '../domain/price';
+import { recognizeLocalText } from '../infrastructure/localTextRecognizer';
 import { recognizeMockText, type ScanScenario } from '../infrastructure/mockTextRecognizer';
 
 export function usePriceScanner() {
@@ -20,7 +21,7 @@ export function usePriceScanner() {
     setSelectedId(null);
   }
 
-  async function scan() {
+  async function read(recognize: () => Promise<Awaited<ReturnType<typeof recognizeMockText>>>) {
     if (busy.current && status !== 'added') return;
     busy.current = true;
     const current = ++request.current;
@@ -28,7 +29,7 @@ export function usePriceScanner() {
     setCandidates([]);
     setSelectedId(null);
     try {
-      const result = extractPriceCandidates(await recognizeMockText(scenario));
+      const result = extractPriceCandidates(await recognize());
       if (current !== request.current) return;
       setCandidates(result);
       setSelectedId(result.length === 1 ? result[0].id : null);
@@ -38,6 +39,14 @@ export function usePriceScanner() {
     } finally {
       if (current === request.current) busy.current = false;
     }
+  }
+
+  async function scan() {
+    await read(() => recognizeMockText(scenario));
+  }
+
+  async function scanPhoto(photoUri: string) {
+    await read(() => recognizeLocalText(photoUri));
   }
 
   function consumeSelected(): PriceCandidate | null {
@@ -51,5 +60,5 @@ export function usePriceScanner() {
   }
 
   function reset() { selectScenario(scenario); }
-  return { scenario, status, candidates, selectedId, setSelectedId, selectScenario, scan, consumeSelected, reset };
+  return { scenario, status, candidates, selectedId, setSelectedId, selectScenario, scan, scanPhoto, consumeSelected, reset };
 }

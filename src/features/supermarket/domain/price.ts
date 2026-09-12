@@ -15,7 +15,10 @@ export function formatMoney(cents: number): string {
   }).format(cents / 100);
 }
 
-export type TextBlock = { text: string };
+// OCR adapters may provide the original position of each block. Price parsing
+// does not depend on it, which keeps the domain independent of a specific OCR.
+export type TextBounds = { x: number; y: number; width: number; height: number };
+export type TextBlock = { text: string; bounds?: TextBounds };
 export type PriceCandidate = { id: string; priceCents: number; context: string };
 
 // Preserve alternatives and their context; never choose the cheapest/largest
