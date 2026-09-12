@@ -10,14 +10,14 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 - Calculadora del supermercado con carga manual, edición de productos,
   cantidades y total estimado en pesos argentinos.
 - Guardado local de la compra para recuperarla al volver a abrir la app.
-- Lecturas simuladas de etiquetas: precio único, promoción con dos precios
-  y lectura fallida. Cada precio requiere confirmación antes de sumarse.
 - Eliminación de productos y vaciado de la compra con confirmación.
 - Interfaz adaptable a pantallas móviles y de escritorio.
 - Captura temporal de etiquetas con cámara, marco de encuadre, vista previa y OCR local: Vision en iOS y ML Kit en Android detectan texto sin enviar fotos a un servidor; los precios detectados siguen requiriendo confirmación.
 
 ### Changed
 
+- El escáner ahora usa exclusivamente capturas de cámara y OCR local; se
+  eliminaron las lecturas simuladas y sus etiquetas de demostración.
 - Actualización de Expo SDK 54 a SDK 57 y de sus dependencias compatibles.
 
 ### Fixed

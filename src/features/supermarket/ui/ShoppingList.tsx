@@ -22,7 +22,7 @@ export function ShoppingList({ items, dispatch, onAdd, onEdit, onClear, full }: 
     {items.length === 0 ? <View style={styles.empty}>
       <View style={styles.basket}><Ionicons name="basket-outline" size={34} color={colors.primary} /></View>
       <Text style={styles.emptyTitle}>Tu próxima compra empieza acá</Text>
-      <Text style={[common.body, { textAlign: 'center', maxWidth: 270 }]}>Agregá un precio manualmente o probá una etiqueta de ejemplo.</Text>
+      <Text style={[common.body, { textAlign: 'center', maxWidth: 270 }]}>Agregá un precio manualmente o capturá una etiqueta.</Text>
     </View> : <View>
       {items.map((item, index) => <View key={item.id} style={[styles.item, index > 0 && styles.separator]}>
         <View style={styles.itemHeading}>

@@ -17,12 +17,9 @@ Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible c
 - Editar nombre, precio y cantidad; sumar/restar unidades y eliminar productos.
 - Vaciar la compra con confirmación.
 - Recuperar la compra después de cerrar y volver a abrir la app.
-- Simular una lectura y confirmar el precio antes de sumarlo.
 - Capturar una etiqueta y leer su texto localmente en el teléfono para detectar precios.
 - Elegir explícitamente entre precio regular y precio condicionado a una tarjeta.
 - Resolver una lectura fallida con carga manual.
-
-La demo entrega bloques de texto inventados: **no analiza la imagen de la etiqueta dibujada ni abre la cámara**. Los productos de ejemplo que confirmes se guardan en la misma compra que los manuales. Se pueden eliminar desde la lista.
 
 Los importes se ingresan en pesos argentinos: `3450`, `3450,50` o `3.450,50`. La coma separa los centavos. Cada ítem admite entre 1 y 99 unidades y un precio de hasta $ 1.000.000; cada compra admite 100 ítems. El total es una estimación, sin descuentos ni cálculo por peso.
 
@@ -38,7 +35,6 @@ src/features/supermarket/
   domain/price.ts                     Conversión de importes y candidatos de precio
   infrastructure/shoppingStorage.ts  AsyncStorage, formato versionado y escrituras ordenadas
   infrastructure/localTextRecognizer.ts Adaptador OCR local (Vision/ML Kit)
-  infrastructure/mockTextRecognizer.ts  Tres respuestas de ejemplo para web
 ```
 
 El estado de la compra se administra con `useReducer`; los totales se derivan de los ítems y los importes se almacenan en centavos enteros. El dominio no depende de React ni de APIs del teléfono. Los componentes muestran datos y emiten acciones; los hooks coordinan el flujo.
@@ -55,7 +51,7 @@ La foto capturada se entrega al OCR local: Vision en iOS y ML Kit en Android. El
 
 Estas reglas son deliberadamente limitadas: el OCR extrae texto, pero no es un intérprete fiable de cualquier etiqueta real. El reducer, la lista, el formulario y el cálculo del total se reutilizan.
 
-El OCR requiere una development build o una compilación de producción instalada en un teléfono; no funciona dentro de Expo Go ni en la versión web. En web permanecen disponibles las lecturas simuladas.
+El OCR requiere una development build o una compilación de producción instalada en un teléfono; no funciona dentro de Expo Go ni en la versión web.
 
 ## Verificación
 
@@ -75,10 +71,8 @@ Recorrido manual sugerido:
 2. Incrementar a 3 unidades: total $ 4.501,50.
 3. Editar precio a `1600`: total $ 4.800,00.
 4. Recargar y verificar que se mantiene la compra.
-5. Simular precio único: el total no cambia hasta confirmar; agrega $ 3.450,00.
-6. Probar promoción: exige elegir entre $ 5.800,00 y $ 4.640,00.
-7. Probar sin lectura: ofrece reintento y carga manual.
-8. Cancelar el vaciado, luego confirmarlo y recargar: la compra queda vacía.
-9. En un teléfono físico con una development build, permitir la cámara, capturar una etiqueta nítida, tocar «Leer etiqueta», elegir el precio detectado y confirmarlo. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
+5. En un teléfono físico con una development build, permitir la cámara, capturar una etiqueta nítida, tocar «Leer etiqueta», elegir el precio detectado y confirmarlo. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
+6. Probar una lectura sin precio: ofrece reintento y carga manual.
+7. Cancelar el vaciado, luego confirmarlo y recargar: la compra queda vacía.
 
 También conviene verificar teclado, áreas seguras, tamaño de texto y persistencia en un teléfono físico antes de la siguiente entrega.
