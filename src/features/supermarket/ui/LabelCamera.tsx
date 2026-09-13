@@ -1,17 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { Image } from 'expo-image';
 import { useEffect, useRef, useState } from 'react';
 import { AppState, Linking, StyleSheet, Text, View } from 'react-native';
 import { ActionButton, colors, common } from './primitives';
 
-export function LabelCamera({ onRecognize, isReading }: { onRecognize: (photoUri: string) => void; isReading: boolean }) {
+export function LabelCamera({ onRecognize }: { onRecognize: (photoUri: string) => void }) {
   const [permission, requestPermission] = useCameraPermissions();
   const camera = useRef<CameraView>(null);
   const [isForeground, setIsForeground] = useState(AppState.currentState === 'active');
   const [isReady, setIsReady] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
-  const [capturedUri, setCapturedUri] = useState<string | null>(null);
   const [mountError, setMountError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,26 +25,13 @@ export function LabelCamera({ onRecognize, isReading }: { onRecognize: (photoUri
     setIsCapturing(true);
     try {
       const photo = await camera.current.takePictureAsync({ quality: 0.8 });
-      setCapturedUri(photo.uri);
       setIsReady(false);
+      onRecognize(photo.uri);
     } catch {
       setMountError('No pudimos capturar la etiqueta. Probá de nuevo o ingresá el precio manualmente.');
     } finally {
       setIsCapturing(false);
     }
-  }
-
-  if (capturedUri) {
-    return <View style={styles.capture}>
-      <Text accessibilityRole="header" style={styles.sectionTitle}>Etiqueta capturada</Text>
-      <Image source={{ uri: capturedUri }} contentFit="cover" style={styles.image} accessibilityLabel="Foto de la etiqueta capturada" />
-      <Text style={common.body}>La imagen queda temporalmente en este dispositivo. Revisá que el precio esté nítido antes de leerla.</Text>
-      <ActionButton label={isReading ? 'Leyendo etiqueta…' : 'Leer etiqueta'} icon="scan-outline" disabled={isReading} onPress={() => onRecognize(capturedUri)} />
-      <ActionButton label="Descartar foto" icon="trash-outline" variant="secondary" onPress={() => {
-        setCapturedUri(null);
-        setMountError(null);
-      }} />
-    </View>;
   }
 
   if (!permission) {
@@ -88,7 +73,6 @@ export function LabelCamera({ onRecognize, isReading }: { onRecognize: (photoUri
   }
 
   return <View style={styles.capture}>
-    <Text accessibilityRole="header" style={styles.sectionTitle}>Capturá una etiqueta</Text>
     <View style={styles.preview}>
       <CameraView ref={camera} style={StyleSheet.absoluteFill} facing="back" onCameraReady={() => setIsReady(true)}
         onMountError={event => setMountError(event.message)} />
@@ -115,6 +99,5 @@ const styles = StyleSheet.create({
   bottomRight: { bottom: 0, right: 0, borderLeftWidth: 0, borderTopWidth: 0, borderBottomRightRadius: 8 },
   frameLabel: { position: 'absolute', bottom: 12, left: 12, right: 12, alignItems: 'center' },
   frameText: { backgroundColor: '#18251CCC', color: '#FFFFFF', fontSize: 12, fontWeight: '600', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14, overflow: 'hidden' },
-  image: { height: 280, width: '100%', borderRadius: 18, backgroundColor: colors.background },
   notice: { alignItems: 'flex-start', backgroundColor: colors.primaryLight, borderRadius: 14, gap: 10, padding: 14 },
 });

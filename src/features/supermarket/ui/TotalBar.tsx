@@ -4,20 +4,20 @@ import { formatMoney } from '../domain/price';
 
 export function TotalBar({ priceCents, quantity }: { priceCents: number; quantity: number }) {
   return <View style={styles.card}>
-    <View style={styles.heading}><Text style={styles.label}>TOTAL ESTIMADO</Text><Ionicons name="basket-outline" size={24} color="#EFCB78" /></View>
-    <Text accessibilityLiveRegion="polite" adjustsFontSizeToFit minimumFontScale={0.4} numberOfLines={1} style={styles.total}>{formatMoney(priceCents)}</Text>
-    <View style={styles.footer}><Text style={styles.detail}>{quantity} {quantity === 1 ? 'unidad' : 'unidades'} en tu compra</Text><Text style={styles.currency}>ARS</Text></View>
-    <Text style={styles.note}>Según los precios ingresados, sin descuentos bancarios.</Text>
+    <View style={styles.copy}>
+      <Text style={styles.label}>TOTAL ESTIMADO</Text>
+      <Text accessibilityLiveRegion="polite" adjustsFontSizeToFit minimumFontScale={0.5} numberOfLines={1} style={styles.total}>{formatMoney(priceCents)}</Text>
+      <Text style={styles.detail}>{quantity} {quantity === 1 ? 'unidad' : 'unidades'} · sin descuentos bancarios</Text>
+    </View>
+    <View style={styles.icon}><Ionicons name="basket-outline" size={25} color="#EFCB78" /></View>
   </View>;
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: '#344B3B', borderRadius: 24, padding: 24, gap: 14 },
-  heading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  card: { backgroundColor: '#344B3B', borderRadius: 24, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16 },
+  copy: { flex: 1, gap: 5, minWidth: 0 },
   label: { fontSize: 11, fontWeight: '600', letterSpacing: 1.8, color: '#DEE7DB' },
-  total: { color: '#FFFFFF', fontSize: 42, fontWeight: '600', letterSpacing: -1.5, fontVariant: ['tabular-nums'], flexShrink: 1 },
-  footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
-  detail: { fontSize: 13, color: '#DEE7DB', flexShrink: 1 },
-  currency: { color: '#FFFFFF', fontSize: 11, fontWeight: '600', backgroundColor: '#506351', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 },
-  note: { fontSize: 11, lineHeight: 17, color: '#DEE7DB', borderTopWidth: 1, borderColor: '#59705C', paddingTop: 14 },
+  total: { color: '#FFFFFF', fontSize: 32, fontWeight: '700', letterSpacing: -1.1, fontVariant: ['tabular-nums'], flexShrink: 1 },
+  detail: { fontSize: 12, lineHeight: 17, color: '#DEE7DB' },
+  icon: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#506351' },
 });

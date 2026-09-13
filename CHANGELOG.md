@@ -16,6 +16,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Changed
 
+- La portada de compra ahora prioriza el escaneo de precios: muestra el total y la cámara directamente, reconoce cada captura sin una confirmación intermedia y vuelve a encuadrar después de agregar un precio; el detalle editable queda bajo demanda.
 - El escáner ahora usa exclusivamente capturas de cámara y OCR local; se
   eliminaron las lecturas simuladas y sus etiquetas de demostración.
 - Actualización de Expo SDK 54 a SDK 57 y de sus dependencias compatibles.

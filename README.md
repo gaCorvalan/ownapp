@@ -17,7 +17,7 @@ Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible c
 - Editar nombre, precio y cantidad; sumar/restar unidades y eliminar productos.
 - Vaciar la compra con confirmación.
 - Recuperar la compra después de cerrar y volver a abrir la app.
-- Capturar una etiqueta y leer su texto localmente en el teléfono para detectar precios.
+- Escanear una etiqueta como acción principal y leer su texto localmente en el teléfono para detectar precios.
 - Elegir explícitamente entre precio regular y precio condicionado a una tarjeta.
 - Resolver una lectura fallida con carga manual.
 
@@ -37,7 +37,7 @@ src/features/supermarket/
   infrastructure/localTextRecognizer.ts Adaptador OCR local (Vision/ML Kit)
 ```
 
-El estado de la compra se administra con `useReducer`; los totales se derivan de los ítems y los importes se almacenan en centavos enteros. El dominio no depende de React ni de APIs del teléfono. Los componentes muestran datos y emiten acciones; los hooks coordinan el flujo.
+El estado de la compra se administra con `useReducer`; los totales se derivan de los ítems y los importes se almacenan en centavos enteros. El dominio no depende de React ni de APIs del teléfono. Los componentes muestran datos y emiten acciones; los hooks coordinan el flujo. La portada mantiene el total y la cámara a la vista; el detalle de productos se abre bajo demanda para que la tarea repetida de capturar precios no requiera desplazarse.
 
 AsyncStorage guarda una única compra bajo `ownapp.supermarket.shopping.v1`, local a cada instalación o navegador/origen. No hay sincronización ni cuentas. La pantalla espera a recuperar los datos antes de habilitar la compra. Si falla la lectura o el guardado, muestra un mensaje y permite reintentar. Las escrituras se serializan para no sobrescribir una compra reciente con una anterior.
 
