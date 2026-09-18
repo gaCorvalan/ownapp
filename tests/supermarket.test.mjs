@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { parsePrice, extractPriceCandidates } from '../src/features/supermarket/domain/price.ts';
-import { extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
+import { correctProductDisplayName, extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
 import { shoppingReducer, shoppingTotals, isShoppingItem } from '../src/features/supermarket/domain/shopping.ts';
 
 test('precios argentinos: pesos, miles y centavos sin redondeo flotante', () => {
@@ -54,6 +54,15 @@ test('descriptor de producto conserva texto fuente y normaliza categoría y cont
 
 test('no inventa un producto a partir de texto de precio o promoción', () => {
   assert.equal(extractProductDescriptor([{ text: 'Con tarjeta: $ 4.640' }]), null);
+});
+
+test('la corrección manual conserva el origen OCR y actualiza el descriptor visible', () => {
+  const descriptor = extractProductDescriptor([{ text: 'ACEITE CAÑUELAS GIRASOL 1,5 L' }]);
+  assert.ok(descriptor);
+  const corrected = correctProductDisplayName(descriptor, 'Aceite Cañuelas Oliva · 1,5 L');
+  assert.equal(corrected.displayName, 'Aceite Cañuelas Oliva · 1,5 L');
+  assert.equal(corrected.source, 'manual');
+  assert.equal(corrected.rawLabelText, descriptor.rawLabelText);
 });
 
 const item = { id: 'one', name: 'Yerba', priceCents: 345050, quantity: 1 };

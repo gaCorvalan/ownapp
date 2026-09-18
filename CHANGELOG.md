@@ -17,6 +17,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Changed
 
+- Corregir el nombre de un producto escaneado ahora actualiza el descriptor persistido y marca su nombre como una corrección manual, sin perder el texto OCR original.
 - La portada de compra ahora prioriza el escaneo de precios: muestra el total y la cámara directamente, reconoce cada captura sin una confirmación intermedia y vuelve a encuadrar después de agregar un precio; el detalle editable queda bajo demanda.
 - El escáner ahora usa exclusivamente capturas de cámara y OCR local; se
   eliminaron las lecturas simuladas y sus etiquetas de demostración.

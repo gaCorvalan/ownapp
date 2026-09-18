@@ -77,6 +77,12 @@ export function extractProductDescriptor(blocks: TextBlock[]): ProductDescriptor
   return { category, brand, variant, netContent, displayName, rawLabelText, source: 'ocr' };
 }
 
+export function correctProductDisplayName(descriptor: ProductDescriptor, displayName: string): ProductDescriptor {
+  const correctedName = displayName.trim();
+  if (!correctedName || correctedName.length > 60) return descriptor;
+  return { ...descriptor, displayName: correctedName, source: 'manual' };
+}
+
 export function isProductDescriptor(value: unknown): value is ProductDescriptor {
   if (!value || typeof value !== 'object') return false;
   const descriptor = value as ProductDescriptor;

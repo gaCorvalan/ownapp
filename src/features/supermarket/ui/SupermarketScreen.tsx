@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShoppingSession } from '../application/useShoppingSession';
-import type { ProductDescriptor } from '../domain/product';
+import { correctProductDisplayName, type ProductDescriptor } from '../domain/product';
 import { MAX_ITEMS, type ShoppingItem } from '../domain/shopping';
 import { ItemEditor } from './ItemEditor';
 import { PriceScanner } from './PriceScanner';
@@ -83,7 +83,13 @@ export function SupermarketScreen() {
     </Modal>
 
     {editor && <ItemEditor item={editor.item} onClose={() => setEditor(null)} onSave={value => {
-      if (editor.item) session.dispatch({ type: 'edit', item: { ...editor.item, ...value, name: value.name || editor.item.name } });
+      if (editor.item) {
+        const name = value.name || editor.item.name;
+        const product = editor.item.product && name !== editor.item.name
+          ? correctProductDisplayName(editor.item.product, name)
+          : editor.item.product;
+        session.dispatch({ type: 'edit', item: { ...editor.item, ...value, name, product } });
+      }
       else addItem(value);
       setEditor(null);
     }} />}
