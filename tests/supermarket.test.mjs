@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { parsePrice, extractPriceCandidates } from '../src/features/supermarket/domain/price.ts';
+import { extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
 import { shoppingReducer, shoppingTotals, isShoppingItem } from '../src/features/supermarket/domain/shopping.ts';
 
 test('precios argentinos: pesos, miles y centavos sin redondeo flotante', () => {
@@ -29,6 +30,30 @@ test('los bloques del OCR pueden incluir coordenadas sin acoplar el precio al pr
     { text: '$ 3.450,00', bounds: { x: 12, y: 24, width: 130, height: 32 } },
   ]);
   assert.deepEqual(candidates.map(value => value.priceCents), [345000]);
+});
+
+test('descriptor de producto conserva texto fuente y normaliza categoría y contenido', () => {
+  const descriptor = extractProductDescriptor([
+    { text: 'ACEITE CAÑUELAS GIRASOL 1,5 L' },
+    { text: 'Precio regular $ 3.450,00' },
+    { text: 'Precio por litro $ 2.300,00' },
+  ]);
+  assert.deepEqual(descriptor && {
+    category: descriptor.category,
+    brand: descriptor.brand,
+    variant: descriptor.variant,
+    netContent: descriptor.netContent,
+    displayName: descriptor.displayName,
+  }, {
+    category: 'Aceite', brand: 'Cañuelas', variant: 'Girasol',
+    netContent: { amount: 1500, unit: 'ml' }, displayName: 'Aceite Cañuelas Girasol · 1,5 L',
+  });
+  assert.match(descriptor.rawLabelText, /Precio regular/);
+  assert.equal(formatNetContent({ amount: 750, unit: 'g' }), '750 g');
+});
+
+test('no inventa un producto a partir de texto de precio o promoción', () => {
+  assert.equal(extractProductDescriptor([{ text: 'Con tarjeta: $ 4.640' }]), null);
 });
 
 const item = { id: 'one', name: 'Yerba', priceCents: 345050, quantity: 1 };

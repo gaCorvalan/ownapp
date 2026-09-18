@@ -17,7 +17,7 @@ Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible c
 - Editar nombre, precio y cantidad; sumar/restar unidades y eliminar productos.
 - Vaciar la compra con confirmación.
 - Recuperar la compra después de cerrar y volver a abrir la app.
-- Escanear una etiqueta como acción principal y leer su texto localmente en el teléfono para detectar precios.
+- Escanear una etiqueta como acción principal y leer su texto localmente en el teléfono para detectar precios y un nombre de producto sugerido.
 - Elegir explícitamente entre precio regular y precio condicionado a una tarjeta.
 - Resolver una lectura fallida con carga manual.
 
@@ -33,6 +33,7 @@ src/features/supermarket/
   application/usePriceScanner.ts      Lectura, elección y confirmación de candidatos
   domain/shopping.ts                  Ítems, acciones, validación y totales
   domain/price.ts                     Conversión de importes y candidatos de precio
+  domain/product.ts                   Descriptor inicial y normalización de productos OCR
   infrastructure/shoppingStorage.ts  AsyncStorage, formato versionado y escrituras ordenadas
   infrastructure/localTextRecognizer.ts Adaptador OCR local (Vision/ML Kit)
 ```
@@ -51,7 +52,7 @@ La foto capturada se entrega al OCR local: Vision en iOS y ML Kit en Android. El
 
 Estas reglas son deliberadamente limitadas: el OCR extrae texto, pero no es un intérprete fiable de cualquier etiqueta real. El reducer, la lista, el formulario y el cálculo del total se reutilizan.
 
-El OCR requiere una development build o una compilación de producción instalada en un teléfono; no funciona dentro de Expo Go ni en la versión web.
+El OCR requiere una development build o una compilación de producción instalada en un teléfono; no funciona dentro de Expo Go ni en la versión web. A partir del texto reconocido, la app conserva localmente un descriptor inicial (texto de etiqueta, categoría y contenido cuando los detecta) y propone un nombre legible. Es una sugerencia: puede corregirse desde el detalle de compra y no reemplaza una base de productos o código de barras.
 
 ## Verificación
 

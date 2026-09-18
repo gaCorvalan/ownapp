@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShoppingSession } from '../application/useShoppingSession';
+import type { ProductDescriptor } from '../domain/product';
 import { MAX_ITEMS, type ShoppingItem } from '../domain/shopping';
 import { ItemEditor } from './ItemEditor';
 import { PriceScanner } from './PriceScanner';
@@ -20,7 +21,7 @@ export function SupermarketScreen() {
   const [purchaseOpen, setPurchaseOpen] = useState(false);
   const full = session.items.length >= MAX_ITEMS;
 
-  function addItem(value: { name: string; priceCents: number; quantity: number }) {
+  function addItem(value: { name: string; priceCents: number; quantity: number; product?: ProductDescriptor }) {
     if (full) return;
     session.dispatch({ type: 'add', item: { ...value, id: createId(), name: value.name || `Producto ${session.items.length + 1}` } });
   }
@@ -45,7 +46,7 @@ export function SupermarketScreen() {
         </View> : <View style={styles.home}>
           <TotalBar {...session.totals} />
           <PriceScanner full={full} onManual={openManual}
-            onAdd={priceCents => addItem({ name: '', priceCents, quantity: 1 })} />
+            onAdd={({ priceCents, product }) => addItem({ name: product?.displayName ?? '', product: product ?? undefined, priceCents, quantity: 1 })} />
           <ActionButton label="Ingresar precio manualmente" icon="add" variant="secondary" onPress={openManual} disabled={full} />
           <Pressable accessibilityRole="button" accessibilityLabel={`Ver compra, ${session.items.length} productos`} onPress={() => setPurchaseOpen(true)} style={({ pressed }) => [styles.purchaseLink, pressed && { opacity: 0.7 }]}>
             <View style={styles.purchaseIcon}><Ionicons name="receipt-outline" size={21} color={colors.primary} /></View>

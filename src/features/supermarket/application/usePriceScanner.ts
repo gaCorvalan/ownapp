@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { extractPriceCandidates, type PriceCandidate, type TextBlock } from '../domain/price';
+import { extractProductDescriptor, type ProductDescriptor } from '../domain/product';
 import { recognizeLocalText } from '../infrastructure/localTextRecognizer';
 
 export function usePriceScanner() {
   const [status, setStatus] = useState<'idle' | 'reading' | 'result' | 'empty' | 'added'>('idle');
   const [candidates, setCandidates] = useState<PriceCandidate[]>([]);
+  const [product, setProduct] = useState<ProductDescriptor | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const request = useRef(0);
   const busy = useRef(false);
@@ -15,6 +17,7 @@ export function usePriceScanner() {
     busy.current = false;
     setStatus('idle');
     setCandidates([]);
+    setProduct(null);
     setSelectedId(null);
   }
 
@@ -24,11 +27,14 @@ export function usePriceScanner() {
     const current = ++request.current;
     setStatus('reading');
     setCandidates([]);
+    setProduct(null);
     setSelectedId(null);
     try {
-      const result = extractPriceCandidates(await recognize());
+      const blocks = await recognize();
+      const result = extractPriceCandidates(blocks);
       if (current !== request.current) return;
       setCandidates(result);
+      setProduct(extractProductDescriptor(blocks));
       setSelectedId(result.length === 1 ? result[0].id : null);
       setStatus(result.length ? 'result' : 'empty');
     } catch {
@@ -52,5 +58,5 @@ export function usePriceScanner() {
     return candidate;
   }
 
-  return { status, candidates, selectedId, setSelectedId, scanPhoto, consumeSelected, reset };
+  return { status, candidates, product, selectedId, setSelectedId, scanPhoto, consumeSelected, reset };
 }

@@ -7,6 +7,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Added
 
+- Detección local de un descriptor de producto a partir del texto OCR: conserva el texto de la etiqueta, normaliza contenido en mililitros/gramos/unidades cuando es posible y propone un nombre editable para la compra.
 - Calculadora del supermercado con carga manual, edición de productos,
   cantidades y total estimado en pesos argentinos.
 - Guardado local de la compra para recuperarla al volver a abrir la app.

@@ -1,6 +1,21 @@
-export type ShoppingItem = { id: string; name: string; priceCents: number; quantity: number };
+import type { ProductDescriptor } from './product';
+
+export type ShoppingItem = { id: string; name: string; priceCents: number; quantity: number; product?: ProductDescriptor };
 export const MAX_QUANTITY = 99;
 export const MAX_ITEMS = 100;
+
+function isStoredProductDescriptor(value: unknown): value is ProductDescriptor {
+  if (!value || typeof value !== 'object') return false;
+  const product = value as ProductDescriptor;
+  const nullableText = (item: unknown) => item === null || typeof item === 'string';
+  const validContent = product.netContent === null || (typeof product.netContent === 'object' && product.netContent !== null &&
+    Number.isSafeInteger(product.netContent.amount) && product.netContent.amount > 0 &&
+    ['ml', 'g', 'unit'].includes(product.netContent.unit));
+  return nullableText(product.category) && nullableText(product.brand) && nullableText(product.variant) && validContent &&
+    typeof product.displayName === 'string' && product.displayName.length > 0 && product.displayName.length <= 60 &&
+    typeof product.rawLabelText === 'string' && product.rawLabelText.length <= 500 &&
+    (product.source === 'ocr' || product.source === 'manual');
+}
 
 export type ShoppingAction =
   | { type: 'restore'; items: ShoppingItem[] }
@@ -16,7 +31,8 @@ export function isShoppingItem(value: unknown): value is ShoppingItem {
   return typeof item.id === 'string' && item.id.length > 0 &&
     typeof item.name === 'string' && item.name.trim().length > 0 && item.name.length <= 60 &&
     Number.isSafeInteger(item.priceCents) && item.priceCents > 0 && item.priceCents <= 100_000_000 &&
-    Number.isInteger(item.quantity) && item.quantity >= 1 && item.quantity <= MAX_QUANTITY;
+    Number.isInteger(item.quantity) && item.quantity >= 1 && item.quantity <= MAX_QUANTITY &&
+    (item.product === undefined || isStoredProductDescriptor(item.product));
 }
 
 export function shoppingReducer(items: ShoppingItem[], action: ShoppingAction): ShoppingItem[] {

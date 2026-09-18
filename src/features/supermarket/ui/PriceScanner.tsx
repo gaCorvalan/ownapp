@@ -3,10 +3,11 @@ import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { usePriceScanner } from '../application/usePriceScanner';
 import { formatMoney } from '../domain/price';
+import type { ProductDescriptor } from '../domain/product';
 import { LabelCamera } from './LabelCamera';
 import { ActionButton, colors, common } from './primitives';
 
-export function PriceScanner({ onAdd, onManual, full }: { onAdd: (priceCents: number) => void; onManual: () => void; full: boolean }) {
+export function PriceScanner({ onAdd, onManual, full }: { onAdd: (value: { priceCents: number; product: ProductDescriptor | null }) => void; onManual: () => void; full: boolean }) {
   const scanner = usePriceScanner();
   const [scanCycle, setScanCycle] = useState(0);
   function restart() {
@@ -23,6 +24,11 @@ export function PriceScanner({ onAdd, onManual, full }: { onAdd: (priceCents: nu
       {scanner.status === 'idle' && !full && <LabelCamera key={scanCycle} onRecognize={photoUri => void scanner.scanPhoto(photoUri)} />}
       {scanner.status === 'reading' && <View style={common.row}><ActivityIndicator color={colors.primary} /><Text style={common.body}>Leyendo texto de la etiqueta…</Text></View>}
       {scanner.status === 'result' && <>
+        {scanner.product && <View style={styles.product}>
+          <Text style={styles.productLabel}>PRODUCTO DETECTADO</Text>
+          <Text style={styles.productName}>{scanner.product.displayName}</Text>
+          <Text style={common.body}>Podés corregir el nombre después, desde tu compra.</Text>
+        </View>}
         <Text style={styles.resultTitle}>{scanner.candidates.length === 1 ? 'Precio detectado. ¿Lo agregamos?' : 'Hay varios precios. Elegí el que te corresponde.'}</Text>
         {scanner.candidates.map(candidate => <Pressable key={candidate.id} accessibilityRole="radio"
           accessibilityLabel={`${formatMoney(candidate.priceCents)}. ${candidate.context}`}
@@ -36,7 +42,7 @@ export function PriceScanner({ onAdd, onManual, full }: { onAdd: (priceCents: nu
         <ActionButton label="Agregar a la compra" icon="add" disabled={!scanner.selectedId || full} onPress={() => {
           const selected = scanner.consumeSelected();
           if (selected) {
-            onAdd(selected.priceCents);
+            onAdd({ priceCents: selected.priceCents, product: scanner.product });
             restart();
           }
         }} />
@@ -57,6 +63,9 @@ export function PriceScanner({ onAdd, onManual, full }: { onAdd: (priceCents: nu
 const styles = StyleSheet.create({
   header: { gap: 4 },
   content: { gap: 14, marginTop: 4 },
+  product: { padding: 14, borderRadius: 14, gap: 4, backgroundColor: colors.primaryLight },
+  productLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1.2, color: colors.primary },
+  productName: { fontSize: 17, fontWeight: '700', color: colors.ink },
   resultTitle: { fontSize: 14, fontWeight: '600', lineHeight: 21, color: colors.ink, flexShrink: 1 },
   candidate: { borderWidth: 1, borderColor: colors.border, padding: 14, borderRadius: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
   selectedCandidate: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
