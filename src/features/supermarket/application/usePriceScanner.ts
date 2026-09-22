@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { extractPriceCandidates, type PriceCandidate, type TextBlock } from '../domain/price';
+import { extractPriceCandidates, extractPublishedUnitPrices, type PriceCandidate, type PublishedUnitPrice, type TextBlock } from '../domain/price';
 import { extractProductDescriptor, type ProductDescriptor } from '../domain/product';
 import { recognizeLocalText } from '../infrastructure/localTextRecognizer';
 
 export function usePriceScanner() {
   const [status, setStatus] = useState<'idle' | 'reading' | 'result' | 'empty' | 'added'>('idle');
   const [candidates, setCandidates] = useState<PriceCandidate[]>([]);
+  const [publishedUnitPrices, setPublishedUnitPrices] = useState<PublishedUnitPrice[]>([]);
   const [product, setProduct] = useState<ProductDescriptor | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const request = useRef(0);
@@ -17,6 +18,7 @@ export function usePriceScanner() {
     busy.current = false;
     setStatus('idle');
     setCandidates([]);
+    setPublishedUnitPrices([]);
     setProduct(null);
     setSelectedId(null);
   }
@@ -27,6 +29,7 @@ export function usePriceScanner() {
     const current = ++request.current;
     setStatus('reading');
     setCandidates([]);
+    setPublishedUnitPrices([]);
     setProduct(null);
     setSelectedId(null);
     try {
@@ -34,6 +37,7 @@ export function usePriceScanner() {
       const result = extractPriceCandidates(blocks);
       if (current !== request.current) return;
       setCandidates(result);
+      setPublishedUnitPrices(extractPublishedUnitPrices(blocks));
       setProduct(extractProductDescriptor(blocks));
       setSelectedId(result.length === 1 ? result[0].id : null);
       setStatus(result.length ? 'result' : 'empty');
@@ -53,10 +57,12 @@ export function usePriceScanner() {
     const candidate = candidates.find(value => value.id === selectedId) ?? null;
     if (!candidate) return null;
     busy.current = true; // Also prevents rapid double taps before a rerender.
-    setStatus('added');
-    setSelectedId(null);
     return candidate;
   }
 
-  return { status, candidates, product, selectedId, setSelectedId, scanPhoto, consumeSelected, reset };
+  function releaseSelected() {
+    busy.current = false;
+  }
+
+  return { status, candidates, publishedUnitPrices, product, selectedId, setSelectedId, scanPhoto, consumeSelected, releaseSelected, reset };
 }

@@ -4,7 +4,10 @@ import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShoppingSession } from '../application/useShoppingSession';
 import { correctProductDisplayName, type ProductDescriptor } from '../domain/product';
+import type { PublishedUnitPrice } from '../domain/price';
+import { classifyPriceTerms, createPriceObservation } from '../domain/priceObservation';
 import { MAX_ITEMS, type ShoppingItem } from '../domain/shopping';
+import { recordPriceObservation } from '../infrastructure/priceObservationStorage';
 import { ItemEditor } from './ItemEditor';
 import { PriceScanner } from './PriceScanner';
 import { ActionButton, colors, common } from './primitives';
@@ -19,6 +22,7 @@ export function SupermarketScreen() {
   const [editor, setEditor] = useState<{ item: ShoppingItem | null } | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
   const [purchaseOpen, setPurchaseOpen] = useState(false);
+  const [observationError, setObservationError] = useState('');
   const full = session.items.length >= MAX_ITEMS;
 
   function addItem(value: { name: string; priceCents: number; quantity: number; product?: ProductDescriptor }) {
@@ -29,6 +33,27 @@ export function SupermarketScreen() {
   function openManual() {
     setPurchaseOpen(false);
     setEditor({ item: null });
+  }
+
+  async function addScannedItem(value: { candidate: { priceCents: number; context: string }; product: ProductDescriptor | null; publishedUnitPrice: PublishedUnitPrice | null }) {
+    if (full) return false;
+    try {
+      const observation = createPriceObservation({
+        product: value.product,
+        priceCents: value.candidate.priceCents,
+        terms: classifyPriceTerms(value.candidate.context),
+        publishedUnitPrice: value.publishedUnitPrice,
+        retailerId: null,
+        source: 'label-ocr',
+      });
+      await recordPriceObservation(observation);
+      addItem({ name: value.product?.displayName ?? '', product: value.product ?? undefined, priceCents: value.candidate.priceCents, quantity: 1 });
+      setObservationError('');
+      return true;
+    } catch {
+      setObservationError('No pudimos registrar este precio en el dispositivo. Volvé a intentar antes de continuar.');
+      return false;
+    }
   }
 
   return <SafeAreaView style={styles.safe}>
@@ -45,8 +70,8 @@ export function SupermarketScreen() {
           </>}
         </View> : <View style={styles.home}>
           <TotalBar {...session.totals} />
-          <PriceScanner full={full} onManual={openManual}
-            onAdd={({ priceCents, product }) => addItem({ name: product?.displayName ?? '', product: product ?? undefined, priceCents, quantity: 1 })} />
+          <PriceScanner full={full} onManual={openManual} onAdd={addScannedItem} />
+          {!!observationError && <Text accessibilityRole="alert" style={styles.observationError}>{observationError}</Text>}
           <ActionButton label="Ingresar precio manualmente" icon="add" variant="secondary" onPress={openManual} disabled={full} />
           <Pressable accessibilityRole="button" accessibilityLabel={`Ver compra, ${session.items.length} productos`} onPress={() => setPurchaseOpen(true)} style={({ pressed }) => [styles.purchaseLink, pressed && { opacity: 0.7 }]}>
             <View style={styles.purchaseIcon}><Ionicons name="receipt-outline" size={21} color={colors.primary} /></View>
@@ -118,6 +143,7 @@ const styles = StyleSheet.create({
   limit: { textAlign: 'center' },
   storage: { flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', paddingTop: 2 },
   storageText: { color: colors.muted, fontSize: 12, flexShrink: 1 },
+  observationError: { color: colors.danger, fontSize: 14, lineHeight: 21, textAlign: 'center' },
   modalScreen: { flex: 1, backgroundColor: colors.background },
   purchaseScreen: { flexGrow: 1, width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingBottom: 28, gap: 18 },
   modalHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, paddingTop: 8 },

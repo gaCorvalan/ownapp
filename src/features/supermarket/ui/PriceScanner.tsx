@@ -2,12 +2,14 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { usePriceScanner } from '../application/usePriceScanner';
-import { formatMoney } from '../domain/price';
+import { formatMoney, type PriceCandidate, type PublishedUnitPrice } from '../domain/price';
 import type { ProductDescriptor } from '../domain/product';
 import { LabelCamera } from './LabelCamera';
 import { ActionButton, colors, common } from './primitives';
 
-export function PriceScanner({ onAdd, onManual, full }: { onAdd: (value: { priceCents: number; product: ProductDescriptor | null }) => void; onManual: () => void; full: boolean }) {
+type ScannedAddition = { candidate: PriceCandidate; product: ProductDescriptor | null; publishedUnitPrice: PublishedUnitPrice | null };
+
+export function PriceScanner({ onAdd, onManual, full }: { onAdd: (value: ScannedAddition) => Promise<boolean>; onManual: () => void; full: boolean }) {
   const scanner = usePriceScanner();
   const [scanCycle, setScanCycle] = useState(0);
   function restart() {
@@ -42,8 +44,11 @@ export function PriceScanner({ onAdd, onManual, full }: { onAdd: (value: { price
         <ActionButton label="Agregar a la compra" icon="add" disabled={!scanner.selectedId || full} onPress={() => {
           const selected = scanner.consumeSelected();
           if (selected) {
-            onAdd({ priceCents: selected.priceCents, product: scanner.product });
-            restart();
+            const publishedUnitPrice = scanner.publishedUnitPrices.length === 1 ? scanner.publishedUnitPrices[0] : null;
+            void onAdd({ candidate: selected, product: scanner.product, publishedUnitPrice }).then(added => {
+              if (added) restart();
+              else scanner.releaseSelected();
+            });
           }
         }} />
         <ActionButton label="Volver a encuadrar" variant="secondary" icon="camera-outline" onPress={restart} />

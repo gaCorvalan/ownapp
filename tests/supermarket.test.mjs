@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parsePrice, extractPriceCandidates } from '../src/features/supermarket/domain/price.ts';
+import { parsePrice, extractPriceCandidates, extractPublishedUnitPrices } from '../src/features/supermarket/domain/price.ts';
 import { correctProductDisplayName, extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
+import { classifyPriceTerms, createPriceObservation } from '../src/features/supermarket/domain/priceObservation.ts';
 import { shoppingReducer, shoppingTotals, isShoppingItem } from '../src/features/supermarket/domain/shopping.ts';
 
 test('precios argentinos: pesos, miles y centavos sin redondeo flotante', () => {
@@ -23,6 +24,27 @@ test('promoción conserva ambas alternativas y sus condiciones', () => {
   assert.deepEqual(candidates.map(value => value.priceCents), [580000, 464000]);
   assert.match(candidates[1].context, /tarjeta/);
   assert.deepEqual(extractPriceCandidates([{ text: '$ —,—' }]), []);
+});
+
+test('clasifica condiciones y conserva precio publicado por medida', () => {
+  assert.deepEqual(classifyPriceTerms('Con tarjeta del supermercado: $ 4.640'), {
+    kind: 'loyalty', conditionText: 'Con tarjeta del supermercado: $ 4.640', rawContext: 'Con tarjeta del supermercado: $ 4.640',
+  });
+  assert.deepEqual(extractPublishedUnitPrices([{ text: 'Precio por litro: $ 2.300,00' }]), [
+    { priceCents: 230000, unit: 'liter', context: 'Precio por litro: $ 2.300,00' },
+  ]);
+});
+
+test('una observación conserva el precio elegido como un registro inmutable', () => {
+  const observation = createPriceObservation({
+    id: 'obs-1', capturedAt: '2026-09-22T12:00:00.000Z', product: null, priceCents: 345000,
+    terms: classifyPriceTerms('Regular: $ 3.450'), publishedUnitPrice: null, retailerId: null, source: 'label-ocr',
+  });
+  assert.deepEqual(observation, {
+    id: 'obs-1', capturedAt: '2026-09-22T12:00:00.000Z', product: null, priceCents: 345000,
+    terms: { kind: 'regular', conditionText: null, rawContext: 'Regular: $ 3.450' },
+    publishedUnitPrice: null, retailerId: null, source: 'label-ocr',
+  });
 });
 
 test('los bloques del OCR pueden incluir coordenadas sin acoplar el precio al proveedor', () => {

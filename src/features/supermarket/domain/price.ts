@@ -20,6 +20,7 @@ export function formatMoney(cents: number): string {
 export type TextBounds = { x: number; y: number; width: number; height: number };
 export type TextBlock = { text: string; bounds?: TextBounds };
 export type PriceCandidate = { id: string; priceCents: number; context: string };
+export type PublishedUnitPrice = { priceCents: number; unit: 'liter' | 'kilogram' | 'unit'; context: string };
 
 // Preserve alternatives and their context; never choose the cheapest/largest
 // amount automatically. Real OCR layout rules come later.
@@ -30,5 +31,19 @@ export function extractPriceCandidates(blocks: TextBlock[]): PriceCandidate[] {
       const priceCents = parsePrice(match[1]);
       return priceCents === null ? [] : [{ id: `${blockIndex}-${index}`, priceCents, context: text.trim() }];
     });
+  });
+}
+
+export function extractPublishedUnitPrices(blocks: TextBlock[]): PublishedUnitPrice[] {
+  return blocks.flatMap(({ text }) => {
+    const unitMatch = text.match(/(?:precio\s*)?(?:por\s*)?(litro|l\b|kg|kilo|unidad(?:es)?|un\b)/i);
+    const priceMatch = text.match(/\$\s*(\d[\d.]*(?:,\d+)?)/);
+    if (!unitMatch || !priceMatch) return [];
+    const priceCents = parsePrice(priceMatch[1]);
+    if (priceCents === null) return [];
+    const sourceUnit = unitMatch[1].toLowerCase();
+    const unit = sourceUnit === 'litro' || sourceUnit === 'l' ? 'liter'
+      : sourceUnit === 'kg' || sourceUnit === 'kilo' ? 'kilogram' : 'unit';
+    return [{ priceCents, unit, context: text.trim() }];
   });
 }

@@ -34,13 +34,17 @@ src/features/supermarket/
   domain/shopping.ts                  Ítems, acciones, validación y totales
   domain/price.ts                     Conversión de importes y candidatos de precio
   domain/product.ts                   Descriptor inicial y normalización de productos OCR
+  domain/priceObservation.ts          Precio elegido, condiciones y referencia por unidad
   infrastructure/shoppingStorage.ts  AsyncStorage, formato versionado y escrituras ordenadas
+  infrastructure/priceObservationStorage.ts SQLite local y cola de sincronización
   infrastructure/localTextRecognizer.ts Adaptador OCR local (Vision/ML Kit)
 ```
 
 El estado de la compra se administra con `useReducer`; los totales se derivan de los ítems y los importes se almacenan en centavos enteros. El dominio no depende de React ni de APIs del teléfono. Los componentes muestran datos y emiten acciones; los hooks coordinan el flujo. La portada mantiene el total y la cámara a la vista; el detalle de productos se abre bajo demanda para que la tarea repetida de capturar precios no requiera desplazarse.
 
 AsyncStorage guarda una única compra bajo `ownapp.supermarket.shopping.v1`, local a cada instalación o navegador/origen. No hay sincronización ni cuentas. La pantalla espera a recuperar los datos antes de habilitar la compra. Si falla la lectura o el guardado, muestra un mensaje y permite reintentar. Las escrituras se serializan para no sobrescribir una compra reciente con una anterior.
+
+Cada precio confirmado desde una etiqueta también se registra en SQLite local como una observación independiente de la compra: conserva producto, importe, condición detectada, precio por medida publicado cuando es inequívoco y fecha de captura. Al mismo tiempo se agrega a una cola local pendiente de sincronización; esta versión no tiene backend ni envía datos fuera del dispositivo. Vaciar la compra no elimina esas observaciones.
 
 ## Flujo del escáner
 

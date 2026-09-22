@@ -7,6 +7,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Added
 
+- Observaciones de precio locales en SQLite y una cola de sincronización pendiente: cada precio confirmado conserva su fecha, contexto de condición y referencia publicada por litro/kilo/unidad cuando es inequívoca, sin enviar datos a un servidor.
 - Detección local de un descriptor de producto a partir del texto OCR: conserva el texto de la etiqueta, normaliza contenido en mililitros/gramos/unidades cuando es posible y propone un nombre editable para la compra.
 - Calculadora del supermercado con carga manual, edición de productos,
   cantidades y total estimado en pesos argentinos.
