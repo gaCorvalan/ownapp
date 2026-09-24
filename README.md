@@ -2,6 +2,9 @@
 
 Primera entrega de una app de herramientas personales, hecha con Expo SDK 57, React Native y TypeScript. La interfaz usa «a mano» como nombre provisional.
 
+La dirección del producto y las fases pendientes se detallan en
+[ROADMAP.md](ROADMAP.md).
+
 ## Ejecutar
 
 ```sh
