@@ -5,6 +5,13 @@ Primera entrega de una app de herramientas personales, hecha con Expo SDK 57, Re
 La dirección del producto y las fases pendientes se detallan en
 [ROADMAP.md](ROADMAP.md).
 
+La propuesta de experiencia y sus hipótesis están en
+[Diseño UX](docs/ux/01-discovery.md), con un
+[plan de validación](docs/ux/02-validation-plan.md). Son documentos de diseño;
+no describen funcionalidades ya implementadas.
+La estructura, el rol de cada elemento y las decisiones vigentes se documentan
+por separado en el [índice de pantallas](docs/ux/pantallas/README.md).
+
 ## Ejecutar
 
 ```sh

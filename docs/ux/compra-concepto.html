@@ -1,0 +1,157 @@
+<style>
+#compra-concepto { --shop-bg: light-dark(#f7f8fc,#141720); --shop-panel: light-dark(#ffffff,#202431); --shop-ink: light-dark(#192234,#f1f3fb); --shop-muted: light-dark(#556075,#b4bfd3); --shop-line: light-dark(#d7deeb,#414b61); --shop-accent: light-dark(#284fbd,#b9caff); --shop-on-accent: light-dark(#ffffff,#162654); --shop-soft: light-dark(#eaf0ff,#2a3654); color: var(--shop-ink); font-family: system-ui,sans-serif; font-size: 16px; line-height: 1.45; max-width: 420px; margin: 0 auto; }
+#compra-concepto * { box-sizing: border-box; }
+#compra-concepto .prototype-note { color: var(--shop-muted); font-size: 12px; margin: 0 0 8px; text-align: center; }
+#compra-concepto .phone { background: var(--shop-bg); border: 1px solid var(--shop-line); border-radius: 24px; overflow: hidden; }
+#compra-concepto header { padding: 20px 20px 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+#compra-concepto .brand { font-weight: 750; font-size: 21px; letter-spacing: -.6px; }
+#compra-concepto .place { font-size: 14px; color: var(--shop-muted); }
+#compra-concepto .total { padding: 4px 20px 18px; border-bottom: 1px solid var(--shop-line); }
+#compra-concepto .money { display: block; font-size: clamp(26px,8vw,36px); font-weight: 720; letter-spacing: -1px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+#compra-concepto .muted { color: var(--shop-muted); font-size: 14px; }
+#compra-concepto main { padding: 20px; min-height: 300px; }
+#compra-concepto h2 { font-size: 22px; margin: 0 0 4px; letter-spacing: -.4px; }
+#compra-concepto h3 { font-size: 17px; margin: 0 0 6px; }
+#compra-concepto p { margin: 0 0 14px; }
+#compra-concepto button { font: inherit; font-weight: 600; color: var(--shop-accent); background: var(--shop-panel); min-height: 48px; border: 1px solid var(--shop-line); border-radius: var(--shop-radius,12px); padding: 11px 14px; cursor: pointer; overflow-wrap: anywhere; }
+#compra-concepto button:disabled { opacity: .5; cursor: default; }
+#compra-concepto .primary { background: var(--shop-accent); color: var(--shop-on-accent); border-color: var(--shop-accent); width: 100%; }
+#compra-concepto .text-button { border-color: transparent; background: transparent; }
+#compra-concepto .stack { display: grid; gap: 12px; }
+#compra-concepto .row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+#compra-concepto .stepper { display: flex; align-items: center; gap: 12px; }
+#compra-concepto .stepper button { min-width: 48px; }
+#compra-concepto input { width: 100%; min-height: 48px; background: var(--shop-panel); color: var(--shop-ink); border: 1px solid var(--shop-line); border-radius: 10px; font: inherit; padding: 10px 12px; margin-top: 5px; }
+#compra-concepto label { font-size: 14px; font-weight: 550; display: block; }
+#compra-concepto .choice { text-align: left; width: 100%; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; color: var(--shop-ink); }
+#compra-concepto .choice[aria-pressed="true"] { background: var(--shop-soft); border: 2px solid var(--shop-accent); }
+#compra-concepto .choice small { width: 100%; font-weight: 400; color: var(--shop-muted); }
+#compra-concepto .prices { display: grid; gap: 8px; }
+#compra-concepto details { border-top: 1px solid var(--shop-line); padding-top: 12px; }
+#compra-concepto summary { padding: 12px 0; min-height: 48px; cursor: pointer; color: var(--shop-accent); font-weight: 600; }
+#compra-concepto .alternative { background: var(--shop-panel); padding: 16px; border-radius: 12px; margin-top: 8px; }
+#compra-concepto .item { padding: 14px 0; border-bottom: 1px solid var(--shop-line); }
+#compra-concepto .item p { margin: 3px 0 8px; }
+#compra-concepto .status { margin: 0 20px; font-size: 14px; color: var(--shop-accent); }
+#compra-concepto .status:not(:empty) { padding: 12px 0; }
+#compra-concepto nav { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); border-top: 1px solid var(--shop-line); padding: 8px; gap: 4px; background: var(--shop-panel); }
+#compra-concepto nav button { border: 0; border-radius: 12px; font-size: 13px; padding: 10px 4px; color: var(--shop-muted); }
+#compra-concepto nav button[aria-current="page"] { background: var(--shop-soft); color: var(--shop-accent); }
+#compra-concepto .section-gap { margin-top: 16px; }
+#compra-concepto .amount { font-variant-numeric: tabular-nums; }
+</style>
+<div id="compra-concepto" aria-label="Concepto de compra Android">
+  <p class="prototype-note">Propuesta interactiva · precios ficticios · captura simulada</p>
+  <div class="phone">
+    <header><span class="brand">a mano</span><span class="place" data-place>Día · del barrio</span></header>
+    <section class="total" aria-label="Total de compra"><span class="muted">Llevás en tu compra</span><strong class="money" data-total>$ 19.650,00</strong><span class="muted" data-count>3 unidades · total estimado</span></section>
+    <main></main>
+    <div class="status" role="status" aria-live="polite"></div>
+    <nav aria-label="Secciones"><button type="button" data-page="comprar" aria-current="page">Comprar</button><button type="button" data-page="pendientes">Pendientes</button><button type="button" data-page="historial">Historial</button></nav>
+  </div>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('compra-concepto');
+  const main = root.querySelector('main');
+  const status = root.querySelector('.status');
+  const design = { palette: 'azul', radius: 12 };
+  let page = 'comprar', stage = 'review', quantity = 1, price = null, name = 'Leche Las Tres Niñas · entera 1 L', manual = false, removed = null;
+  let items = [{ name: 'Arroz largo fino · 1 kg', price: 145000, quantity: 1 }, { name: 'Yerba Unión · 1 kg', price: 540000, quantity: 1 }, { name: 'Pollo · bandeja', price: 1280000, quantity: 1 }];
+  const pending = [], history = [];
+  const money = cents => '$ ' + (cents / 100).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const escape = text => String(text).replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
+  const total = () => items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const parse = value => { if (!/^\d+(,\d{1,2})?$/.test(value.trim())) return null; const [whole, decimal = ''] = value.trim().split(','); const cents = Number(whole) * 100 + Number(decimal.padEnd(2, '0')); return Number.isSafeInteger(cents) && cents > 0 && cents <= 100000000 ? cents : null; };
+  const say = text => { status.textContent = text; };
+  const action = (id, label, style = '') => `<button type="button" data-action="${id}" class="${style}">${label}</button>`;
+  function renderDesign() {
+    const plum = design.palette === 'ciruela';
+    root.style.setProperty('--shop-accent', plum ? 'light-dark(#773877,#f2b5ed)' : 'light-dark(#284fbd,#b9caff)');
+    root.style.setProperty('--shop-on-accent', plum ? 'light-dark(#ffffff,#3f163e)' : 'light-dark(#ffffff,#162654)');
+    root.style.setProperty('--shop-soft', plum ? 'light-dark(#f7eaf6,#422b45)' : 'light-dark(#eaf0ff,#2a3654)');
+    root.style.setProperty('--shop-radius', design.radius + 'px');
+  }
+  function refreshAdd() {
+    const button = main.querySelector('[data-action="add"]');
+    if (button) { button.disabled = !price || !name.trim(); button.textContent = price ? `Agregar ${quantity === 1 ? '1 unidad' : quantity + ' unidades'} · ${money(price * quantity)}` : 'Elegí un precio para agregar'; }
+  }
+  function render() {
+    root.querySelector('.total').hidden = page !== 'comprar';
+    root.querySelector('[data-place]').textContent = page === 'comprar' ? 'Día · del barrio' : page === 'pendientes' ? 'Próximas visitas' : 'Compras anteriores';
+    root.querySelector('[data-total]').textContent = money(total());
+    root.querySelector('[data-count]').textContent = `${items.reduce((sum, item) => sum + item.quantity, 0)} unidades · total estimado`;
+    root.querySelectorAll('[data-page]').forEach(button => { if (button.dataset.page === page) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); });
+    if (page === 'pendientes') {
+      main.innerHTML = `<h2>Pendientes</h2><p class="muted">Para tu próxima visita</p>${pending.length ? `<div class="alternative"><h3>Coto · de casa</h3><strong>Leche La Serenísima · entera 1 L</strong><p class="amount">${money(210000)} · 1 unidad</p><p class="muted">Registrado el 18 sep 2026.<br>Verificá el precio al llegar.</p>${action('remove-pending','Quitar de pendientes','text-button')}</div>` : '<p>No dejaste productos pendientes todavía.</p>'}`;
+      return;
+    }
+    if (page === 'historial') {
+      main.innerHTML = `<h2>Historial</h2><p class="muted">Tus compras finalizadas</p>${history.length ? history.map((purchase, index) => `<section class="item"><h3>Día · del barrio</h3><p class="muted">24 sep 2026 · ${purchase.units} unidades</p><p>Calculado: <strong>${money(purchase.total)}</strong></p>${purchase.ticket !== null ? `<p>Pagado: <strong>${money(purchase.ticket)}</strong></p><p class="muted">Diferencia con el cálculo: ${money(purchase.ticket - purchase.total)}</p>` : '<p class="muted">Total del ticket sin completar</p>'}<label>Total del ticket · ARS (opcional)<input data-ticket="${index}" inputmode="decimal" placeholder="Ej. 19650,00" value="${purchase.ticket === null ? '' : (purchase.ticket / 100).toFixed(2).replace('.', ',')}"></label><button type="button" class="text-button" data-save-ticket="${index}">Guardar total del ticket</button></section>`).join('') : '<p>Al finalizar una compra, podés volver acá para consultar o completar su total.</p>'}`;
+      return;
+    }
+    if (stage === 'closing') {
+      main.innerHTML = `<h2>Finalizar compra</h2><p class="muted">Se conservarán tus productos y el total calculado.</p><div class="stack"><label>Total del ticket · ARS (opcional)<input data-close-ticket inputmode="decimal" placeholder="Podés completarlo después"></label>${action('finish','Guardar compra','primary')}${action('cancel-close','Seguir comprando','text-button')}</div>`;
+      return;
+    }
+    let content = '';
+    if (stage === 'review') {
+      content = `<h2>${manual ? 'Agregar producto' : 'Confirmá la etiqueta'}</h2><p class="muted">Todavía no se sumó a tu compra.</p><div class="stack"><label>Producto<input data-name maxlength="60" value="${escape(name)}"></label>${manual ? '' : `<div class="prices" role="group" aria-label="Precio aplicable"><button type="button" class="choice" data-price="235000" aria-pressed="${price === 235000}"><span>Precio regular</span><strong>${money(235000)}</strong></button><button type="button" class="choice" data-price="210000" aria-pressed="${price === 210000}"><span>Con tarjeta de la tienda</span><strong>${money(210000)}</strong><small>Elegilo si cumplís la condición.</small></button></div>`}<label>Precio por unidad · ARS<input data-price-input inputmode="decimal" placeholder="Elegí o ingresá un importe" value="${price ? (price / 100).toFixed(2).replace('.', ',') : ''}"></label><div class="row"><span>Cantidad</span><div class="stepper"><button type="button" data-action="minus" aria-label="Restar una unidad" ${quantity === 1 ? 'disabled' : ''}>−</button><strong>${quantity}</strong><button type="button" data-action="plus" aria-label="Sumar una unidad" ${quantity === 99 ? 'disabled' : ''}>+</button></div></div>${action('add','Elegí un precio para agregar','primary')}${manual ? '' : `<details><summary>Ver precios que guardaste</summary><div class="alternative"><h3>Leche La Serenísima · entera 1 L</h3><p class="amount"><strong>${money(210000)}</strong> · regular</p><p class="muted">Coto · de casa<br>Registrado el 18 sep 2026. Puede haber cambiado.</p>${action('pending',pending.length ? 'Ya está pendiente en Coto' : 'Dejar pendiente para Coto')}</div></details>`}${action('cancel','Cancelar captura','text-button')}</div>`;
+    } else {
+      content = `<h2>${items.length ? 'Seguí comprando' : 'Empezá tu compra'}</h2><p class="muted">Capturá la etiqueta de góndola o del envase.</p><div class="stack">${action('scan','Capturar etiqueta','primary')}${action('manual','Ingresar a mano')}</div>`;
+    }
+    content += `<details class="section-gap"><summary>Ver compra · ${items.length} productos</summary>${items.map((item, index) => `<div class="item"><strong>${escape(item.name)}</strong><p class="muted">${item.quantity} × ${money(item.price)}</p><div class="row"><strong class="amount">${money(item.price * item.quantity)}</strong><button type="button" class="text-button" data-remove="${index}" aria-label="No llevar ${escape(item.name)}">No lo llevo</button></div></div>`).join('') || '<p>Tu compra está vacía.</p>'}${items.length ? action('close','Finalizar compra','text-button') : ''}</details>${removed ? `<div class="section-gap">${action('undo','Deshacer último retiro')}</div>` : ''}`;
+    main.innerHTML = content;
+    refreshAdd();
+  }
+  root.addEventListener('input', event => {
+    if (event.target.matches('[data-name]')) name = event.target.value;
+    if (event.target.matches('[data-price-input]')) {
+      price = parse(event.target.value);
+      main.querySelectorAll('[data-price]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.price) === price)));
+    }
+    refreshAdd();
+  });
+  root.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button || button.disabled) return;
+    if (button.dataset.page) { page = button.dataset.page; say(''); render(); return; }
+    if (button.dataset.price) { price = Number(button.dataset.price); render(); return; }
+    if (button.hasAttribute('data-remove')) { const index = Number(button.dataset.remove); removed = { item: items[index], index }; items.splice(index, 1); say('Producto retirado. Podés deshacerlo.'); render(); main.querySelector('details.section-gap').open = true; return; }
+    if (button.hasAttribute('data-save-ticket')) {
+      const index = Number(button.dataset.saveTicket), value = main.querySelector(`[data-ticket="${index}"]`).value;
+      const ticket = parse(value);
+      if (ticket === null) { say('Ingresá un importe válido, por ejemplo 19650,50.'); return; }
+      history[index].ticket = ticket; say('Total del ticket guardado. Los precios de los productos se conservan.'); render(); return;
+    }
+    switch (button.dataset.action) {
+      case 'plus': quantity = Math.min(99, quantity + 1); break;
+      case 'minus': quantity = Math.max(1, quantity - 1); break;
+      case 'add': if (!price || !name.trim()) return; items.push({ name: name.trim(), price, quantity }); stage = 'ready'; say(`${name}: ${quantity} ${quantity === 1 ? 'unidad agregada' : 'unidades agregadas'}.`); break;
+      case 'scan': stage = 'review'; manual = false; quantity = 1; price = null; name = 'Leche Las Tres Niñas · entera 1 L'; say(''); break;
+      case 'manual': stage = 'review'; manual = true; quantity = 1; price = null; name = ''; say(''); break;
+      case 'cancel': stage = 'ready'; say('Captura descartada. Tu total no cambió.'); break;
+      case 'pending': if (!pending.length) pending.push({ name: 'Leche La Serenísima · entera 1 L', price: 210000 }); say('Leche La Serenísima pendiente en Coto. No se sumó a esta compra.'); break;
+      case 'remove-pending': pending.length = 0; say('Pendiente eliminado.'); break;
+      case 'undo': if (removed) { items.splice(removed.index, 0, removed.item); removed = null; say('Producto recuperado.'); } break;
+      case 'close': stage = 'closing'; say(''); break;
+      case 'cancel-close': stage = 'ready'; break;
+      case 'finish': {
+        const value = main.querySelector('[data-close-ticket]').value;
+        const ticket = value.trim() ? parse(value) : null;
+        if (value.trim() && ticket === null) { say('Ingresá un importe válido o dejalo vacío para completar después.'); return; }
+        history.unshift({ total: total(), units: items.reduce((sum, item) => sum + item.quantity, 0), items: items.map(item => ({ ...item })), ticket });
+        items = []; removed = null; stage = 'ready'; page = 'historial'; say('Compra guardada. Podés completar el ticket cuando quieras.'); break;
+      }
+    }
+    render();
+  });
+  renderDesign();
+  render();
+  if (globalThis.Tweak) {
+    const tweak = new Tweak({ container: root, onChange: renderDesign });
+    tweak.addSelect(design, 'palette', { label: 'Acento', options: [{ label: 'Azul profundo', value: 'azul' }, { label: 'Ciruela', value: 'ciruela' }] });
+    tweak.addSlider(design, 'radius', { label: 'Redondeado de controles', min: 6, max: 20, unit: 'px' });
+  }
+})();
+</script>
