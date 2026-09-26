@@ -8,7 +8,7 @@ import { useShoppingSession } from '../application/useShoppingSession';
 import { correctProductDisplayName, type ProductDescriptor } from '../domain/product';
 import type { PublishedUnitPrice } from '../domain/price';
 import { classifyPriceTerms, createPriceObservation } from '../domain/priceObservation';
-import { MAX_ITEMS, type ShoppingItem } from '../domain/shopping';
+import { MAX_ITEMS, shoppingCounts, type ShoppingItem } from '../domain/shopping';
 import { storeLabel } from '../domain/store';
 import { recordPriceObservation } from '../infrastructure/priceObservationStorage';
 import { ItemEditor } from './ItemEditor';
@@ -28,6 +28,7 @@ export function SupermarketScreen() {
   const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [observationError, setObservationError] = useState('');
   const full = session.items.length >= MAX_ITEMS;
+  const counts = shoppingCounts(session.items);
 
   useEffect(() => {
     if (session.loadState === 'ready' && (!session.purchase || !session.store)) router.replace('/');
@@ -79,14 +80,14 @@ export function SupermarketScreen() {
         </View> : session.store ? <View style={styles.home}>
           <Text style={styles.storeLabel}>{storeLabel(session.store)}</Text>
           <TotalBar {...session.totals} />
-          <PriceScanner full={full} onManual={openManual} onAdd={addScannedItem} />
+          <PriceScanner full={full} active={!purchaseOpen && !editor} onManual={openManual} onAdd={addScannedItem} />
           {!!observationError && <Text accessibilityRole="alert" style={styles.observationError}>{observationError}</Text>}
           <ActionButton label="Ingresar precio manualmente" icon="add" variant="secondary" onPress={openManual} disabled={full} />
-          <Pressable accessibilityRole="button" accessibilityLabel={`Ver compra, ${session.items.length} productos`} onPress={() => setPurchaseOpen(true)} style={({ pressed }) => [styles.purchaseLink, pressed && { opacity: 0.7 }]}>
+          <Pressable accessibilityRole="button" accessibilityLabel={`Ver compra, ${counts.included} productos incluidos y ${counts.apart} apartados`} onPress={() => setPurchaseOpen(true)} style={({ pressed }) => [styles.purchaseLink, pressed && { opacity: 0.7 }]}>
             <View style={styles.purchaseIcon}><Ionicons name="receipt-outline" size={21} color={colors.ink} /></View>
             <View style={{ flex: 1 }}>
               <Text style={styles.purchaseTitle}>Ver compra</Text>
-              <Text style={common.body}>{session.items.length === 0 ? 'Todavía no agregaste productos' : `${session.items.length} ${session.items.length === 1 ? 'producto' : 'productos'} · editá cantidades y precios`}</Text>
+              <Text style={common.body}>{session.items.length === 0 ? 'Todavía no agregaste productos' : `${counts.included} ${counts.included === 1 ? 'incluido' : 'incluidos'} · ${counts.apart} ${counts.apart === 1 ? 'apartado' : 'apartados'}`}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </Pressable>
@@ -102,17 +103,20 @@ export function SupermarketScreen() {
 
     <Modal visible={purchaseOpen} animationType="slide" onRequestClose={() => setPurchaseOpen(false)} accessibilityViewIsModal>
       <SafeAreaView style={styles.modalScreen}>
-        <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.purchaseScreen} keyboardShouldPersistTaps="handled">
+        <View style={styles.purchaseTop}>
           <View style={styles.modalHeader}>
-            <View><Text accessibilityRole="header" style={styles.modalTitle}>Tu compra</Text><Text style={common.body}>Revisá productos, cantidades y precios.</Text></View>
-            <Pressable accessibilityRole="button" accessibilityLabel="Cerrar compra" onPress={() => setPurchaseOpen(false)} style={({ pressed }) => [styles.close, pressed && { opacity: 0.65 }]}>
-              <Ionicons name="close" size={22} color={colors.ink} />
+            <Pressable accessibilityRole="button" accessibilityLabel="Volver a capturar" onPress={() => setPurchaseOpen(false)} style={({ pressed }) => [styles.close, pressed && { opacity: 0.65 }]}>
+              <Ionicons name="arrow-back" size={22} color={colors.ink} />
             </Pressable>
+            <View style={{ flex: 1 }}><Text accessibilityRole="header" style={styles.modalTitle}>Tu compra</Text><Text style={common.body}>{session.store ? storeLabel(session.store) : ''}</Text></View>
           </View>
-          <TotalBar {...session.totals} />
+          <TotalBar {...session.totals} includedProducts={counts.included} apartCount={counts.apart} tonal />
+        </View>
+        <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.purchaseScreen} keyboardShouldPersistTaps="handled">
           <ShoppingList items={session.items} dispatch={session.dispatch} full={full}
             onAdd={openManual} onEdit={item => setEditor({ item })} onClear={() => setConfirmClear(true)} />
         </ScrollView>
+        <View style={styles.purchaseFooter}><ActionButton label="Volver a capturar" variant="secondary" icon="camera-outline" onPress={() => setPurchaseOpen(false)} /></View>
       </SafeAreaView>
     </Modal>
 
@@ -130,7 +134,7 @@ export function SupermarketScreen() {
     <Modal visible={confirmClear} transparent animationType="fade" onRequestClose={() => setConfirmClear(false)} accessibilityViewIsModal>
       <View style={styles.overlay}><View style={[common.card, styles.confirm]}>
         <Text accessibilityRole="header" style={common.title}>¿Vaciar esta compra?</Text>
-        <Text style={common.body}>Se eliminarán todos los productos y el total volverá a cero.</Text>
+        <Text style={common.body}>Se eliminarán todos los productos, incluidos y apartados, y el total volverá a cero.</Text>
         <ActionButton label="Sí, vaciar compra" variant="danger" onPress={() => { session.dispatch({ type: 'clear' }); setConfirmClear(false); }} />
         <ActionButton label="Seguir comprando" variant="secondary" onPress={() => setConfirmClear(false)} />
       </View></View>
@@ -157,8 +161,10 @@ const styles = StyleSheet.create({
   storageText: { ...typography.caption, color: colors.textSecondary, flexShrink: 1 },
   observationError: { ...typography.secondary, color: colors.danger, textAlign: 'center' },
   modalScreen: { flex: 1, backgroundColor: colors.canvas },
-  purchaseScreen: { flexGrow: 1, width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingBottom: 28, gap: 18 },
-  modalHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, paddingTop: 8 },
+  purchaseTop: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingBottom: 12, gap: 16 },
+  purchaseScreen: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingBottom: 24 },
+  purchaseFooter: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 8, backgroundColor: colors.canvas },
+  modalHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 8 },
   modalTitle: { ...typography.screenTitle, color: colors.ink, marginBottom: 4 },
   close: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: colors.surfaceTonal },
   overlay: { flex: 1, backgroundColor: colors.cameraScrim, justifyContent: 'center', alignItems: 'center', padding: 20 },

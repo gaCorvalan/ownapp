@@ -7,6 +7,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Added
 
+- Revisión de la compra con inclusión reversible por producto: apartar conserva toda la fila y su cantidad sin sumarla al total; reincorporar recupera el subtotal. El estado persiste en la compra abierta.
 - Inicio con acceso a empezar o continuar una única compra abierta, selección de sucursal y alta manual con supermercado y referencia libre.
 - Asociación de los nuevos precios escaneados con la sucursal elegida.
 - Observaciones de precio locales en SQLite y una cola de sincronización pendiente: cada precio confirmado conserva su fecha, contexto de condición y referencia publicada por litro/kilo/unidad cuando es inequívoca, sin enviar datos a un servidor.
@@ -20,6 +21,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Changed
 
+- La revisión usa una pantalla completa con total y recuentos de incluidos/apartados visibles mientras se recorre la lista; la cámara se pausa durante esa revisión.
 - La compra local pasa al formato versionado `shopping.v2`; recupera los ítems de `shopping.v1` y solicita asignar sucursal antes de continuar una compra anterior.
 - Empezar otra compra requiere descartar explícitamente la abierta; las observaciones de precios ya registradas se conservan.
 - La interfaz existente usa la paleta clara petróleo/lima y Lexend Deca en

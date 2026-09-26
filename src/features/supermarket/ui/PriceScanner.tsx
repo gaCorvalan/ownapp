@@ -10,7 +10,7 @@ import { ActionButton, colors, common } from './primitives';
 
 type ScannedAddition = { candidate: PriceCandidate; product: ProductDescriptor | null; publishedUnitPrice: PublishedUnitPrice | null };
 
-export function PriceScanner({ onAdd, onManual, full }: { onAdd: (value: ScannedAddition) => Promise<boolean>; onManual: () => void; full: boolean }) {
+export function PriceScanner({ onAdd, onManual, full, active = true }: { onAdd: (value: ScannedAddition) => Promise<boolean>; onManual: () => void; full: boolean; active?: boolean }) {
   const scanner = usePriceScanner();
   const [scanCycle, setScanCycle] = useState(0);
   function restart() {
@@ -24,7 +24,7 @@ export function PriceScanner({ onAdd, onManual, full }: { onAdd: (value: Scanned
       <Text style={common.body}>Capturá una etiqueta y confirmá el importe.</Text>
     </View>
     <View accessibilityLiveRegion="polite" style={styles.content}>
-      {scanner.status === 'idle' && !full && <LabelCamera key={scanCycle} onRecognize={photoUri => void scanner.scanPhoto(photoUri)} />}
+      {scanner.status === 'idle' && !full && active && <LabelCamera key={scanCycle} onRecognize={photoUri => void scanner.scanPhoto(photoUri)} />}
       {scanner.status === 'reading' && <View style={common.row}><ActivityIndicator color={colors.ink} /><Text style={common.body}>Leyendo texto de la etiqueta…</Text></View>}
       {scanner.status === 'result' && <>
         {scanner.product && <View style={styles.product}>

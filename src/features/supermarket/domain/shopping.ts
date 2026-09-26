@@ -1,6 +1,6 @@
 import type { ProductDescriptor } from './product';
 
-export type ShoppingItem = { id: string; name: string; priceCents: number; quantity: number; product?: ProductDescriptor };
+export type ShoppingItem = { id: string; name: string; priceCents: number; quantity: number; included?: boolean; product?: ProductDescriptor };
 export const MAX_QUANTITY = 99;
 export const MAX_ITEMS = 100;
 
@@ -22,6 +22,7 @@ export type ShoppingAction =
   | { type: 'add'; item: ShoppingItem }
   | { type: 'edit'; item: ShoppingItem }
   | { type: 'quantity'; id: string; delta: -1 | 1 }
+  | { type: 'toggleIncluded'; id: string }
   | { type: 'remove'; id: string }
   | { type: 'clear' };
 
@@ -32,6 +33,7 @@ export function isShoppingItem(value: unknown): value is ShoppingItem {
     typeof item.name === 'string' && item.name.trim().length > 0 && item.name.length <= 60 &&
     Number.isSafeInteger(item.priceCents) && item.priceCents > 0 && item.priceCents <= 100_000_000 &&
     Number.isInteger(item.quantity) && item.quantity >= 1 && item.quantity <= MAX_QUANTITY &&
+    (item.included === undefined || typeof item.included === 'boolean') &&
     (item.product === undefined || isStoredProductDescriptor(item.product));
 }
 
@@ -44,14 +46,22 @@ export function shoppingReducer(items: ShoppingItem[], action: ShoppingAction): 
       ? items.map(item => item.id === action.item.id ? action.item : item) : items;
     case 'quantity': return items.map(item => item.id === action.id
       ? { ...item, quantity: Math.max(1, Math.min(MAX_QUANTITY, item.quantity + action.delta)) } : item);
+    case 'toggleIncluded': return items.map(item => item.id === action.id
+      ? { ...item, included: item.included === false } : item);
     case 'remove': return items.filter(item => item.id !== action.id);
     case 'clear': return [];
   }
 }
 
 export function shoppingTotals(items: ShoppingItem[]) {
-  return items.reduce((totals, item) => ({
+  return items.filter(item => item.included !== false).reduce((totals, item) => ({
     priceCents: totals.priceCents + item.priceCents * item.quantity,
     quantity: totals.quantity + item.quantity,
   }), { priceCents: 0, quantity: 0 });
+}
+
+export function shoppingCounts(items: ShoppingItem[]) {
+  return items.reduce((counts, item) => item.included === false
+    ? { ...counts, apart: counts.apart + 1 }
+    : { ...counts, included: counts.included + 1 }, { included: 0, apart: 0 });
 }

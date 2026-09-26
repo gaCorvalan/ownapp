@@ -15,8 +15,9 @@ El [sistema de marca elegido para implementar](docs/ux/visual/sistema-de-marca.m
 define Lexend Deca, petróleo y lima a partir de la
 [dirección visual vigente](docs/ux/visual/v2/README.md). La interfaz actual ya
 usa esa paleta y tipografía en tema claro; la composición y el recorrido de las
-láminas se implementa de forma incremental: inicio y selección de sucursal ya
-están disponibles; cierre e historial siguen pendientes.
+láminas se implementa de forma incremental: inicio, selección de sucursal y
+revisión reversible de la compra ya están disponibles; cierre e historial
+siguen pendientes.
 
 ## Ejecutar
 
@@ -33,8 +34,8 @@ Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible c
 - Continuar una compra abierta desde Inicio, o descartarla explícitamente para empezar otra.
 - Recuperar una compra de la versión anterior sin perder sus productos, asignándole una sucursal al continuar.
 - Agregar un precio manualmente con nombre opcional y cantidad.
-- Editar nombre, precio y cantidad; sumar/restar unidades y eliminar productos.
-- Vaciar la compra con confirmación.
+- Editar nombre, precio y cantidad; sumar/restar unidades, apartar productos del total y reincorporarlos.
+- Vaciar la compra con confirmación, eliminando tanto incluidos como apartados.
 - Recuperar la compra después de cerrar y volver a abrir la app.
 - Escanear una etiqueta como acción principal y leer su texto localmente en el teléfono para detectar precios y un nombre de producto sugerido.
 - Elegir explícitamente entre precio regular y precio condicionado a una tarjeta.
@@ -63,7 +64,7 @@ src/features/supermarket/
   infrastructure/localTextRecognizer.ts Adaptador OCR local (Vision/ML Kit)
 ```
 
-El estado de la compra se comparte entre Inicio y la pantalla de captura; las acciones de ítems pasan por un reducer puro. Los totales se derivan de los ítems y los importes se almacenan en centavos enteros. El dominio no depende de React ni de APIs del teléfono. La pantalla de compra mantiene el total y la cámara a la vista; el detalle de productos se abre bajo demanda.
+El estado de la compra se comparte entre Inicio y la pantalla de captura; las acciones de ítems pasan por un reducer puro. Los totales se derivan sólo de los ítems incluidos y los importes se almacenan en centavos enteros. Apartar conserva el ítem completo, su cantidad y su precio para reincorporarlo sin volver a escanear. El dominio no depende de React ni de APIs del teléfono. La pantalla de compra mantiene el total y la cámara a la vista; la revisión se abre a pantalla completa con el total visible al recorrer la lista.
 
 AsyncStorage guarda una sola compra abierta bajo `ownapp.supermarket.shopping.v2` y las sucursales manuales en `ownapp.supermarket.stores.v1`, local a cada instalación o navegador/origen. Las compras previas guardadas en `shopping.v1` se recuperan con sus ítems intactos y piden sucursal al continuar. No hay sincronización ni cuentas. Inicio espera la lectura antes de habilitar la compra. Si falla la lectura o el guardado, muestra un mensaje y permite reintentar. Las escrituras de compra se serializan para no sobrescribir un cambio reciente con uno anterior.
 
@@ -91,7 +92,7 @@ pnpm lint
 pnpm test
 ```
 
-Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, cálculos, edición, cantidades, identidad de productos y migración de compra anterior.
+Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, cálculos, edición, cantidades, identidad de productos, migración de compra anterior y exclusión reversible del total.
 
 Recorrido manual sugerido:
 
@@ -101,6 +102,7 @@ Recorrido manual sugerido:
 4. Volver a Inicio, continuar la compra y luego cerrar y reabrir la app: se conserva el total y se ofrece continuar, sin entrar automáticamente.
 5. En un teléfono físico con una development build, permitir la cámara, capturar una etiqueta nítida, tocar «Leer etiqueta», elegir el precio detectado y confirmarlo. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
 6. Probar una lectura sin precio: ofrece reintento y carga manual.
-7. Tocar «Empezar otra compra», cancelar el descarte y comprobar que sigue intacta. Confirmar el descarte y comprobar que se puede elegir una sucursal nueva.
+7. En «Ver compra», apartar un producto con varias unidades: la fila y su cantidad siguen visibles, pero el total y el recuento de incluidos bajan. Reincorporarlo y comprobar que recupera el subtotal original. Volver a capturar y reabrir la compra; el estado debe persistir al reiniciar la app.
+8. Tocar «Empezar otra compra», cancelar el descarte y comprobar que sigue intacta. Confirmar el descarte y comprobar que se puede elegir una sucursal nueva.
 
 También conviene verificar teclado, áreas seguras, tamaño de texto y persistencia en un teléfono físico antes de la siguiente entrega.

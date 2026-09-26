@@ -3,7 +3,7 @@ import test from 'node:test';
 import { parsePrice, extractPriceCandidates, extractPublishedUnitPrices } from '../src/features/supermarket/domain/price.ts';
 import { correctProductDisplayName, extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
 import { classifyPriceTerms, createPriceObservation } from '../src/features/supermarket/domain/priceObservation.ts';
-import { shoppingReducer, shoppingTotals, isShoppingItem } from '../src/features/supermarket/domain/shopping.ts';
+import { shoppingReducer, shoppingTotals, shoppingCounts, isShoppingItem } from '../src/features/supermarket/domain/shopping.ts';
 import { decodePurchaseSession } from '../src/features/supermarket/domain/purchaseSession.ts';
 import { normalizeStoreName, storeLabel } from '../src/features/supermarket/domain/store.ts';
 
@@ -126,4 +126,25 @@ test('la compra anterior migra sin perder ítems y una compra descartada no reap
 test('la referencia manual de una sucursal conserva un nombre legible', () => {
   assert.equal(normalizeStoreName('  Del   barrio  '), 'Del barrio');
   assert.equal(storeLabel({ id: 's', supermarket: 'Día', reference: 'Del barrio' }), 'Día · Del barrio');
+});
+
+test('apartar una fila excluye todas sus unidades y reincorporarla recupera el total', () => {
+  const first = { ...item, quantity: 2 };
+  const second = { ...item, id: 'two', priceCents: 1200 };
+  const original = [first, second];
+  const apart = shoppingReducer(original, { type: 'toggleIncluded', id: 'one' });
+  assert.deepEqual(apart.map(value => value.id), ['one', 'two']);
+  assert.equal(apart[0].quantity, 2);
+  assert.deepEqual(shoppingTotals(apart), { priceCents: 1200, quantity: 1 });
+  assert.deepEqual(shoppingCounts(apart), { included: 1, apart: 1 });
+  assert.deepEqual(shoppingTotals(shoppingReducer(apart, { type: 'toggleIncluded', id: 'one' })), shoppingTotals(original));
+});
+
+test('una compra con todo apartado conserva las filas y suma cero', () => {
+  const apart = shoppingReducer([item], { type: 'toggleIncluded', id: 'one' });
+  assert.equal(apart.length, 1);
+  assert.equal(isShoppingItem(apart[0]), true);
+  assert.deepEqual(shoppingTotals(apart), { priceCents: 0, quantity: 0 });
+  assert.deepEqual(shoppingCounts(apart), { included: 0, apart: 1 });
+  assert.deepEqual(decodePurchaseSession(JSON.stringify({ version: 2, session: { id: 'p', storeId: 's', items: apart } }), null)?.items, apart);
 });
