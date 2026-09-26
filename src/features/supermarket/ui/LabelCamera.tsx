@@ -2,10 +2,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { typography } from '@/constants/brand';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useEffect, useRef, useState } from 'react';
-import { AppState, Linking, StyleSheet, Text, View } from 'react-native';
+import { AppState, Linking, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { ActionButton, colors, common } from './primitives';
 
 export function LabelCamera({ onRecognize }: { onRecognize: (photoUri: string) => void }) {
+  const { height } = useWindowDimensions();
   const [permission, requestPermission] = useCameraPermissions();
   const camera = useRef<CameraView>(null);
   const [isForeground, setIsForeground] = useState(AppState.currentState === 'active');
@@ -74,7 +75,7 @@ export function LabelCamera({ onRecognize }: { onRecognize: (photoUri: string) =
   }
 
   return <View style={styles.capture}>
-    <View style={styles.preview}>
+    <View style={[styles.preview, { height: Math.max(300, Math.min(520, height * 0.45)) }]}>
       <CameraView ref={camera} style={StyleSheet.absoluteFill} facing="back" onCameraReady={() => setIsReady(true)}
         onMountError={event => setMountError(event.message)} />
       <View pointerEvents="none" style={styles.frame}>
@@ -83,15 +84,22 @@ export function LabelCamera({ onRecognize }: { onRecognize: (photoUri: string) =
       </View>
       <View pointerEvents="none" style={styles.frameLabel}><Text style={styles.frameText}>Ubicá la etiqueta dentro del marco</Text></View>
     </View>
-    <Text style={common.body}>Buscá buena luz y acercate lo suficiente para que el precio se vea nítido.</Text>
-    <ActionButton label={isCapturing ? 'Capturando…' : 'Capturar etiqueta'} icon="camera" disabled={!isReady || isCapturing} onPress={capture} />
+    <View style={styles.captureAction}>
+      <Pressable accessibilityRole="button" accessibilityLabel={isCapturing ? 'Capturando etiqueta' : 'Capturar etiqueta'} accessibilityState={{ disabled: !isReady || isCapturing }} disabled={!isReady || isCapturing} onPress={() => void capture()} style={({ pressed }) => [styles.captureButton, (pressed || !isReady || isCapturing) && { opacity: 0.55 }]}>
+        <Ionicons name="scan-outline" size={30} color={colors.ink} />
+      </Pressable>
+      <Text style={styles.captureLabel}>{isCapturing ? 'Capturando…' : 'Capturar'}</Text>
+    </View>
   </View>;
 }
 
 const styles = StyleSheet.create({
   capture: { gap: 12 },
   sectionTitle: { ...typography.product, color: colors.ink },
-  preview: { height: 280, overflow: 'hidden', borderRadius: 18, backgroundColor: colors.ink, position: 'relative' },
+  preview: { overflow: 'hidden', borderRadius: 22, backgroundColor: colors.ink, position: 'relative' },
+  captureAction: { alignItems: 'center', gap: 6, paddingTop: 2 },
+  captureButton: { width: 72, height: 72, borderRadius: 36, backgroundColor: colors.accent, borderWidth: 5, borderColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
+  captureLabel: { ...typography.secondary, color: colors.ink },
   frame: { position: 'absolute', top: 22, right: 22, bottom: 22, left: 22 },
   corner: { position: 'absolute', width: 28, height: 28, borderColor: colors.onInk, borderWidth: 3 },
   topLeft: { top: 0, left: 0, borderRightWidth: 0, borderBottomWidth: 0, borderTopLeftRadius: 8 },

@@ -22,6 +22,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Changed
 
+- Captura con cámara dominante y resumen del carrito fijo en la base, accesible por toque o deslizamiento ascendente. La confirmación presenta los precios en filas y permite elegir cantidad con el subtotal visible antes de agregar.
 - La persistencia de compras usa `shopping.v3` para guardar en una sola escritura la compra abierta y el historial; migra las compras locales de `shopping.v2` y `shopping.v1`.
 - Al empezar otra compra abierta, se puede finalizar la anterior con ticket opcional o descartarla tras confirmación.
 - La revisión usa una pantalla completa con total y recuentos de incluidos/apartados visibles mientras se recorre la lista; la cámara se pausa durante esa revisión.

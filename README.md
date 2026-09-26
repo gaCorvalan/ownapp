@@ -40,7 +40,7 @@ Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible c
 - Vaciar la compra con confirmación, eliminando tanto incluidos como apartados.
 - Recuperar la compra después de cerrar y volver a abrir la app.
 - Escanear una etiqueta como acción principal y leer su texto localmente en el teléfono para detectar precios y un nombre de producto sugerido.
-- Elegir explícitamente entre precio regular y precio condicionado a una tarjeta.
+- Elegir explícitamente entre precio regular y precio condicionado a una tarjeta, ajustar la cantidad y confirmar el subtotal antes de sumar.
 - Resolver una lectura fallida con carga manual.
 
 Los importes se ingresan en pesos argentinos: `3450`, `3450,50` o `3.450,50`. La coma separa los centavos. Cada ítem admite entre 1 y 99 unidades y un precio de hasta $ 1.000.000; cada compra admite 100 ítems. El total es una estimación, sin descuentos ni cálculo por peso.
@@ -68,7 +68,7 @@ src/features/supermarket/
   infrastructure/localTextRecognizer.ts Adaptador OCR local (Vision/ML Kit)
 ```
 
-El estado de la compra se comparte entre Inicio y la pantalla de captura; las acciones de ítems pasan por un reducer puro. Los totales se derivan sólo de los ítems incluidos y los importes se almacenan en centavos enteros. Apartar conserva el ítem completo, su cantidad y su precio para reincorporarlo sin volver a escanear. El dominio no depende de React ni de APIs del teléfono. La pantalla de compra mantiene el total y la cámara a la vista; la revisión se abre a pantalla completa con el total visible al recorrer la lista.
+El estado de la compra se comparte entre Inicio y la pantalla de captura; las acciones de ítems pasan por un reducer puro. Los totales se derivan sólo de los ítems incluidos y los importes se almacenan en centavos enteros. Apartar conserva el ítem completo, su cantidad y su precio para reincorporarlo sin volver a escanear. El dominio no depende de React ni de APIs del teléfono. La cámara ocupa el área principal y el resumen del carrito permanece en la base; tocarlo o deslizarlo hacia arriba abre la revisión a pantalla completa.
 
 AsyncStorage guarda la compra abierta y las finalizadas juntas bajo `ownapp.supermarket.shopping.v3`, y las sucursales manuales bajo `ownapp.supermarket.stores.v1`, local a cada instalación o navegador/origen. Los formatos `shopping.v2` y `shopping.v1` se recuperan sin perder ítems; las compras `v1` piden sucursal al continuar. El cierre se escribe en una sola operación para no vaciar la compra antes de guardar su historial. No hay sincronización ni cuentas. Inicio espera la lectura antes de habilitar la compra. Si falla la lectura o el guardado, muestra un mensaje y permite reintentar. Las escrituras se serializan para no sobrescribir un cambio reciente con uno anterior.
 
@@ -79,10 +79,10 @@ Cada precio confirmado desde una etiqueta también se registra en SQLite local c
 ## Flujo del escáner
 
 ```text
-Foto o simulación → bloques de texto → candidatos → elección/confirmación → ítem de compra
+Foto → bloques de texto → candidatos → elección/confirmación → ítem de compra
 ```
 
-La foto capturada se entrega al OCR local: Vision en iOS y ML Kit en Android. El reconocimiento se hace en el dispositivo; la foto no se envía a un servidor y queda temporalmente mientras la pantalla está abierta. El OCR devuelve bloques de texto con sus coordenadas. `extractPriceCandidates` reconoce importes con símbolo `$` y descarta bloques que indican precios de referencia por kilo/litro. Conserva el contexto de cada candidato. Con varios candidatos no selecciona ninguno automáticamente. La confirmación se consume una sola vez para impedir duplicados por doble toque.
+La foto capturada se entrega al OCR local: Vision en iOS y ML Kit en Android. El reconocimiento se hace en el dispositivo; la foto no se envía a un servidor y queda temporalmente mientras la pantalla está abierta. El OCR devuelve bloques de texto con sus coordenadas. `extractPriceCandidates` reconoce importes con símbolo `$` y descarta bloques que indican precios de referencia por kilo/litro. Conserva el contexto de cada candidato. Con varios candidatos no selecciona ninguno automáticamente; con uno, lo preselecciona, pero todavía requiere tocar Agregar. La cantidad elegida multiplica el subtotal mostrado sin alterar el carrito hasta confirmar. La confirmación se consume una sola vez para impedir duplicados por doble toque.
 
 Estas reglas son deliberadamente limitadas: el OCR extrae texto, pero no es un intérprete fiable de cualquier etiqueta real. El reducer, la lista, el formulario y el cálculo del total se reutilizan.
 
@@ -106,7 +106,7 @@ Recorrido manual sugerido:
 2. Agregar supermercado y referencia; comprobar que abre la cámara con la sucursal indicada.
 3. Cargar `Leche`, precio `1500,50`, cantidad `2`: total $ 3.001,00. Incrementar a 3 unidades y editar el precio a `1600`: total $ 4.800,00.
 4. Volver a Inicio, continuar la compra y luego cerrar y reabrir la app: se conserva el total y se ofrece continuar, sin entrar automáticamente.
-5. En un teléfono físico con una development build, permitir la cámara, capturar una etiqueta nítida, tocar «Leer etiqueta», elegir el precio detectado y confirmarlo. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
+5. En un teléfono físico con una development build, permitir la cámara, capturar una etiqueta nítida, elegir el precio detectado, ajustar la cantidad y confirmar. Antes de Agregar, el total del resumen no debe cambiar; después debe sumar el subtotal y volver a cámara. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
 6. Probar una lectura sin precio: ofrece reintento y carga manual.
 7. En «Ver compra», apartar un producto con varias unidades: la fila y su cantidad siguen visibles, pero el total y el recuento de incluidos bajan. Reincorporarlo y comprobar que recupera el subtotal original. Volver a capturar y reabrir la compra; el estado debe persistir al reiniciar la app.
 8. Abrir «Finalizar compra», dejar el ticket vacío y guardar: el detalle conserva incluidos y «No llevaste»; Inicio muestra la última compra con «Total estimado». Completar después el ticket desde el detalle y comprobar que muestra «Total del ticket» sin cambiar el estimado.

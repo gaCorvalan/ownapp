@@ -6,7 +6,7 @@ import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShoppingSession } from '../application/useShoppingSession';
 import { correctProductDisplayName, type ProductDescriptor } from '../domain/product';
-import type { PublishedUnitPrice } from '../domain/price';
+import { formatMoney, type PublishedUnitPrice } from '../domain/price';
 import { classifyPriceTerms, createPriceObservation } from '../domain/priceObservation';
 import { MAX_ITEMS, shoppingCounts, type ShoppingItem } from '../domain/shopping';
 import { storeLabel } from '../domain/store';
@@ -29,6 +29,7 @@ export function SupermarketScreen() {
   const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [observationError, setObservationError] = useState('');
   const reopenCart = useRef(false);
+  const cartTouchStart = useRef<number | null>(null);
   const full = session.items.length >= MAX_ITEMS;
   const counts = shoppingCounts(session.items);
 
@@ -59,7 +60,7 @@ export function SupermarketScreen() {
     setEditor({ item: null });
   }
 
-  async function addScannedItem(value: { candidate: { priceCents: number; context: string }; product: ProductDescriptor | null; publishedUnitPrice: PublishedUnitPrice | null }) {
+  async function addScannedItem(value: { candidate: { priceCents: number; context: string }; product: ProductDescriptor | null; publishedUnitPrice: PublishedUnitPrice | null; quantity: number }) {
     if (full || !session.store) return false;
     try {
       const observation = createPriceObservation({
@@ -71,7 +72,7 @@ export function SupermarketScreen() {
         source: 'label-ocr',
       });
       await recordPriceObservation(observation);
-      addItem({ name: value.product?.displayName ?? '', product: value.product ?? undefined, priceCents: value.candidate.priceCents, quantity: 1 });
+      addItem({ name: value.product?.displayName ?? '', product: value.product ?? undefined, priceCents: value.candidate.priceCents, quantity: value.quantity });
       setObservationError('');
       return true;
     } catch {
@@ -81,32 +82,17 @@ export function SupermarketScreen() {
   }
 
   return <SafeAreaView style={styles.safe}>
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+    <ScrollView style={styles.mainScroll} contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
-        <View style={styles.brandRow}>
-          <View style={common.row}><View style={styles.logo}><Ionicons name="leaf-outline" size={20} color={colors.ink} /></View><Text style={styles.brand}>a mano<Text style={{ color: colors.selectionBorder }}>.</Text></Text></View>
-          <Pressable accessibilityRole="button" accessibilityLabel="Volver al inicio" onPress={() => router.replace('/')} style={styles.back}><Ionicons name="arrow-back" size={19} color={colors.ink} /><Text style={styles.backText}>Inicio</Text></Pressable>
-        </View>
+        <View style={styles.captureHeader}><Pressable accessibilityRole="button" accessibilityLabel="Volver al inicio" onPress={() => router.replace('/')} style={styles.back}><Ionicons name="arrow-back" size={22} color={colors.onInk} /></Pressable><View style={{ flex: 1 }}><Text style={styles.storeLabel}>{session.store ? storeLabel(session.store) : 'Compra en curso'}</Text><Text style={styles.headerCaption}>COMPRA EN CURSO</Text></View></View>
         {session.loadState !== 'ready' ? <View style={common.card}>
           {session.loadState === 'loading' ? <><ActivityIndicator color={colors.ink} /><Text style={common.body}>Recuperando tu compra…</Text></> : <>
             <Text accessibilityRole="alert" style={common.body}>No pudimos recuperar tu compra guardada. Volvé a intentar para no perderla.</Text>
             <ActionButton label="Volver a cargar" onPress={session.retryLoad} />
           </>}
         </View> : session.store ? <View style={styles.home}>
-          <Text style={styles.storeLabel}>{storeLabel(session.store)}</Text>
-          <TotalBar {...session.totals} />
           <PriceScanner full={full} active={isFocused && !purchaseOpen && !editor} onManual={openManual} onAdd={addScannedItem} />
           {!!observationError && <Text accessibilityRole="alert" style={styles.observationError}>{observationError}</Text>}
-          <ActionButton label="Ingresar precio manualmente" icon="add" variant="secondary" onPress={openManual} disabled={full} />
-          <Pressable accessibilityRole="button" accessibilityLabel={`Ver compra, ${counts.included} productos incluidos y ${counts.apart} apartados`} onPress={() => setPurchaseOpen(true)} style={({ pressed }) => [styles.purchaseLink, pressed && { opacity: 0.7 }]}>
-            <View style={styles.purchaseIcon}><Ionicons name="receipt-outline" size={21} color={colors.ink} /></View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.purchaseTitle}>Ver compra</Text>
-              <Text style={common.body}>{session.items.length === 0 ? 'Todavía no agregaste productos' : `${counts.included} ${counts.included === 1 ? 'incluido' : 'incluidos'} · ${counts.apart} ${counts.apart === 1 ? 'apartado' : 'apartados'}`}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
-          </Pressable>
-          {full && <Text style={[common.body, styles.limit]}>La compra llegó al límite de 100 productos.</Text>}
           <View accessibilityLiveRegion="polite" style={styles.storage}>
             <Ionicons name={session.saveState === 'error' ? 'alert-circle-outline' : 'phone-portrait-outline'} size={15} color={colors.textSecondary} />
             <Text style={styles.storageText}>{session.saveState === 'saved' ? 'Compra guardada en este dispositivo' : session.saveState === 'saving' ? 'Guardando compra…' : 'No se guardaron los últimos cambios.'}</Text>
@@ -115,6 +101,10 @@ export function SupermarketScreen() {
         </View> : null}
       </View>
     </ScrollView>
+    {session.loadState === 'ready' && session.store && <Pressable accessibilityRole="button" accessibilityLabel={`Ver compra, total estimado ${formatMoney(session.totals.priceCents)}, ${counts.included} productos incluidos`} onPress={() => setPurchaseOpen(true)} onTouchStart={event => { cartTouchStart.current = event.nativeEvent.pageY; }} onTouchEnd={event => { if (cartTouchStart.current !== null && cartTouchStart.current - event.nativeEvent.pageY > 40) setPurchaseOpen(true); cartTouchStart.current = null; }} style={({ pressed }) => [styles.cartSummary, pressed && { opacity: 0.85 }]}>
+      <View style={styles.cartHandle} />
+      <View style={styles.cartRow}><View style={{ flex: 1, gap: 4 }}><Text style={styles.cartEyebrow}>TOTAL ESTIMADO</Text><Text style={styles.cartTotal}>{formatMoney(session.totals.priceCents)}</Text><Text style={styles.cartDetail}>{counts.included} {counts.included === 1 ? 'producto' : 'productos'} · {session.totals.quantity} {session.totals.quantity === 1 ? 'unidad' : 'unidades'}{counts.apart ? ` · ${counts.apart} ${counts.apart === 1 ? 'apartado' : 'apartados'}` : ''}</Text></View><View style={styles.cartAction}><View style={styles.cartChevron}><Ionicons name="chevron-up" size={23} color={colors.ink} /></View><Text style={styles.cartActionLabel}>Ver compra</Text></View></View>
+    </Pressable>}
 
     <Modal visible={purchaseOpen} animationType="slide" onRequestClose={() => setPurchaseOpen(false)} accessibilityViewIsModal>
       <SafeAreaView style={styles.modalScreen}>
@@ -163,19 +153,23 @@ export function SupermarketScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.canvas },
-  scroll: { flexGrow: 1, paddingHorizontal: 18, paddingBottom: 28 },
+  mainScroll: { flex: 1 },
+  scroll: { flexGrow: 1, paddingHorizontal: 18, paddingBottom: 18 },
   container: { width: '100%', maxWidth: 540, alignSelf: 'center' },
-  brandRow: { flexDirection: 'row', gap: 12, alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14 },
-  logo: { width: 34, height: 34, borderRadius: 12, backgroundColor: colors.surfaceTonal, alignItems: 'center', justifyContent: 'center' },
-  brand: { ...typography.screenTitle, letterSpacing: -1, color: colors.ink },
-  back: { minHeight: 48, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 5 },
-  backText: { ...typography.secondary, color: colors.ink },
-  storeLabel: { ...typography.sectionTitle, color: colors.ink },
-  home: { gap: 14, paddingTop: 12 },
-  purchaseLink: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 18, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  purchaseIcon: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: colors.surfaceTonal },
-  purchaseTitle: { ...typography.product, color: colors.ink, marginBottom: 2 },
-  limit: { textAlign: 'center' },
+  captureHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.ink, borderRadius: 18, paddingHorizontal: 10, paddingVertical: 10, marginTop: 10 },
+  back: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
+  storeLabel: { ...typography.product, color: colors.onInk },
+  headerCaption: { ...typography.caption, color: colors.onInkSecondary, letterSpacing: 1 },
+  home: { gap: 14, paddingTop: 14 },
+  cartSummary: { width: '100%', maxWidth: 640, alignSelf: 'center', backgroundColor: colors.ink, borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
+  cartHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: colors.onInkSecondary, alignSelf: 'center', marginBottom: 9 },
+  cartRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  cartEyebrow: { ...typography.caption, color: colors.onInkSecondary, letterSpacing: 1 },
+  cartTotal: { ...typography.screenTitle, color: colors.onInk, fontVariant: ['tabular-nums'] },
+  cartDetail: { ...typography.caption, color: colors.onInkSecondary },
+  cartAction: { alignItems: 'center', gap: 5 },
+  cartChevron: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
+  cartActionLabel: { ...typography.caption, color: colors.accent },
   storage: { flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', paddingTop: 2 },
   storageText: { ...typography.caption, color: colors.textSecondary, flexShrink: 1 },
   observationError: { ...typography.secondary, color: colors.danger, textAlign: 'center' },
