@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { typography } from '@/constants/brand';
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useFocusEffect, useIsFocused, useRouter } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShoppingSession } from '../application/useShoppingSession';
@@ -22,17 +22,32 @@ function createId() { return `${Date.now()}-${++nextItemId}-${Math.random().toSt
 
 export function SupermarketScreen() {
   const router = useRouter();
+  const isFocused = useIsFocused();
   const session = useShoppingSession();
   const [editor, setEditor] = useState<{ item: ShoppingItem | null } | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
   const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [observationError, setObservationError] = useState('');
+  const reopenCart = useRef(false);
   const full = session.items.length >= MAX_ITEMS;
   const counts = shoppingCounts(session.items);
 
   useEffect(() => {
     if (session.loadState === 'ready' && (!session.purchase || !session.store)) router.replace('/');
   }, [session.loadState, session.purchase, session.store, router]);
+
+  useFocusEffect(useCallback(() => {
+    if (reopenCart.current) {
+      reopenCart.current = false;
+      if (session.purchase) setPurchaseOpen(true);
+    }
+  }, [session.purchase]));
+
+  function openFinish() {
+    reopenCart.current = true;
+    setPurchaseOpen(false);
+    router.push('/finish');
+  }
 
   function addItem(value: { name: string; priceCents: number; quantity: number; product?: ProductDescriptor }) {
     if (full) return;
@@ -80,7 +95,7 @@ export function SupermarketScreen() {
         </View> : session.store ? <View style={styles.home}>
           <Text style={styles.storeLabel}>{storeLabel(session.store)}</Text>
           <TotalBar {...session.totals} />
-          <PriceScanner full={full} active={!purchaseOpen && !editor} onManual={openManual} onAdd={addScannedItem} />
+          <PriceScanner full={full} active={isFocused && !purchaseOpen && !editor} onManual={openManual} onAdd={addScannedItem} />
           {!!observationError && <Text accessibilityRole="alert" style={styles.observationError}>{observationError}</Text>}
           <ActionButton label="Ingresar precio manualmente" icon="add" variant="secondary" onPress={openManual} disabled={full} />
           <Pressable accessibilityRole="button" accessibilityLabel={`Ver compra, ${counts.included} productos incluidos y ${counts.apart} apartados`} onPress={() => setPurchaseOpen(true)} style={({ pressed }) => [styles.purchaseLink, pressed && { opacity: 0.7 }]}>
@@ -116,7 +131,11 @@ export function SupermarketScreen() {
           <ShoppingList items={session.items} dispatch={session.dispatch} full={full}
             onAdd={openManual} onEdit={item => setEditor({ item })} onClear={() => setConfirmClear(true)} />
         </ScrollView>
-        <View style={styles.purchaseFooter}><ActionButton label="Volver a capturar" variant="secondary" icon="camera-outline" onPress={() => setPurchaseOpen(false)} /></View>
+        <View style={styles.purchaseFooter}>
+          <ActionButton label="Finalizar compra" onPress={openFinish} disabled={counts.included === 0} />
+          {counts.included === 0 && <Text style={styles.emptyFinish}>Reincorporá un producto para guardar esta compra.</Text>}
+          <ActionButton label="Volver a capturar" variant="ghost" icon="camera-outline" onPress={() => setPurchaseOpen(false)} />
+        </View>
       </SafeAreaView>
     </Modal>
 
@@ -163,7 +182,8 @@ const styles = StyleSheet.create({
   modalScreen: { flex: 1, backgroundColor: colors.canvas },
   purchaseTop: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingBottom: 12, gap: 16 },
   purchaseScreen: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingBottom: 24 },
-  purchaseFooter: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 8, backgroundColor: colors.canvas },
+  purchaseFooter: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 8, backgroundColor: colors.canvas, gap: 2 },
+  emptyFinish: { ...typography.caption, color: colors.textSecondary, textAlign: 'center' },
   modalHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 8 },
   modalTitle: { ...typography.screenTitle, color: colors.ink, marginBottom: 4 },
   close: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: colors.surfaceTonal },

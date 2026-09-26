@@ -7,6 +7,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Added
 
+- Cierre de compra con ticket opcional, conservación de «No llevaste», detalle de la compra guardada e historial local accesible desde Inicio. El ticket puede completarse o corregirse después.
 - Revisión de la compra con inclusión reversible por producto: apartar conserva toda la fila y su cantidad sin sumarla al total; reincorporar recupera el subtotal. El estado persiste en la compra abierta.
 - Inicio con acceso a empezar o continuar una única compra abierta, selección de sucursal y alta manual con supermercado y referencia libre.
 - Asociación de los nuevos precios escaneados con la sucursal elegida.
@@ -21,6 +22,8 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Changed
 
+- La persistencia de compras usa `shopping.v3` para guardar en una sola escritura la compra abierta y el historial; migra las compras locales de `shopping.v2` y `shopping.v1`.
+- Al empezar otra compra abierta, se puede finalizar la anterior con ticket opcional o descartarla tras confirmación.
 - La revisión usa una pantalla completa con total y recuentos de incluidos/apartados visibles mientras se recorre la lista; la cámara se pausa durante esa revisión.
 - La compra local pasa al formato versionado `shopping.v2`; recupera los ítems de `shopping.v1` y solicita asignar sucursal antes de continuar una compra anterior.
 - Empezar otra compra requiere descartar explícitamente la abierta; las observaciones de precios ya registradas se conservan.

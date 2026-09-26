@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parsePrice, extractPriceCandidates, extractPublishedUnitPrices } from '../src/features/supermarket/domain/price.ts';
+import { parsePrice, parseTicketAmount, extractPriceCandidates, extractPublishedUnitPrices } from '../src/features/supermarket/domain/price.ts';
 import { correctProductDisplayName, extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
 import { classifyPriceTerms, createPriceObservation } from '../src/features/supermarket/domain/priceObservation.ts';
 import { shoppingReducer, shoppingTotals, shoppingCounts, isShoppingItem } from '../src/features/supermarket/domain/shopping.ts';
-import { decodePurchaseSession } from '../src/features/supermarket/domain/purchaseSession.ts';
+import { decodePurchaseLedger, decodePurchaseSession, finishPurchase, updateTicket } from '../src/features/supermarket/domain/purchaseSession.ts';
 import { normalizeStoreName, storeLabel } from '../src/features/supermarket/domain/store.ts';
 
 test('precios argentinos: pesos, miles y centavos sin redondeo flotante', () => {
@@ -147,4 +147,36 @@ test('una compra con todo apartado conserva las filas y suma cero', () => {
   assert.deepEqual(shoppingTotals(apart), { priceCents: 0, quantity: 0 });
   assert.deepEqual(shoppingCounts(apart), { included: 0, apart: 1 });
   assert.deepEqual(decodePurchaseSession(JSON.stringify({ version: 2, session: { id: 'p', storeId: 's', items: apart } }), null)?.items, apart);
+});
+
+test('el ticket acepta importes argentinos mayores que un precio unitario y sigue siendo opcional', () => {
+  assert.equal(parseTicketAmount('1.250.000,50'), 125000050);
+  assert.equal(parseTicketAmount(''), null);
+  assert.equal(parseTicketAmount('12,345'), null);
+  assert.equal(parseTicketAmount('0'), null);
+});
+
+test('finalizar conserva incluidos y apartados, y separa ticket de estimación', () => {
+  const store = { id: 'store-1', supermarket: 'Día', reference: 'Del barrio' };
+  const apart = { ...item, id: 'two', included: false, quantity: 2 };
+  const ledger = { active: { id: 'purchase-1', storeId: store.id, items: [item, apart] }, completed: [] };
+  const saved = finishPurchase(ledger, store, '2026-09-26T12:00:00.000Z', null);
+  assert.equal(saved.active, null);
+  assert.deepEqual(saved.completed[0].items, [item, apart]);
+  assert.equal(saved.completed[0].ticketCents, null);
+  assert.deepEqual(shoppingTotals(saved.completed[0].items), { priceCents: item.priceCents, quantity: 1 });
+  const withTicket = updateTicket(saved, 'purchase-1', 340000);
+  assert.equal(withTicket.completed[0].ticketCents, 340000);
+  assert.equal(saved.completed[0].ticketCents, null);
+  assert.deepEqual(decodePurchaseLedger(JSON.stringify({ version: 3, ...withTicket }), null, null), withTicket);
+});
+
+test('el cierre rechaza una compra sin incluidos y migra el formato previo sin perder ítems', () => {
+  const store = { id: 's', supermarket: 'Día', reference: 'Centro' };
+  const allApart = { active: { id: 'p', storeId: 's', items: [{ ...item, included: false }] }, completed: [] };
+  assert.throws(() => finishPurchase(allApart, store, new Date().toISOString(), null));
+  const previous = JSON.stringify({ version: 2, session: { id: 'p', storeId: 's', items: [item] } });
+  assert.deepEqual(decodePurchaseLedger(null, previous, null), { active: { id: 'p', storeId: 's', items: [item] }, completed: [] });
+  assert.deepEqual(decodePurchaseLedger(null, null, JSON.stringify({ version: 1, items: [item] })), { active: { id: 'legacy-purchase', storeId: null, items: [item] }, completed: [] });
+  assert.deepEqual(decodePurchaseLedger(JSON.stringify({ version: 3, active: null, completed: [] }), previous, null), { active: null, completed: [] });
 });

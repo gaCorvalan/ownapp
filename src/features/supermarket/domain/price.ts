@@ -9,6 +9,14 @@ export function parsePrice(input: string): number | null {
   return Number.isSafeInteger(cents) && cents > 0 && cents <= MAX_PRICE_CENTS ? cents : null;
 }
 
+export function parseTicketAmount(input: string): number | null {
+  const value = input.trim().replace(/^\$\s*/, '');
+  if (!/^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/.test(value)) return null;
+  const [whole, fraction = ''] = value.replaceAll('.', '').split(',');
+  const cents = Number(whole) * 100 + Number(fraction.padEnd(2, '0'));
+  return Number.isSafeInteger(cents) && cents > 0 && cents <= 10_000_000_000 ? cents : null;
+}
+
 export function formatMoney(cents: number): string {
   return new Intl.NumberFormat('es-AR', {
     style: 'currency', currency: 'ARS', minimumFractionDigits: 2,

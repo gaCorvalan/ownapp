@@ -16,8 +16,8 @@ define Lexend Deca, petróleo y lima a partir de la
 [dirección visual vigente](docs/ux/visual/v2/README.md). La interfaz actual ya
 usa esa paleta y tipografía en tema claro; la composición y el recorrido de las
 láminas se implementa de forma incremental: inicio, selección de sucursal y
-revisión reversible de la compra ya están disponibles; cierre e historial
-siguen pendientes.
+revisión reversible, cierre con ticket opcional e historial local ya están
+disponibles.
 
 ## Ejecutar
 
@@ -33,6 +33,8 @@ Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible c
 - Empezar una compra desde Inicio, agregar una sucursal manualmente y volver a elegirla en visitas posteriores.
 - Continuar una compra abierta desde Inicio, o descartarla explícitamente para empezar otra.
 - Recuperar una compra de la versión anterior sin perder sus productos, asignándole una sucursal al continuar.
+- Finalizar una compra con al menos un producto incluido, conservando los apartados como «No llevaste» y el total del ticket sólo si se informa.
+- Consultar compras anteriores y completar o corregir el total del ticket después.
 - Agregar un precio manualmente con nombre opcional y cantidad.
 - Editar nombre, precio y cantidad; sumar/restar unidades, apartar productos del total y reincorporarlos.
 - Vaciar la compra con confirmación, eliminando tanto incluidos como apartados.
@@ -48,6 +50,8 @@ Los importes se ingresan en pesos argentinos: `3450`, `3450,50` o `3.450,50`. La
 ```text
 app/index.tsx                         Inicio
 app/purchase.tsx                      Ruta de compra
+app/finish.tsx                        Cierre de compra
+app/history/                          Lista y detalle de compras guardadas
 src/features/supermarket/
   ui/                                 Inicio, compra, lista, escáner y formularios
   application/useShoppingSession.tsx  Estado compartido y coordinación del guardado
@@ -56,7 +60,7 @@ src/features/supermarket/
   domain/price.ts                     Conversión de importes y candidatos de precio
   domain/product.ts                   Descriptor inicial y normalización de productos OCR
   domain/priceObservation.ts          Precio elegido, condiciones y referencia por unidad
-  domain/purchaseSession.ts           Sesión activa y migración de compra anterior
+  domain/purchaseSession.ts           Sesión activa, compras guardadas y migraciones
   domain/store.ts                     Sucursal manual
   infrastructure/shoppingStorage.ts  AsyncStorage, formato versionado y escrituras ordenadas
   infrastructure/storeStorage.ts     Sucursales guardadas localmente
@@ -66,7 +70,9 @@ src/features/supermarket/
 
 El estado de la compra se comparte entre Inicio y la pantalla de captura; las acciones de ítems pasan por un reducer puro. Los totales se derivan sólo de los ítems incluidos y los importes se almacenan en centavos enteros. Apartar conserva el ítem completo, su cantidad y su precio para reincorporarlo sin volver a escanear. El dominio no depende de React ni de APIs del teléfono. La pantalla de compra mantiene el total y la cámara a la vista; la revisión se abre a pantalla completa con el total visible al recorrer la lista.
 
-AsyncStorage guarda una sola compra abierta bajo `ownapp.supermarket.shopping.v2` y las sucursales manuales en `ownapp.supermarket.stores.v1`, local a cada instalación o navegador/origen. Las compras previas guardadas en `shopping.v1` se recuperan con sus ítems intactos y piden sucursal al continuar. No hay sincronización ni cuentas. Inicio espera la lectura antes de habilitar la compra. Si falla la lectura o el guardado, muestra un mensaje y permite reintentar. Las escrituras de compra se serializan para no sobrescribir un cambio reciente con uno anterior.
+AsyncStorage guarda la compra abierta y las finalizadas juntas bajo `ownapp.supermarket.shopping.v3`, y las sucursales manuales bajo `ownapp.supermarket.stores.v1`, local a cada instalación o navegador/origen. Los formatos `shopping.v2` y `shopping.v1` se recuperan sin perder ítems; las compras `v1` piden sucursal al continuar. El cierre se escribe en una sola operación para no vaciar la compra antes de guardar su historial. No hay sincronización ni cuentas. Inicio espera la lectura antes de habilitar la compra. Si falla la lectura o el guardado, muestra un mensaje y permite reintentar. Las escrituras se serializan para no sobrescribir un cambio reciente con uno anterior.
+
+El estimado de una compra finalizada se sigue calculando desde sus ítems incluidos. El importe del ticket, cuando se informa, se guarda por separado y puede agregarse después sin alterar los precios de los productos. Una compra vacía o con todos los productos apartados no puede finalizarse por ahora; se conserva abierta para revisarla o descartarla explícitamente.
 
 Cada precio confirmado desde una etiqueta también se registra en SQLite local como una observación independiente de la compra: conserva producto, importe, sucursal elegida, condición detectada, precio por medida publicado cuando es inequívoco y fecha de captura. Las observaciones anteriores conservan su sucursal desconocida. Al mismo tiempo se agrega a una cola local pendiente de sincronización; esta versión no tiene backend ni envía datos fuera del dispositivo. Vaciar o descartar la compra no elimina esas observaciones.
 
@@ -92,7 +98,7 @@ pnpm lint
 pnpm test
 ```
 
-Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, cálculos, edición, cantidades, identidad de productos, migración de compra anterior y exclusión reversible del total.
+Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, cálculos, edición, cantidades, identidad de productos, migraciones, exclusión reversible del total y cierre con ticket opcional.
 
 Recorrido manual sugerido:
 
@@ -103,6 +109,8 @@ Recorrido manual sugerido:
 5. En un teléfono físico con una development build, permitir la cámara, capturar una etiqueta nítida, tocar «Leer etiqueta», elegir el precio detectado y confirmarlo. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
 6. Probar una lectura sin precio: ofrece reintento y carga manual.
 7. En «Ver compra», apartar un producto con varias unidades: la fila y su cantidad siguen visibles, pero el total y el recuento de incluidos bajan. Reincorporarlo y comprobar que recupera el subtotal original. Volver a capturar y reabrir la compra; el estado debe persistir al reiniciar la app.
-8. Tocar «Empezar otra compra», cancelar el descarte y comprobar que sigue intacta. Confirmar el descarte y comprobar que se puede elegir una sucursal nueva.
+8. Abrir «Finalizar compra», dejar el ticket vacío y guardar: el detalle conserva incluidos y «No llevaste»; Inicio muestra la última compra con «Total estimado». Completar después el ticket desde el detalle y comprobar que muestra «Total del ticket» sin cambiar el estimado.
+9. Probar un ticket inválido y un cierre con todos los productos apartados: no se guarda ni desaparece la compra. Volver con Atrás desde el cierre y comprobar que el borrador del ticket sigue escrito.
+10. Tocar «Empezar otra compra», cancelar el descarte y comprobar que sigue intacta. Elegir finalizar la anterior o confirmar el descarte; después se puede elegir una sucursal nueva.
 
 También conviene verificar teclado, áreas seguras, tamaño de texto y persistencia en un teléfono físico antes de la siguiente entrega.
