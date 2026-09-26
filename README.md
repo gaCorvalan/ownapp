@@ -11,7 +11,7 @@ La propuesta de experiencia y sus hipótesis están en
 no describen funcionalidades ya implementadas.
 La estructura, el rol de cada elemento y las decisiones vigentes se documentan
 por separado en el [índice de pantallas](docs/ux/pantallas/README.md).
-La [dirección visual vigente](docs/ux/visual/v1/README.md) usa Lexend Deca,
+La [dirección visual vigente](docs/ux/visual/v2/README.md) usa Lexend Deca,
 petróleo y lima como base provisional; no es todavía la UI implementada.
 
 ## Ejecutar

@@ -4,8 +4,9 @@ Actualización: 24 de septiembre de 2026.
 Estado: dirección y acceso a la compra acordados; composición fina propuesta.
 [Índice de pantallas](README.md).
 
-Representación vigente: [dirección visual 01](../visual/v1/README.md), estados
-01 y 03. [Wireflow previo](../wireflows/v1/README.md) como antecedente.
+Representación vigente: [recorrido visual 02](../visual/v2/README.md), estado
+01. El retorno con feedback sigue descrito en v1; v2 lo omite para mostrar
+el cierre en una sola lámina. [Wireflow previo](../wireflows/v1/README.md) como antecedente.
 El rumbo visual es provisional; los detalles dibujados siguen siendo propuestas.
 
 ## Rol y contexto

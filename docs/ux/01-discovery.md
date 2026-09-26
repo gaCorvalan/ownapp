@@ -77,6 +77,7 @@ Un historial personal no debe presentarse como un índice general de inflación.
 | El flujo actual de elegir precio y agregar le resulta adecuado | Conservar ese flujo y trabajar jerarquía y componentes |
 | Quiere apartar productos sin perderlos de vista (26/09) | Excluirlos del total y reincorporarlos durante la compra para evaluar decisiones; reemplaza quitar con Deshacer fugaz |
 | Apartar el producto completo es suficiente (26/09) | Afectar todas las unidades de la fila y conservar su cantidad; no diseñar apartado parcial |
+| Considera valioso lo agregado pero no llevado (26/09) | Conservar los apartados en la compra finalizada como «No llevaste», sin sumarlos al gasto ni convertirlos automáticamente en pendientes |
 
 ## Propuestas pendientes de validación
 
@@ -94,7 +95,7 @@ Un historial personal no debe presentarse como un índice general de inflación.
   y evitar afirmar «hoy más barato» con una observación de otra fecha.
 - Definir el control para apartar/reincorporar y su posición. Está acordado
   afectar toda la cantidad del producto, de forma reversible y sin desaparecer.
-  No destruye la observación; el destino de los apartados al finalizar sigue pendiente.
+  No destruye la observación; al finalizar se conserva como «No llevaste».
 - Elegir sucursal una vez por compra. Permitir completarla más tarde si falta;
   no presentar ubicación desconocida como precio de toda una cadena.
 - Guardar observación confirmada incluso al decidir no comprar; especificar
@@ -106,6 +107,7 @@ Un historial personal no debe presentarse como un índice general de inflación.
 | --- | --- | --- |
 | Observación | Precio visto, fecha, lugar, origen y condiciones | Que se compró ni que sigue vigente |
 | Carrito | Productos elegidos y editables | Gasto pagado |
+| No llevaste | Productos agregados y apartados, conservados en esa compra | Gasto, ahorro demostrado, motivo de descarte ni intención de otra compra |
 | Pendiente | Intención de comprar un producto en otro local | Stock ni reserva del precio |
 | Compra finalizada | Ítems y total calculado conservados | Ticket confirmado |
 | Total del ticket | Importe pagado ingresado por la persona | Precio pagado conocido para cada ítem ni reintegro futuro |
@@ -169,7 +171,7 @@ La exploración inicial usó superficies neutras con acento azul o ciruela.
 El usuario consideró desacertado el concepto de interfaz y pidió trabajar los
 roles, la jerarquía y las estrategias mobile antes del tratamiento visual.
 Esa exploración fue descartada. La
-[dirección visual vigente](visual/v1/README.md) desarrolla la composición A
+[dirección visual vigente](visual/v2/README.md) desarrolla la composición A
 con Lexend Deca, petróleo, lima y superficies tonales. El usuario aceptó
 continuar por este camino provisionalmente, pero aclaró que aún no lo convence
 del todo: no hay aprobación definitiva del acabado ni validación de usabilidad.

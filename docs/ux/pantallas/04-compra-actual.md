@@ -5,12 +5,10 @@ Estado: pantalla completa, acceso y exclusión reversible del total acordados;
 control y composición interna propuestos.
 [Índice de pantallas](README.md).
 
-Representación vigente: [dirección visual 01](../visual/v1/README.md), estado 04,
-aceptada como rumbo provisional. El [wireflow](../wireflows/v1/README.md) queda
-como antecedente. La compra de ejemplo tiene cuatro productos: no demuestra
-aún una lista mensual larga.
-La lámina precede a la decisión de apartar productos: su papelera no representa
-la interacción vigente. La edición de nombre/precio se pospuso el 26/09.
+Representación vigente: [recorrido visual 02](../visual/v2/README.md), estado 03,
+con una casilla de inclusión propuesta. El [wireflow](../wireflows/v1/README.md)
+y la lámina v1 quedan como antecedentes. Cuatro productos de ejemplo no
+demuestran aún una lista mensual larga. La edición de nombre/precio se pospuso.
 
 ## Rol y contexto
 
@@ -94,9 +92,11 @@ reincorporar → $24.350. No es necesario mostrar dos totales competidores.
 No se divide una fila entre unidades incluidas y apartadas. Se conserva la
 cantidad para reincorporarlo; ajustar cantidad es una acción distinta.
 
-Pendiente: definir persistencia al reabrir y destino de los
-apartados al finalizar. No convertirlos automáticamente en pendientes para
-otra sucursal ni contabilizarlos como compra realizada.
+**Acordado al finalizar:** conservar los apartados en esa compra como
+«No llevaste», separados de los incluidos y sin sumarlos al gasto. El usuario
+considera valioso recordar lo agregado pero no llevado. No convertirlos
+automáticamente en pendientes para otra sucursal ni inferir por qué los dejó.
+La recuperación del estado al reabrir una compra en curso sigue por precisar.
 
 ### Compra vacía
 
@@ -118,7 +118,7 @@ propuesto y separado de apartar: no se diseñará apartado parcial de unidades.
 El usuario aceptó ingresar el total del ticket, siempre opcional y también
 después de llegar a casa. Finalizar y vaciar tienen significados distintos.
 El cierre deberá conservar los ítems, el total calculado y el contexto de la
-compra; su pantalla o estado se documentará al diseñarlo.
+compra. Su composición se propone en [Finalización](05-finalizacion.md).
 
 Si luego se ingresa un ticket diferente del cálculo, conservar ambos importes.
 No repartir la diferencia entre los precios de los productos. Los reintegros
@@ -140,6 +140,7 @@ bancarios automáticos quedan fuera de la primera versión.
 | COM-12 | 2026-09-26 | Propuesto | Casilla de inclusión, fila en la misma posición y texto «Apartado · No suma»; conservar datos y legibilidad |
 | COM-13 | 2026-09-26 | Acordado para esta etapa | Posponer diseño de edición de nombre/precio; no cambia el editor existente ni elimina recuperación ante errores |
 | COM-14 | 2026-09-26 | Acordado | Apartar el producto completo, con todas sus unidades; conservar cantidad para reincorporarlo, sin dividir la fila en estados parciales |
+| COM-15 | 2026-09-26 | Acordado | Al finalizar, conservar los apartados bajo «No llevaste», fuera del total; el usuario considera valiosa la información de lo agregado pero no llevado |
 
 ## Desarrollo visual 01 · propuesto
 
@@ -148,7 +149,8 @@ superficie clara con tinte, filas blancas por producto y cierre petróleo
 separado abajo. Cantidad y subtotal quedan en la misma fila; nombre y precio
 unitario arriba. Sus iconos de edición y papelera quedaron desactualizados
 por COM-11 y COM-13. La próxima revisión representará inclusión reversible,
-con área táctil amplia; todavía no se generó esa nueva lámina.
+con área táctil amplia. Esa revisión ya está disponible en el
+[recorrido visual 02](../visual/v2/README.md).
 
 El último producto aparece primero con tinte suave; no es una clasificación
 por necesidad ni por ahorro. El orden y el resaltado siguen siendo propuestas.
@@ -165,7 +167,7 @@ de abrir a pantalla completa y volver a captura con Atrás.
 - Orden de productos y densidad de la lista para una compra mensual.
 - Ubicación del total y finalizar con teclado, texto ampliado y lista larga.
 - Control de inclusión, comprensión de «Apartado» y lectura del total actualizado.
-- Conservación del estado de inclusión al reabrir y destino de apartados al cerrar.
+- Conservación del estado de inclusión al reabrir y comprensión de «No llevaste» al cerrar.
 - Reincorporación sin salto de posición y diferencia entre cero incluidos y lista vacía.
 - Que el desplazamiento de la lista no cierre accidentalmente la pantalla.
 - Que volver, finalizar y vaciar se interpreten como acciones distintas.

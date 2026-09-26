@@ -29,6 +29,7 @@ Las decisiones acordadas también necesitan validación de usabilidad.
 | [02 · Captura](02-captura.md) | Capturar etiquetas con el acumulado accesible | Cámara protagonista y acceso al carrito acordados; detalles propuestos |
 | [03 · Confirmación](03-confirmacion.md) | Elegir un precio y agregar el producto | Flujo y composición A elegidos; acabado visual e interacción fina pendientes |
 | [04 · Compra actual](04-compra-actual.md) | Revisar y modificar la compra completa | Pantalla completa y apertura ascendente acordadas; organización en diseño |
+| [05 · Finalización](05-finalizacion.md) | Guardar la compra y lo que no se llevó | Ticket opcional y «No llevaste» acordados; composición propuesta |
 
 Confirmación se documenta por separado porque tiene una tarea y jerarquía
 propias. Todavía no se decidió si será una pantalla independiente o un estado
@@ -44,6 +45,10 @@ actual a pantalla completa. Volver recupera el contexto de captura. El lugar
 exacto de la elección de sucursal sigue pendiente: no se aprobó una pantalla
 adicional obligatoria antes de capturar.
 
+Compra actual → Finalización → detalle de la compra guardada (destino propuesto).
+Al cerrar se conservan incluidos y «No llevaste» por separado; sólo los primeros
+suman al total estimado. El ticket no es requisito de cierre.
+
 ## Áreas que aún no tienen composición definida
 
 | Área | Necesidad ya identificada | Qué falta decidir |
@@ -51,7 +56,6 @@ adicional obligatoria antes de capturar.
 | Supermercado/sucursal | Asociar los precios a los locales habituales | Momento de elección, presentación y datos faltantes |
 | Comparación | Consultar alternativas desde el escaneo | Superficie, jerarquía y retorno a confirmación |
 | Pendientes | Guardar el producto específico elegido para otro supermercado | Listado por local y uso durante la visita siguiente |
-| Finalización | Conservar la compra y permitir ticket opcional | Composición del cierre y confirmación del guardado |
 | Historial | Recuperar compras y completar el ticket después | Navegación entre compras, precios y resumen mensual |
 
 Se creará un documento por pantalla cuando trabajemos su estructura. No se
@@ -97,7 +101,7 @@ No presentar estas etapas como si hubiera que empezar el diseño de nuevo.
 - El primer HTML fue descartado y retirado. Su aprendizaje permanece: el
   usuario lo percibió como un formulario lineal, poco pensado para mobile.
 
-La [dirección visual 01 · Lexend Deca](../visual/v1/README.md) es la base vigente:
+El [recorrido visual 02 · Lexend Deca](../visual/v2/README.md) es la referencia vigente:
 desarrolla A con superficies tonales, petróleo y lima. El usuario aceptó
 continuar por este camino **provisionalmente**, aclarando que todavía no le
 convence del todo. No están cerrados paleta, componentes ni acabado final.

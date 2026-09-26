@@ -1,5 +1,8 @@
 # Dirección visual 01 · Lexend Deca
 
+Antecedente visual. El [recorrido 02](../v2/README.md) es la lámina vigente e
+incorpora apartados y finalización, sin los lápices ni la papelera de esta versión.
+
 Fecha: 24 de septiembre de 2026.
 Estado: **rumbo visual aceptado provisionalmente; no es una aprobación definitiva
 ni una prueba de usabilidad**. El usuario indicó que mejoró bastante y quiere

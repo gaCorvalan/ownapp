@@ -2,7 +2,7 @@
 
 Estado al 24/09/2026: preparado, sin participantes evaluados ni resultados.
 
-Material vigente: [dirección visual 01 · Lexend Deca](visual/v1/README.md),
+Material vigente: [recorrido visual 02 · Lexend Deca](visual/v2/README.md),
 aceptada como rumbo provisional, y [decisiones por pantalla](pantallas/README.md).
 El [wireflow](wireflows/v1/README.md) queda como antecedente de estructura; A fue
 elegida. El HTML descartado se retiró y no debe usarse para pruebas.
@@ -62,6 +62,7 @@ El facilitador registra esa intervención.
 | Comparar | Querés evaluar llevar la leche hoy o comprar otra en tu próximo supermercado | Abre alternativas y lee fecha/condición/presentación |
 | Pendiente | Elegís la alternativa concreta para otra visita | No la confunde con un producto del carrito actual |
 | Cerrar | Terminaste de pagar, pero no tenés el ticket a mano | Finaliza sin importe obligatorio |
+| Consultar lo apartado | Ya guardaste la compra y querés recordar el arroz que decidiste dejar | Encuentra «No llevaste» en el futuro detalle; no lo confunde con gasto, ahorro o pendiente de otra visita |
 | Completar | Ya en casa, encontrás el ticket | Recupera compra y registra total sin alterar los ítems |
 
 Un prototipo sin cámara real no permite juzgar legibilidad de etiquetas, latencia OCR, calidad de

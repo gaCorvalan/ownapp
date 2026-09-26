@@ -9,7 +9,7 @@ aprobados. No se elimina el editor existente ni se asume OCR infalible;
 se conserva Volver a encuadrar como salida de la lectura.
 [Índice de pantallas](README.md).
 
-Representación vigente: [dirección visual 01](../visual/v1/README.md), estado 02,
+Representación vigente: [recorrido visual 02](../visual/v2/README.md), estado 02,
 aceptada como rumbo provisional. Ilustra un precio ya elegido. El
 [wireflow y alternativas A/B](../wireflows/v1/README.md) quedan como antecedente;
 la comparación muestra el estado inicial sin elección.
