@@ -68,7 +68,12 @@ Un historial personal no debe presentarse como un índice general de inflación.
 | Pendiente de un producto elegido específicamente | Conservar marca, variante y presentación seleccionadas |
 | Total del ticket opcional y editable después | Finalizar sin bloquear y completar desde historial |
 | Frecuenta las mismas sucursales | Favorecer selección entre locales habituales |
-| Empezar compra → panel de sucursales → elegir → cámara (26/09) | Elegir el local antes de capturar, sin confirmación adicional; primer uso pendiente |
+| Empezar compra → panel de sucursales → elegir → cámara (26/09) | Elegir el local antes de capturar, sin confirmación adicional |
+| Alta simple ahora; catálogo de supermercados/sucursales después (26/09) | Permitir registro manual en la primera versión; Google Maps fue mencionado como posibilidad futura, no como fuente o integración aprobada |
+| Referencia simple de sucursal suficiente (26/09) | Pedir supermercado y referencia libre sin exigir dirección exacta; no asumir identidad compartida entre usuarios |
+| Distinguir regreso desde otra app de apertura desde cero (26/09) | Regreso: recuperar pantalla activa. Apertura desde cero: Inicio con card de compra abierta, sucursal, total y Continuar; sin repetir selección de local |
+| Una sola compra abierta en la primera versión (26/09) | Resolver explícitamente la anterior de forma sencilla antes de iniciar otra; sin cierre automático ni pérdida silenciosa |
+| Prioriza compras anteriores frente a Pendientes en Inicio (26/09) | Dar acceso secundario al historial; la utilidad de Pendientes aún debe evaluarse, sin eliminarlo del futuro alcance |
 | No le gusta el estilo ni la paleta actuales | Explorar otra dirección; marca/nombre aún no decididos |
 | Puede probar y conseguir participantes | Preparar prueba personal y ronda con compradores reales |
 | Abre la app frente al primer producto y ya eligió supermercado | Inicio rápido, sin orientar la portada a decidir dónde ir |
@@ -97,8 +102,8 @@ Un historial personal no debe presentarse como un índice general de inflación.
 - Definir el control para apartar/reincorporar y su posición. Está acordado
   afectar toda la cantidad del producto, de forma reversible y sin desaparecer.
   No destruye la observación; al finalizar se conserva como «No llevaste».
-- Elección antes de la cámara ya acordada. Definir primer uso y local no
-  encontrado: completarlo después fue una propuesta anterior, no una excepción
+- Elección antes de la cámara y alta manual simple ya acordadas. Definir los
+  validaciones y recuperación del alta: completarlo después fue una propuesta anterior, no una excepción
   aprobada. No presentar ubicación desconocida como precio de toda una cadena.
 - Guardar observación confirmada incluso al decidir no comprar; especificar
   ese comportamiento en el producto y verificar correcciones posteriores.

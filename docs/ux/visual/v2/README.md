@@ -7,7 +7,7 @@ y lima. Sin cambios de código de la aplicación.
 
 ![Capturar, confirmar, apartar y finalizar](01-recorrido-lexend-deca.png)
 
-Una lámina PNG de 3680 × 2480; sin SVG ni pantallas sueltas. La
+Esta lámina de compra mide 3680 × 2480; sin SVG ni pantallas sueltas. La
 [versión 01](../v1/README.md) queda como antecedente de estilo, no como guía
 vigente de edición o retiro. Su sistema tipográfico, fuente real y procedencia
 se mantienen. Los marcos siguen en 360 × 780 unidades de composición.
@@ -58,3 +58,52 @@ Para muchos apartados, la composición y expansión se precisan en
   real. No se presentan pantallas implementadas ni resultados con participantes.
 - Sólo documentación y PNG: sin pruebas de app, bundles, revisión web ni
   ejecución en teléfono. Faltan gestos, teclado, texto ampliado y listas largas.
+
+## Inicio, sucursal y cámara
+
+![Recorrido de entrada y sus variantes](02-inicio-sucursal.png)
+
+Una nueva lámina para el recorrido de entrada, de 2760 × 4400. Mantiene Lexend
+Deca real y la paleta provisional; no genera exportaciones por pantalla.
+
+**Fila superior, recorrido habitual:** Inicio → Empezar compra → panel con
+sucursales guardadas → tocar una → cámara. El nuevo acumulado es cero. Se asume
+permiso de cámara concedido sólo para ilustrar este caso; permisos y errores
+no están resueltos por el dibujo.
+
+**Fila inferior, variantes independientes, no pasos consecutivos:**
+
+- **Primera vez:** propósito y acción principal; explicación breve del historial
+  en lugar de una tarjeta vacía o datos inexistentes. Al empezar sin sucursales,
+  proponer abrir el alta dentro del panel directamente.
+- **Agregar sucursal:** supermercado y referencia libre; «Guardar y empezar»
+  propuesto evita volver a elegir el local recién creado. Esta variante también
+  sirve para agregar otro local; el fondo ilustrado corresponde a uso habitual.
+- **Compra abierta:** sucursal, total y Continuar al abrir desde cero. Empezar
+  otra requiere resolver la anterior. El diálogo de resolución no se dibujó y
+  la conservación de datos al descartar sigue pendiente.
+
+La prioridad secundaria del historial está acordada. La preview de la última
+compra, su posición, la forma del panel inferior y los textos son propuestas.
+Pendientes queda fuera del inicio por ahora: no se está eliminando ni validando
+esa funcionalidad futura. No hay dashboard mensual ni barra global aprobados.
+
+La compra anterior muestra $38.450 como **Total del ticket**, con datos ficticios.
+Cuando no haya ticket deberá decir **Total estimado**, sin fingir un pago
+confirmado. La card abre el futuro detalle; Ver todas, el futuro historial.
+Ambas composiciones de destino siguen pendientes. Las iniciales de sucursales
+son recursos genéricos, no logos ni datos obtenidos de un catálogo real.
+
+La CTA inferior conserva posición entre los tres estados del inicio. El cierre
+del panel y Ver todas deben tener áreas táctiles amplias aunque su representación
+sea pequeña. Teclado, texto ampliado, lector de pantalla y altura real disponible
+requieren pruebas, no se verifican en una imagen estática.
+
+Decisiones y fundamento en [Inicio](../../pantallas/01-inicio.md) y
+[Selección de sucursal](../../pantallas/06-seleccion-sucursal.md).
+
+**Verificación de esta lámina:** inspección visual, fuente registrada como
+Lexend Deca, consistencia entre sucursal elegida y cabecera de cámara, total de
+nueva compra $0 y conservación del ejemplo de compra abierta ($22.900).
+Sin código de app modificado, pruebas automáticas de app, bundles ni ejecución
+web o en teléfono físico. La imagen no demuestra persistencia ni navegación real.

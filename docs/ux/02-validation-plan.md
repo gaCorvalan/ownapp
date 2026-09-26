@@ -56,6 +56,12 @@ El facilitador registra esa intervención.
 | Tarea | Situación a plantear | Qué observar |
 | --- | --- | --- |
 | Cargar | Querés llevar dos unidades de esta leche al precio regular | Precio, cantidad, confianza sobre si se agregó |
+| Empezar por primera vez | Estás frente a una etiqueta en tu supermercado y todavía no guardaste ninguna sucursal | Encuentra Empezar, registra supermercado/referencia y llega a cámara sin catálogo ni pasos redundantes |
+| Repetir local | Volvés a una sucursal que ya habías usado | La reconoce en el panel y entra a cámara sin repetir el alta |
+| Consultar compras | Querés revisar cuánto registraste en tu compra anterior | Descubre el acceso secundario al historial sin iniciar una compra; distingue estimado de ticket |
+| Volver de otra app | Durante la compra consultás algo fuera de la app y regresás | Recupera la pantalla activa sin repetir Inicio ni selección de sucursal; verificar ciclo de vida real en Android aparte del prototipo |
+| Reabrir | Cerraste la app con una compra sin finalizar y la abrís otra vez | Reconoce sucursal y total en Inicio; Continuar retoma sin crear otra compra |
+| Empezar otra | Estás en otro supermercado y quedó abierta la compra anterior | Entiende cómo resolverla antes de iniciar otra; no la confunde con apartar productos ni interpreta un cierre automático |
 | Revisar | Querés saber cuánto pagarías sin llevar el arroz, sin perderlo de vista | Encuentra carrito, aparta el producto y entiende que su precio visible ya no suma |
 | Recuperar | Después de revisar otros productos, cambiás de opinión y querés llevar el arroz | Lo reincorpora sin escanear ni depender de un aviso temporal; total y cantidad coherentes |
 | Apartar varias unidades | Llevabas dos leches; querés calcular el total sin llevar ninguna y luego volver a incluir ambas | Se aparta toda la fila y se recupera la cantidad 2; no se interpreta como restar sólo una unidad |

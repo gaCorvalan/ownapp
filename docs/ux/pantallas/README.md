@@ -30,7 +30,7 @@ Las decisiones acordadas también necesitan validación de usabilidad.
 | [03 · Confirmación](03-confirmacion.md) | Elegir un precio y agregar el producto | Flujo y composición A elegidos; acabado visual e interacción fina pendientes |
 | [04 · Compra actual](04-compra-actual.md) | Revisar y modificar la compra completa | Pantalla completa y apertura ascendente acordadas; organización en diseño |
 | [05 · Finalización](05-finalizacion.md) | Guardar la compra y lo que no se llevó | Ticket opcional y «No llevaste» acordados; composición propuesta |
-| [06 · Selección de sucursal](06-seleccion-sucursal.md) | Elegir dónde se compra antes de capturar | Secuencia acordada; primer uso y composición pendientes |
+| [06 · Selección de sucursal](06-seleccion-sucursal.md) | Elegir dónde se compra antes de capturar | Secuencia, supermercado y referencia libre acordados; composición pendiente |
 
 Confirmación se documenta por separado porque tiene una tarea y jerarquía
 propias. Todavía no se decidió si será una pantalla independiente o un estado
@@ -43,8 +43,20 @@ Inicio → Empezar compra → panel de sucursales → elegir → Captura → Con
 
 Desde Captura, tocar o deslizar hacia arriba el resumen del carrito abre Compra
 actual a pantalla completa. Volver recupera el contexto de captura. La selección
-de sucursal antes de la cámara está acordada para nuevas compras. El primer uso,
-local no encontrado y recuperación de una compra abierta siguen por definir.
+de sucursal antes de la cámara está acordada para nuevas compras, con alta manual
+simple en esta versión. La composición está propuesta, no validada. El catálogo compartido
+queda para el futuro.
+
+La [lámina de entrada](../visual/v2/README.md#inicio-sucursal-y-cámara) propone la
+composición de Inicio y del panel, incluyendo primer uso y compra abierta.
+Compras anteriores es el acceso secundario priorizado; Pendientes queda fuera
+del inicio por ahora, hasta entender mejor su utilidad cotidiana.
+
+Con una compra abierta: al iniciar la app desde cero, mostrar Inicio con sucursal,
+total y Continuar compra; al volver de otra app en la sesión, recuperar directamente
+la pantalla activa. Se acuerda una sola compra abierta para esta versión:
+resolver explícitamente la anterior antes de empezar otra. La presentación de
+esa resolución y el tratamiento de descarte siguen propuestos.
 
 Compra actual → Finalización → detalle de la compra guardada (destino propuesto).
 Al cerrar se conservan incluidos y «No llevaste» por separado; sólo los primeros
@@ -54,7 +66,7 @@ suman al total estimado. El ticket no es requisito de cierre.
 
 | Área | Necesidad ya identificada | Qué falta decidir |
 | --- | --- | --- |
-| Supermercado/sucursal | Asociar los precios a los locales habituales | Presentación, primer uso y datos faltantes; momento de elección ya acordado |
+| Supermercado/sucursal | Asociar los precios a los locales habituales | Presentación y validaciones; selección previa y alta con referencia libre acordadas |
 | Comparación | Consultar alternativas desde el escaneo | Superficie, jerarquía y retorno a confirmación |
 | Pendientes | Guardar el producto específico elegido para otro supermercado | Listado por local y uso durante la visita siguiente |
 | Historial | Recuperar compras y completar el ticket después | Navegación entre compras, precios y resumen mensual |
