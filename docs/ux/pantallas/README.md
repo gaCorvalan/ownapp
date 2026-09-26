@@ -86,8 +86,10 @@ presupone que cada área vaya a necesitar una pantalla independiente.
    ayude a entender el origen de una decisión.
 4. Definir para cada propuesta qué se debería observar en una prueba. No
    registrar «validado» sin evidencia de esa comprobación.
-5. Mantener abiertos tamaños, paleta y componentes específicos hasta diseñarlos.
-   Elegir un patrón no obliga a incorporar una dependencia.
+5. Tomar paleta y escala tipográfica del
+   [sistema de marca](../visual/sistema-de-marca.md). Los componentes y su
+   comportamiento específico siguen sujetos a diseño y pruebas; elegir un
+   patrón no obliga a incorporar una dependencia.
 6. Entregar las próximas exploraciones visuales en **PNG**, con una lámina por
    recorrido y otra de alternativas sólo cuando haya una decisión que comparar.
    No duplicar SVG/PNG ni exportar cada pantalla por separado. Esta preferencia
@@ -115,9 +117,10 @@ No presentar estas etapas como si hubiera que empezar el diseño de nuevo.
   usuario lo percibió como un formulario lineal, poco pensado para mobile.
 
 El [recorrido visual 02 · Lexend Deca](../visual/v2/README.md) es la referencia vigente:
-desarrolla A con superficies tonales, petróleo y lima. El usuario aceptó
-continuar por este camino **provisionalmente**, aclarando que todavía no le
-convence del todo. No están cerrados paleta, componentes ni acabado final.
+desarrolla A con superficies tonales, petróleo y lima. Después de esa
+exploración se eligió una [base de marca](../visual/sistema-de-marca.md) para
+implementarla y probarla. Los componentes y el acabado en dispositivo aún
+requieren revisión.
 Es una lámina estática, no un prototipo navegable ni una implementación. El
 [Wireflow 01 · Compra activa](../wireflows/v1/README.md) presenta cuatro estados
 del recorrido y la comparación de confirmación; **A ya fue elegida**. Se

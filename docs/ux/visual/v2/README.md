@@ -5,6 +5,10 @@ Estado: decisiones de inclusión y conservación acordadas; controles y composic
 propuestos. Mantiene la dirección visual provisional de Lexend Deca, petróleo
 y lima. Sin cambios de código de la aplicación.
 
+Actualización posterior: el [sistema de marca](../sistema-de-marca.md) adopta
+esta paleta y tipografía como base para implementar y probar. La lámina sigue
+siendo una propuesta de composición, no una captura de la app.
+
 ![Capturar, confirmar, apartar y finalizar](01-recorrido-lexend-deca.png)
 
 Esta lámina de compra mide 3680 × 2480; sin SVG ni pantallas sueltas. La
