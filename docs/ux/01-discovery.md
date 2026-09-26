@@ -59,10 +59,10 @@ Un historial personal no debe presentarse como un índice general de inflación.
 | --- | --- |
 | Sin presupuesto fijo habitual | No pedir un límite para comenzar |
 | Lista previa opcional | Poder entrar directamente a comprar |
-| Necesita nombres reconocibles | Confirmar/corregir el nombre en la captura |
+| Necesita nombres reconocibles | Mostrar el nombre; el diseño de su corrección manual se pospuso el 26/09 |
 | Precios de góndola y de envase | Admitir ambos orígenes en un mismo flujo |
 | Promociones bancarias fuera del inicio | No estimar reintegros automáticos |
-| Elegir/corregir manualmente el precio es suficiente | No incorporar un motor de promociones en el primer incremento |
+| Inicialmente aceptó elegir/corregir el precio; el 26/09 pospuso su editor | Conservar selección OCR sin motor de promociones; el ajuste manual complejo queda pendiente |
 | Comparación desde el escaneo | Consultar alternativas sin sumar al carrito |
 | Marcas aceptables según producto | Mostrar alternativas; la persona decide equivalencia |
 | Pendiente de un producto elegido específicamente | Conservar marca, variante y presentación seleccionadas |
@@ -75,6 +75,8 @@ Un historial personal no debe presentarse como un índice general de inflación.
 | Toque o swipe del carrito deben abrir la compra completa | Pantalla de revisión propia con transición ascendente, no un bottom sheet |
 | Carga manual muy secundaria | Resolver su presencia y recuperación de errores sin competir con capturar |
 | El flujo actual de elegir precio y agregar le resulta adecuado | Conservar ese flujo y trabajar jerarquía y componentes |
+| Quiere apartar productos sin perderlos de vista (26/09) | Excluirlos del total y reincorporarlos durante la compra para evaluar decisiones; reemplaza quitar con Deshacer fugaz |
+| Apartar el producto completo es suficiente (26/09) | Afectar todas las unidades de la fila y conservar su cantidad; no diseñar apartado parcial |
 
 ## Propuestas pendientes de validación
 
@@ -82,14 +84,17 @@ Un historial personal no debe presentarse como un índice general de inflación.
   destinos del primer boceto no fue aprobada como estructura definitiva.
 - Total compacto siempre disponible en el flujo activo; último ítem agregado
   visible y correcciones cercanas a la captura.
-- Facilitar corrección de nombre/precio y cantidad sin cambiar el flujo aceptado
-  de elegir precio y agregar. Falta decidir cuándo completar un nombre ausente;
+- La edición de nombre/precio se pospone por pedido del usuario (26/09), sin
+  eliminar el editor existente. Cantidad sigue propuesta. La lectura OCR puede
+  fallar; comprobar si reencuadrar alcanza. Falta decidir qué hacer con un nombre ausente;
   no está aprobado exigirlo como un nuevo paso obligatorio.
 - Alternativas bajo demanda. Identificar primero el mismo producto; mostrar
   otros como posibles alternativas, no equivalencias garantizadas por OCR.
 - Mostrar precio histórico, fecha, sucursal y condición. Usar «Registrado el…»
   y evitar afirmar «hoy más barato» con una observación de otra fecha.
-- Quitar con posibilidad de deshacer; «No lo llevo» no destruye la observación.
+- Definir el control para apartar/reincorporar y su posición. Está acordado
+  afectar toda la cantidad del producto, de forma reversible y sin desaparecer.
+  No destruye la observación; el destino de los apartados al finalizar sigue pendiente.
 - Elegir sucursal una vez por compra. Permitir completarla más tarde si falta;
   no presentar ubicación desconocida como precio de toda una cadena.
 - Guardar observación confirmada incluso al decidir no comprar; especificar
@@ -115,8 +120,11 @@ Esto complementa el ROADMAP técnico, sin reemplazarlo ni aprobar sus cambios.
 
 ### A · Validar una compra completa
 
-Captura/manual, nombre/precio/cantidad corregibles, total, revisión del carrito,
-quitar/deshacer, contexto de sucursal, cierre y recuperación de la compra.
+Captura, recuperación ante errores, cantidad, total, revisión del carrito,
+apartar/reincorporar, contexto de sucursal, cierre y recuperación de la compra.
+El diseño del editor de nombre/precio se pospuso el 26/09; no confundir esa
+prioridad de diseño con una garantía de OCR infalible o la eliminación de
+funciones existentes. El acceso manual ante fallos sigue por resolver.
 Total del ticket opcional en el cierre y después. Probar el flujo existente
 como referencia antes de implementar todas estas mejoras.
 
@@ -160,7 +168,11 @@ público. No se trasladan porcentajes publicitarios de ahorro a esta app.
 La exploración inicial usó superficies neutras con acento azul o ciruela.
 El usuario consideró desacertado el concepto de interfaz y pidió trabajar los
 roles, la jerarquía y las estrategias mobile antes del tratamiento visual.
-Esa exploración no es la referencia vigente ni hay una paleta aprobada.
+Esa exploración fue descartada. La
+[dirección visual vigente](visual/v1/README.md) desarrolla la composición A
+con Lexend Deca, petróleo, lima y superficies tonales. El usuario aceptó
+continuar por este camino provisionalmente, pero aclaró que aún no lo convence
+del todo: no hay aprobación definitiva del acabado ni validación de usabilidad.
 Mantener «a mano» provisionalmente; el rechazo del estilo no se interpreta como
 una solicitud de cambiar el nombre.
 
@@ -176,7 +188,7 @@ una solicitud de cambiar el nombre.
 - No pedir cuentas, ubicación automática ni preferencias por categoría para la
   primera prueba. Sin dependencias nuevas para explorar la propuesta.
 
-El boceto `compra-concepto.html` se conserva sólo como antecedente de la
-exploración descartada. Usa datos ficticios y captura simulada, no representa
-las decisiones posteriores y no debe utilizarse como prototipo vigente para
-pruebas o implementación. La nueva base son los documentos por pantalla.
+El HTML de la exploración descartada se retiró durante la limpieza. Se conserva
+su aprendizaje —evitar una experiencia lineal de formulario—, no un segundo
+prototipo que pueda confundirse con el diseño vigente. La base de decisiones
+son los documentos por pantalla y la lámina visual enlazada arriba.

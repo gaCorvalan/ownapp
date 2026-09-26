@@ -1,6 +1,6 @@
 # Pantallas y decisiones de experiencia
 
-Actualización: 24 de septiembre de 2026.
+Actualización: 26 de septiembre de 2026.
 
 Este índice reúne el diseño que estamos definiendo en conversación. Cada
 pantalla tiene un documento propio: propósito, contexto, jerarquía, estructura,
@@ -27,7 +27,7 @@ Las decisiones acordadas también necesitan validación de usabilidad.
 | --- | --- | --- |
 | [01 · Inicio](01-inicio.md) | Empezar o recuperar una compra | Propósito acordado; composición y estados propuestos |
 | [02 · Captura](02-captura.md) | Capturar etiquetas con el acumulado accesible | Cámara protagonista y acceso al carrito acordados; detalles propuestos |
-| [03 · Confirmación](03-confirmacion.md) | Elegir un precio y agregar el producto | Flujo actual aceptado; tratamiento visual en diseño |
+| [03 · Confirmación](03-confirmacion.md) | Elegir un precio y agregar el producto | Flujo y composición A elegidos; acabado visual e interacción fina pendientes |
 | [04 · Compra actual](04-compra-actual.md) | Revisar y modificar la compra completa | Pantalla completa y apertura ascendente acordadas; organización en diseño |
 
 Confirmación se documenta por separado porque tiene una tarea y jerarquía
@@ -71,15 +71,55 @@ presupone que cada área vaya a necesitar una pantalla independiente.
    registrar «validado» sin evidencia de esa comprobación.
 5. Mantener abiertos tamaños, paleta y componentes específicos hasta diseñarlos.
    Elegir un patrón no obliga a incorporar una dependencia.
+6. Entregar las próximas exploraciones visuales en **PNG**, con una lámina por
+   recorrido y otra de alternativas sólo cuando haya una decisión que comparar.
+   No duplicar SVG/PNG ni exportar cada pantalla por separado. Esta preferencia
+   de formato fue expresada por el usuario; los documentos por pantalla se
+   mantienen porque tienen una función distinta: explicar y registrar decisiones.
+
+## Qué define un wireframe
+
+El wireframe sí es diseño: define organización espacial, jerarquía, agrupaciones,
+controles y recorridos. Cuando el usuario elige una composición, esa estructura
+se conserva como base para desarrollarla, salvo un cambio justificado por nueva
+evidencia o una decisión posterior.
+
+El acabado visual concreta colores, tipografía, espaciado, iconografía y estados
+de los componentes. El comportamiento detallado concreta gestos, animaciones,
+teclado, errores, textos largos y accesibilidad. Un dibujo estático puede definir
+parte de esos aspectos, pero no demuestra que funcionen en un dispositivo.
+No presentar estas etapas como si hubiera que empezar el diseño de nuevo.
 
 ## Relación con el trabajo anterior
 
 - [Discovery](../01-discovery.md): necesidades y alcance del producto.
 - [Plan de validación](../02-validation-plan.md): investigación y pruebas.
-- `../compra-concepto.html`: exploración anterior, **descartada como referencia
-  visual y de estructura**. El usuario señaló que parecía un formulario lineal
-  y no una experiencia pensada para mobile. Se conserva como antecedente, no
-  como diseño a implementar ni prototipo vigente para pruebas.
+- El primer HTML fue descartado y retirado. Su aprendizaje permanece: el
+  usuario lo percibió como un formulario lineal, poco pensado para mobile.
 
-No hay paleta ni estilo de componentes aprobados. El siguiente entregable
-visual será un wireflow de estas pantallas, basado en sus decisiones.
+La [dirección visual 01 · Lexend Deca](../visual/v1/README.md) es la base vigente:
+desarrolla A con superficies tonales, petróleo y lima. El usuario aceptó
+continuar por este camino **provisionalmente**, aclarando que todavía no le
+convence del todo. No están cerrados paleta, componentes ni acabado final.
+Es una lámina estática, no un prototipo navegable ni una implementación. El
+[Wireflow 01 · Compra activa](../wireflows/v1/README.md) presenta cuatro estados
+del recorrido y la comparación de confirmación; **A ya fue elegida**. Se
+conservan únicamente sus dos láminas PNG y su explicación como antecedente.
+
+## Continuación propuesta
+
+1. Completar la compra cotidiana: apartar productos sin que desaparezcan,
+   reincorporarlos al total, lectura fallida y cierre con ticket opcional.
+   La edición de nombre/precio se pospuso el 26/09. Definir superficies y
+   retornos antes de pulir más decoración.
+2. Conectar principio y fin: Inicio sin historial, retomar compra, selección
+   de sucursal y recuperación posterior del ticket. No exigir un dashboard ni
+   una navegación de pestañas sin una función clara.
+3. Prototipar y probar ese recorrido en el teléfono y con compradores. Las
+   pruebas de cámara/OCR real corresponden a la app, no a una simulación visual.
+4. Desarrollar comparación y pendientes para otra sucursal como segundo recorrido,
+   con fecha, presentación y condición del precio visibles; probarlo después.
+
+Esta secuencia es una propuesta, no autorización para implementar la app.
+Mantener una lámina por recorrido y un documento por pantalla; ajustar la
+dirección visual con feedback concreto y separar gusto de facilidad de uso.
