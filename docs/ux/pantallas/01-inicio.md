@@ -1,7 +1,7 @@
 # 01 · Inicio
 
-Actualización: 24 de septiembre de 2026.
-Estado: propósito acordado; estructura detallada propuesta.
+Actualización: 26 de septiembre de 2026.
+Estado: propósito y recorrido de nueva compra acordados; estructura detallada propuesta.
 [Índice de pantallas](README.md).
 
 ## Rol y contexto
@@ -44,15 +44,16 @@ llenar espacio: su utilidad se evaluará en el wireframe.
 ### Primer uso, sin compra
 
 Mostrar el propósito y la acción de inicio. No requerir presupuesto o lista
-previa, según lo acordado en discovery. La elección del local es contexto
-necesario para comparar precios, pero el momento exacto de solicitarlo sigue
-abierto. Evitar convertir esa elección en una preparación larga frente a la
-primera etiqueta.
+previa, según lo acordado en discovery. **Acordado:** Empezar compra → panel
+de sucursales → elegir una → abrir cámara. La elección ocurre antes de la
+primera captura. Cómo incorporar el primer local y qué hacer si no se encuentra
+sigue pendiente; no convertir esa preparación en un formulario largo.
 
 ### Usuario habitual, sin compra abierta
 
-Mantener el acceso principal en un lugar consistente. Propuesta: ofrecer locales
-habituales al comenzar. Aún no se decide si se muestran pendientes en el inicio
+Mantener el acceso principal en un lugar consistente. **Acordado:** ofrecer el
+[panel de sucursales](06-seleccion-sucursal.md) al tocar Empezar compra; elegir
+una abre la cámara, sin otro botón de continuar. Aún no se decide si se muestran pendientes en el inicio
 o después de elegir el local; no asumir que su función es decidir el comercio.
 
 ### Compra abierta
@@ -75,7 +76,8 @@ Precisar el comportamiento ante cierre completo y reapertura en el wireflow.
 | INI-02 | 2026-09-24 | Acordado | No orientar su función principal a elegir supermercado: esa decisión ya está tomada al abrir |
 | INI-03 | 2026-09-24 | Propuesto | Adaptar contenido a primer uso, uso habitual y compra abierta, conservando la estructura |
 | INI-04 | 2026-09-24 | Propuesto | Dar prioridad a continuar cuando existe una compra, para evitar duplicación y pérdida de contexto |
-| INI-05 | 2026-09-24 | Pendiente | Definir acceso a destinos secundarios y selección de sucursal; no se ratificaron las tres pestañas del boceto anterior |
+| INI-05 | 2026-09-24 | Parcialmente resuelto | Selección de sucursal resuelta por INI-06; destinos secundarios y navegación global siguen pendientes |
+| INI-06 | 2026-09-26 | Acordado | Empezar compra abre un panel de sucursales; tocar una abre la cámara. No se elige el local después del primer escaneo como recorrido normal |
 
 ## Qué falta resolver y comprobar
 

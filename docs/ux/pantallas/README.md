@@ -30,6 +30,7 @@ Las decisiones acordadas también necesitan validación de usabilidad.
 | [03 · Confirmación](03-confirmacion.md) | Elegir un precio y agregar el producto | Flujo y composición A elegidos; acabado visual e interacción fina pendientes |
 | [04 · Compra actual](04-compra-actual.md) | Revisar y modificar la compra completa | Pantalla completa y apertura ascendente acordadas; organización en diseño |
 | [05 · Finalización](05-finalizacion.md) | Guardar la compra y lo que no se llevó | Ticket opcional y «No llevaste» acordados; composición propuesta |
+| [06 · Selección de sucursal](06-seleccion-sucursal.md) | Elegir dónde se compra antes de capturar | Secuencia acordada; primer uso y composición pendientes |
 
 Confirmación se documenta por separado porque tiene una tarea y jerarquía
 propias. Todavía no se decidió si será una pantalla independiente o un estado
@@ -38,12 +39,12 @@ técnicos.
 
 ## Recorrido de referencia
 
-Inicio → contexto de supermercado/sucursal → Captura → Confirmación → Captura.
+Inicio → Empezar compra → panel de sucursales → elegir → Captura → Confirmación → Captura.
 
 Desde Captura, tocar o deslizar hacia arriba el resumen del carrito abre Compra
-actual a pantalla completa. Volver recupera el contexto de captura. El lugar
-exacto de la elección de sucursal sigue pendiente: no se aprobó una pantalla
-adicional obligatoria antes de capturar.
+actual a pantalla completa. Volver recupera el contexto de captura. La selección
+de sucursal antes de la cámara está acordada para nuevas compras. El primer uso,
+local no encontrado y recuperación de una compra abierta siguen por definir.
 
 Compra actual → Finalización → detalle de la compra guardada (destino propuesto).
 Al cerrar se conservan incluidos y «No llevaste» por separado; sólo los primeros
@@ -53,7 +54,7 @@ suman al total estimado. El ticket no es requisito de cierre.
 
 | Área | Necesidad ya identificada | Qué falta decidir |
 | --- | --- | --- |
-| Supermercado/sucursal | Asociar los precios a los locales habituales | Momento de elección, presentación y datos faltantes |
+| Supermercado/sucursal | Asociar los precios a los locales habituales | Presentación, primer uso y datos faltantes; momento de elección ya acordado |
 | Comparación | Consultar alternativas desde el escaneo | Superficie, jerarquía y retorno a confirmación |
 | Pendientes | Guardar el producto específico elegido para otro supermercado | Listado por local y uso durante la visita siguiente |
 | Historial | Recuperar compras y completar el ticket después | Navegación entre compras, precios y resumen mensual |
