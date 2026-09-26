@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { fontFamilies, typography } from '@/constants/brand';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { usePriceScanner } from '../application/usePriceScanner';
@@ -24,7 +25,7 @@ export function PriceScanner({ onAdd, onManual, full }: { onAdd: (value: Scanned
     </View>
     <View accessibilityLiveRegion="polite" style={styles.content}>
       {scanner.status === 'idle' && !full && <LabelCamera key={scanCycle} onRecognize={photoUri => void scanner.scanPhoto(photoUri)} />}
-      {scanner.status === 'reading' && <View style={common.row}><ActivityIndicator color={colors.primary} /><Text style={common.body}>Leyendo texto de la etiqueta…</Text></View>}
+      {scanner.status === 'reading' && <View style={common.row}><ActivityIndicator color={colors.ink} /><Text style={common.body}>Leyendo texto de la etiqueta…</Text></View>}
       {scanner.status === 'result' && <>
         {scanner.product && <View style={styles.product}>
           <Text style={styles.productLabel}>PRODUCTO DETECTADO</Text>
@@ -37,7 +38,7 @@ export function PriceScanner({ onAdd, onManual, full }: { onAdd: (value: Scanned
           accessibilityState={{ checked: scanner.selectedId === candidate.id }}
           onPress={() => scanner.setSelectedId(candidate.id)}
           style={[styles.candidate, scanner.selectedId === candidate.id && styles.selectedCandidate]}>
-          <Ionicons name={scanner.selectedId === candidate.id ? 'radio-button-on' : 'radio-button-off'} size={21} color={colors.primary} />
+          <Ionicons name={scanner.selectedId === candidate.id ? 'radio-button-on' : 'radio-button-off'} size={21} color={colors.ink} />
           <View style={{ flex: 1, gap: 4 }}><Text style={styles.candidatePrice}>{formatMoney(candidate.priceCents)}</Text>
             <Text style={common.body}>{candidate.context}</Text></View>
         </Pressable>)}
@@ -68,13 +69,13 @@ export function PriceScanner({ onAdd, onManual, full }: { onAdd: (value: Scanned
 const styles = StyleSheet.create({
   header: { gap: 4 },
   content: { gap: 14, marginTop: 4 },
-  product: { padding: 14, borderRadius: 14, gap: 4, backgroundColor: colors.primaryLight },
-  productLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1.2, color: colors.primary },
-  productName: { fontSize: 17, fontWeight: '700', color: colors.ink },
-  resultTitle: { fontSize: 14, fontWeight: '600', lineHeight: 21, color: colors.ink, flexShrink: 1 },
+  product: { padding: 14, borderRadius: 14, gap: 4, backgroundColor: colors.surfaceTonal },
+  productLabel: { ...typography.caption, letterSpacing: 1, color: colors.ink },
+  productName: { ...typography.product, color: colors.ink },
+  resultTitle: { ...typography.secondary, color: colors.ink, flexShrink: 1 },
   candidate: { borderWidth: 1, borderColor: colors.border, padding: 14, borderRadius: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  selectedCandidate: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-  candidatePrice: { color: colors.ink, fontSize: 21, fontWeight: '700' },
-  notice: { padding: 14, backgroundColor: colors.primaryLight, borderRadius: 14, gap: 8 },
-  footer: { fontSize: 12, color: colors.muted, textAlign: 'center', lineHeight: 18 },
+  selectedCandidate: { borderColor: colors.selectionBorder, backgroundColor: colors.selection },
+  candidatePrice: { fontFamily: fontFamilies.bold, fontSize: 21, lineHeight: 27, color: colors.ink },
+  notice: { padding: 14, backgroundColor: colors.surfaceTonal, borderRadius: 14, gap: 8 },
+  footer: { ...typography.caption, color: colors.textSecondary, textAlign: 'center' },
 });

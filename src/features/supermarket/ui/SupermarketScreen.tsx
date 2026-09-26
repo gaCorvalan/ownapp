@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { typography } from '@/constants/brand';
 import { useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -60,11 +61,11 @@ export function SupermarketScreen() {
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
         <View style={styles.brandRow}>
-          <View style={common.row}><View style={styles.logo}><Ionicons name="leaf-outline" size={20} color={colors.primary} /></View><Text style={styles.brand}>a mano<Text style={{ color: '#8C995E' }}>.</Text></Text></View>
+          <View style={common.row}><View style={styles.logo}><Ionicons name="leaf-outline" size={20} color={colors.ink} /></View><Text style={styles.brand}>a mano<Text style={{ color: colors.selectionBorder }}>.</Text></Text></View>
           <Text style={common.eyebrow}>COMPRA ACTUAL</Text>
         </View>
         {session.loadState !== 'ready' ? <View style={common.card}>
-          {session.loadState === 'loading' ? <><ActivityIndicator color={colors.primary} /><Text style={common.body}>Recuperando tu compra…</Text></> : <>
+          {session.loadState === 'loading' ? <><ActivityIndicator color={colors.ink} /><Text style={common.body}>Recuperando tu compra…</Text></> : <>
             <Text accessibilityRole="alert" style={common.body}>No pudimos recuperar tu compra guardada. Volvé a intentar para no perderla.</Text>
             <ActionButton label="Volver a cargar" onPress={session.retryLoad} />
           </>}
@@ -74,16 +75,16 @@ export function SupermarketScreen() {
           {!!observationError && <Text accessibilityRole="alert" style={styles.observationError}>{observationError}</Text>}
           <ActionButton label="Ingresar precio manualmente" icon="add" variant="secondary" onPress={openManual} disabled={full} />
           <Pressable accessibilityRole="button" accessibilityLabel={`Ver compra, ${session.items.length} productos`} onPress={() => setPurchaseOpen(true)} style={({ pressed }) => [styles.purchaseLink, pressed && { opacity: 0.7 }]}>
-            <View style={styles.purchaseIcon}><Ionicons name="receipt-outline" size={21} color={colors.primary} /></View>
+            <View style={styles.purchaseIcon}><Ionicons name="receipt-outline" size={21} color={colors.ink} /></View>
             <View style={{ flex: 1 }}>
               <Text style={styles.purchaseTitle}>Ver compra</Text>
               <Text style={common.body}>{session.items.length === 0 ? 'Todavía no agregaste productos' : `${session.items.length} ${session.items.length === 1 ? 'producto' : 'productos'} · editá cantidades y precios`}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </Pressable>
           {full && <Text style={[common.body, styles.limit]}>La compra llegó al límite de 100 productos.</Text>}
           <View accessibilityLiveRegion="polite" style={styles.storage}>
-            <Ionicons name={session.saveState === 'error' ? 'alert-circle-outline' : 'phone-portrait-outline'} size={15} color={colors.muted} />
+            <Ionicons name={session.saveState === 'error' ? 'alert-circle-outline' : 'phone-portrait-outline'} size={15} color={colors.textSecondary} />
             <Text style={styles.storageText}>{session.saveState === 'saved' ? 'Compra guardada en este dispositivo' : session.saveState === 'saving' ? 'Guardando compra…' : 'No se guardaron los últimos cambios.'}</Text>
           </View>
           {session.saveState === 'error' && <ActionButton label="Reintentar guardado" variant="ghost" onPress={session.retrySave} />}
@@ -97,7 +98,7 @@ export function SupermarketScreen() {
           <View style={styles.modalHeader}>
             <View><Text accessibilityRole="header" style={styles.modalTitle}>Tu compra</Text><Text style={common.body}>Revisá productos, cantidades y precios.</Text></View>
             <Pressable accessibilityRole="button" accessibilityLabel="Cerrar compra" onPress={() => setPurchaseOpen(false)} style={({ pressed }) => [styles.close, pressed && { opacity: 0.65 }]}>
-              <Ionicons name="close" size={22} color={colors.primary} />
+              <Ionicons name="close" size={22} color={colors.ink} />
             </Pressable>
           </View>
           <TotalBar {...session.totals} />
@@ -130,25 +131,25 @@ export function SupermarketScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: colors.canvas },
   scroll: { flexGrow: 1, paddingHorizontal: 18, paddingBottom: 28 },
   container: { width: '100%', maxWidth: 540, alignSelf: 'center' },
   brandRow: { flexDirection: 'row', gap: 12, alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14 },
-  logo: { width: 34, height: 34, borderRadius: 12, backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
-  brand: { fontSize: 22, fontWeight: '700', letterSpacing: -1, color: colors.ink },
+  logo: { width: 34, height: 34, borderRadius: 12, backgroundColor: colors.surfaceTonal, alignItems: 'center', justifyContent: 'center' },
+  brand: { ...typography.screenTitle, letterSpacing: -1, color: colors.ink },
   home: { gap: 14, paddingTop: 12 },
   purchaseLink: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 18, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  purchaseIcon: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: colors.primaryLight },
-  purchaseTitle: { fontSize: 16, fontWeight: '700', color: colors.ink, marginBottom: 2 },
+  purchaseIcon: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: colors.surfaceTonal },
+  purchaseTitle: { ...typography.product, color: colors.ink, marginBottom: 2 },
   limit: { textAlign: 'center' },
   storage: { flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', paddingTop: 2 },
-  storageText: { color: colors.muted, fontSize: 12, flexShrink: 1 },
-  observationError: { color: colors.danger, fontSize: 14, lineHeight: 21, textAlign: 'center' },
-  modalScreen: { flex: 1, backgroundColor: colors.background },
+  storageText: { ...typography.caption, color: colors.textSecondary, flexShrink: 1 },
+  observationError: { ...typography.secondary, color: colors.danger, textAlign: 'center' },
+  modalScreen: { flex: 1, backgroundColor: colors.canvas },
   purchaseScreen: { flexGrow: 1, width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: 20, paddingBottom: 28, gap: 18 },
   modalHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, paddingTop: 8 },
-  modalTitle: { fontSize: 28, fontWeight: '700', letterSpacing: -0.8, color: colors.ink, marginBottom: 4 },
-  close: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: colors.primaryLight },
-  overlay: { flex: 1, backgroundColor: '#18251CCC', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalTitle: { ...typography.screenTitle, color: colors.ink, marginBottom: 4 },
+  close: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: colors.surfaceTonal },
+  overlay: { flex: 1, backgroundColor: colors.cameraScrim, justifyContent: 'center', alignItems: 'center', padding: 20 },
   confirm: { width: '100%', maxWidth: 400 },
 });

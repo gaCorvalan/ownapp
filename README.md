@@ -13,8 +13,9 @@ La estructura, el rol de cada elemento y las decisiones vigentes se documentan
 por separado en el [índice de pantallas](docs/ux/pantallas/README.md).
 El [sistema de marca elegido para implementar](docs/ux/visual/sistema-de-marca.md)
 define Lexend Deca, petróleo y lima a partir de la
-[dirección visual vigente](docs/ux/visual/v2/README.md). La fuente y la paleta
-todavía no se aplicaron a la interfaz existente.
+[dirección visual vigente](docs/ux/visual/v2/README.md). La interfaz actual ya
+usa esa paleta y tipografía en tema claro; la composición y el recorrido de las
+láminas todavía no están implementados.
 
 ## Ejecutar
 

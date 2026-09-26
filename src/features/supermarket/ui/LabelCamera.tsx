@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { typography } from '@/constants/brand';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useEffect, useRef, useState } from 'react';
 import { AppState, Linking, StyleSheet, Text, View } from 'react-native';
@@ -43,7 +44,7 @@ export function LabelCamera({ onRecognize }: { onRecognize: (photoUri: string) =
   if (!permission.granted) {
     const permanentlyDenied = !permission.canAskAgain;
     return <View style={styles.notice} accessibilityLiveRegion="polite">
-      <Ionicons name="camera-outline" size={24} color={colors.primary} />
+      <Ionicons name="camera-outline" size={24} color={colors.ink} />
       <Text accessibilityRole="header" style={styles.sectionTitle}>Capturá una etiqueta</Text>
       <Text style={common.body}>{permanentlyDenied
         ? 'La cámara está desactivada para esta app. Podés habilitarla desde la configuración del teléfono o seguir con las otras opciones.'
@@ -89,15 +90,15 @@ export function LabelCamera({ onRecognize }: { onRecognize: (photoUri: string) =
 
 const styles = StyleSheet.create({
   capture: { gap: 12 },
-  sectionTitle: { fontSize: 16, lineHeight: 22, fontWeight: '700', color: colors.ink },
-  preview: { height: 280, overflow: 'hidden', borderRadius: 18, backgroundColor: '#18251C', position: 'relative' },
+  sectionTitle: { ...typography.product, color: colors.ink },
+  preview: { height: 280, overflow: 'hidden', borderRadius: 18, backgroundColor: colors.ink, position: 'relative' },
   frame: { position: 'absolute', top: 22, right: 22, bottom: 22, left: 22 },
-  corner: { position: 'absolute', width: 28, height: 28, borderColor: '#FFFFFF', borderWidth: 3 },
+  corner: { position: 'absolute', width: 28, height: 28, borderColor: colors.onInk, borderWidth: 3 },
   topLeft: { top: 0, left: 0, borderRightWidth: 0, borderBottomWidth: 0, borderTopLeftRadius: 8 },
   topRight: { top: 0, right: 0, borderLeftWidth: 0, borderBottomWidth: 0, borderTopRightRadius: 8 },
   bottomLeft: { bottom: 0, left: 0, borderRightWidth: 0, borderTopWidth: 0, borderBottomLeftRadius: 8 },
   bottomRight: { bottom: 0, right: 0, borderLeftWidth: 0, borderTopWidth: 0, borderBottomRightRadius: 8 },
   frameLabel: { position: 'absolute', bottom: 12, left: 12, right: 12, alignItems: 'center' },
-  frameText: { backgroundColor: '#18251CCC', color: '#FFFFFF', fontSize: 12, fontWeight: '600', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14, overflow: 'hidden' },
-  notice: { alignItems: 'flex-start', backgroundColor: colors.primaryLight, borderRadius: 14, gap: 10, padding: 14 },
+  frameText: { ...typography.caption, backgroundColor: colors.cameraScrim, color: colors.onInk, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14, overflow: 'hidden' },
+  notice: { alignItems: 'flex-start', backgroundColor: colors.surfaceTonal, borderRadius: 14, gap: 10, padding: 14 },
 });

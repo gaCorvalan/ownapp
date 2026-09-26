@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { fontFamilies, typography } from '@/constants/brand';
 import { StyleSheet, Text, View } from 'react-native';
 import { formatMoney } from '../domain/price';
 import { MAX_QUANTITY, type ShoppingAction, type ShoppingItem } from '../domain/shopping';
@@ -20,7 +21,7 @@ export function ShoppingList({ items, dispatch, onAdd, onEdit, onClear, full }: 
       <View style={styles.count}><Text style={styles.countText}>{items.length} {items.length === 1 ? 'producto' : 'productos'}</Text></View>
     </View>
     {items.length === 0 ? <View style={styles.empty}>
-      <View style={styles.basket}><Ionicons name="basket-outline" size={34} color={colors.primary} /></View>
+      <View style={styles.basket}><Ionicons name="basket-outline" size={34} color={colors.ink} /></View>
       <Text style={styles.emptyTitle}>Tu próxima compra empieza acá</Text>
       <Text style={[common.body, { textAlign: 'center', maxWidth: 270 }]}>Agregá un precio manualmente o capturá una etiqueta.</Text>
     </View> : <View>
@@ -54,16 +55,16 @@ export function ShoppingList({ items, dispatch, onAdd, onEdit, onClear, full }: 
 }
 
 const styles = StyleSheet.create({
-  count: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, backgroundColor: colors.background },
-  countText: { fontSize: 12, color: colors.muted, fontWeight: '500' },
+  count: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, backgroundColor: colors.canvas },
+  countText: { ...typography.caption, color: colors.textSecondary },
   empty: { alignItems: 'center', paddingVertical: 30, gap: 12 },
-  basket: { width: 70, height: 70, borderRadius: 24, backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
-  emptyTitle: { fontSize: 17, fontWeight: '600', color: colors.ink, textAlign: 'center' },
+  basket: { width: 70, height: 70, borderRadius: 24, backgroundColor: colors.surfaceTonal, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
+  emptyTitle: { ...typography.action, color: colors.ink, textAlign: 'center' },
   item: { paddingVertical: 16, gap: 12 },
   separator: { borderTopWidth: 1, borderColor: colors.border },
   itemHeading: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', gap: 12 },
-  itemName: { fontSize: 16, fontWeight: '600', color: colors.ink },
-  subtotal: { fontSize: 17, fontWeight: '700', color: colors.ink, fontVariant: ['tabular-nums'] },
-  stepper: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.background, borderRadius: 12 },
-  quantity: { minWidth: 22, textAlign: 'center', fontSize: 15, fontWeight: '600', color: colors.ink },
+  itemName: { ...typography.product, color: colors.ink },
+  subtotal: { fontFamily: fontFamilies.bold, fontSize: 17, lineHeight: 23, color: colors.ink, fontVariant: ['tabular-nums'] },
+  stepper: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.canvas, borderRadius: 12 },
+  quantity: { minWidth: 22, textAlign: 'center', ...typography.product, color: colors.ink },
 });

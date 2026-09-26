@@ -71,7 +71,7 @@ Ratios calculados sobre colores sólidos sRGB: `ink`/`accent` 9,21:1;
 5,42:1; `danger`/`dangerSurface` 5,85:1. `selectionBorder`/`selection`
 alcanza 3,83:1. `border` es decorativo y tiene sólo 1,51:1 sobre blanco.
 
-Estos pares no sustituyen una revisión de todos los estados. En el siguiente
-incremento se aplicarán los tokens a la interfaz actual y se comprobarán
-fuente, tamaño de texto, foco, controles deshabilitados y contraste sobre
-cámara real. El tema claro será explícito hasta diseñar el oscuro.
+Estos pares no sustituyen una revisión de todos los estados. Los tokens ya se
+aplican a la interfaz actual. Fuente, tamaño de texto, foco, controles
+deshabilitados y contraste sobre cámara real requieren comprobación en un
+teléfono. El tema claro será explícito hasta diseñar el oscuro.

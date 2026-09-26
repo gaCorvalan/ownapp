@@ -1,3 +1,4 @@
+import { fontFamilies, typography } from '@/constants/brand';
 import { useRef, useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { parsePrice } from '../domain/price';
@@ -37,12 +38,12 @@ export function ItemEditor({ item, onSave, onClose }: {
           <Text style={common.body}>Ingresá el precio por unidad. Nosotros hacemos la cuenta.</Text>
           <View style={styles.field}>
             <Text style={styles.label}>Nombre <Text style={common.body}>(opcional)</Text></Text>
-            <TextInput accessibilityLabel="Nombre del producto" placeholder="Ej. Yerba mate" placeholderTextColor={colors.muted}
+            <TextInput accessibilityLabel="Nombre del producto" placeholder="Ej. Yerba mate" placeholderTextColor={colors.textSecondary}
               value={name} onChangeText={setName} maxLength={60} style={styles.input} autoCapitalize="sentences" />
           </View>
           <View style={styles.field}>
             <Text style={styles.label}>Precio por unidad · ARS</Text>
-            <TextInput accessibilityLabel="Precio por unidad en pesos" placeholder="Ej. 3450,50" placeholderTextColor={colors.muted}
+            <TextInput accessibilityLabel="Precio por unidad en pesos" placeholder="Ej. 3450,50" placeholderTextColor={colors.textSecondary}
               value={price} onChangeText={setPrice} maxLength={18} keyboardType="decimal-pad" style={styles.input} />
           </View>
           <View style={styles.field}>
@@ -60,11 +61,11 @@ export function ItemEditor({ item, onSave, onClose }: {
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: '#18251CCC', alignItems: 'center', justifyContent: 'center', padding: 16 },
+  overlay: { flex: 1, backgroundColor: colors.cameraScrim, alignItems: 'center', justifyContent: 'center', padding: 16 },
   dialog: { width: '100%', maxWidth: 440, maxHeight: '95%', backgroundColor: colors.surface, borderRadius: 24, overflow: 'hidden' },
   content: { padding: 24, gap: 18 },
   field: { gap: 8 },
-  label: { fontSize: 14, fontWeight: '600', color: colors.ink },
-  input: { minHeight: 50, borderWidth: 1, borderColor: '#A5AEA4', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, color: colors.ink, fontSize: 16, backgroundColor: colors.surface },
-  error: { color: colors.danger, lineHeight: 21, fontSize: 14 },
+  label: { ...typography.secondary, color: colors.ink },
+  input: { minHeight: 50, borderWidth: 1, borderColor: colors.selectionBorder, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, color: colors.ink, fontFamily: fontFamilies.regular, fontSize: 16, lineHeight: 23, backgroundColor: colors.surface },
+  error: { ...typography.secondary, color: colors.danger },
 });
