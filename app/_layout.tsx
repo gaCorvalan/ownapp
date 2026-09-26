@@ -6,6 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { ShoppingSessionProvider } from '@/src/features/supermarket/application/useShoppingSession';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -37,7 +38,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={navigationTheme}>
-      <Stack screenOptions={{ headerShown: false }} />
+      <ShoppingSessionProvider><Stack screenOptions={{ headerShown: false }} /></ShoppingSessionProvider>
       <StatusBar style="dark" />
     </ThemeProvider>
   );

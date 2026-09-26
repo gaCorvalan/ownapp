@@ -7,6 +7,8 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Added
 
+- Inicio con acceso a empezar o continuar una única compra abierta, selección de sucursal y alta manual con supermercado y referencia libre.
+- Asociación de los nuevos precios escaneados con la sucursal elegida.
 - Observaciones de precio locales en SQLite y una cola de sincronización pendiente: cada precio confirmado conserva su fecha, contexto de condición y referencia publicada por litro/kilo/unidad cuando es inequívoca, sin enviar datos a un servidor.
 - Detección local de un descriptor de producto a partir del texto OCR: conserva el texto de la etiqueta, normaliza contenido en mililitros/gramos/unidades cuando es posible y propone un nombre editable para la compra.
 - Calculadora del supermercado con carga manual, edición de productos,
@@ -18,6 +20,8 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Changed
 
+- La compra local pasa al formato versionado `shopping.v2`; recupera los ítems de `shopping.v1` y solicita asignar sucursal antes de continuar una compra anterior.
+- Empezar otra compra requiere descartar explícitamente la abierta; las observaciones de precios ya registradas se conservan.
 - La interfaz existente usa la paleta clara petróleo/lima y Lexend Deca en
   cámara, confirmación, carrito y edición, con colores y estilos de texto
   compartidos. El inicio mantiene el tema claro mientras se diseña el oscuro.

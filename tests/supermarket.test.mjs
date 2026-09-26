@@ -4,6 +4,8 @@ import { parsePrice, extractPriceCandidates, extractPublishedUnitPrices } from '
 import { correctProductDisplayName, extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
 import { classifyPriceTerms, createPriceObservation } from '../src/features/supermarket/domain/priceObservation.ts';
 import { shoppingReducer, shoppingTotals, isShoppingItem } from '../src/features/supermarket/domain/shopping.ts';
+import { decodePurchaseSession } from '../src/features/supermarket/domain/purchaseSession.ts';
+import { normalizeStoreName, storeLabel } from '../src/features/supermarket/domain/store.ts';
 
 test('precios argentinos: pesos, miles y centavos sin redondeo flotante', () => {
   for (const [input, expected] of [['3450', 345000], ['$ 3.450,50', 345050], ['0,01', 1], ['12,5', 1250], ['1.000.000', 100000000]]) {
@@ -112,4 +114,16 @@ test('cantidades y datos inválidos no corrompen la compra', () => {
   assert.equal(isShoppingItem({ ...item, quantity: -1 }), false);
   assert.equal(isShoppingItem({ ...item, name: '' }), false);
   assert.deepEqual(shoppingReducer([], { type: 'add', item: { ...item, priceCents: -10 } }), []);
+});
+
+test('la compra anterior migra sin perder ítems y una compra descartada no reaparece', () => {
+  const legacy = JSON.stringify({ version: 1, items: [item] });
+  assert.deepEqual(decodePurchaseSession(null, legacy), { id: 'legacy-purchase', storeId: null, items: [item] });
+  assert.equal(decodePurchaseSession(JSON.stringify({ version: 2, session: null }), legacy), null);
+  assert.throws(() => decodePurchaseSession(JSON.stringify({ version: 2, session: { id: 'x', storeId: 's', items: [item, item] } }), null));
+});
+
+test('la referencia manual de una sucursal conserva un nombre legible', () => {
+  assert.equal(normalizeStoreName('  Del   barrio  '), 'Del barrio');
+  assert.equal(storeLabel({ id: 's', supermarket: 'Día', reference: 'Del barrio' }), 'Día · Del barrio');
 });

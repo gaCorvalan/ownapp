@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { typography } from '@/constants/brand';
-import { useState } from 'react';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShoppingSession } from '../application/useShoppingSession';
@@ -8,6 +9,7 @@ import { correctProductDisplayName, type ProductDescriptor } from '../domain/pro
 import type { PublishedUnitPrice } from '../domain/price';
 import { classifyPriceTerms, createPriceObservation } from '../domain/priceObservation';
 import { MAX_ITEMS, type ShoppingItem } from '../domain/shopping';
+import { storeLabel } from '../domain/store';
 import { recordPriceObservation } from '../infrastructure/priceObservationStorage';
 import { ItemEditor } from './ItemEditor';
 import { PriceScanner } from './PriceScanner';
@@ -19,12 +21,17 @@ let nextItemId = 0;
 function createId() { return `${Date.now()}-${++nextItemId}-${Math.random().toString(36).slice(2, 8)}`; }
 
 export function SupermarketScreen() {
+  const router = useRouter();
   const session = useShoppingSession();
   const [editor, setEditor] = useState<{ item: ShoppingItem | null } | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
   const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [observationError, setObservationError] = useState('');
   const full = session.items.length >= MAX_ITEMS;
+
+  useEffect(() => {
+    if (session.loadState === 'ready' && (!session.purchase || !session.store)) router.replace('/');
+  }, [session.loadState, session.purchase, session.store, router]);
 
   function addItem(value: { name: string; priceCents: number; quantity: number; product?: ProductDescriptor }) {
     if (full) return;
@@ -37,14 +44,14 @@ export function SupermarketScreen() {
   }
 
   async function addScannedItem(value: { candidate: { priceCents: number; context: string }; product: ProductDescriptor | null; publishedUnitPrice: PublishedUnitPrice | null }) {
-    if (full) return false;
+    if (full || !session.store) return false;
     try {
       const observation = createPriceObservation({
         product: value.product,
         priceCents: value.candidate.priceCents,
         terms: classifyPriceTerms(value.candidate.context),
         publishedUnitPrice: value.publishedUnitPrice,
-        retailerId: null,
+        retailerId: session.store.id,
         source: 'label-ocr',
       });
       await recordPriceObservation(observation);
@@ -62,14 +69,15 @@ export function SupermarketScreen() {
       <View style={styles.container}>
         <View style={styles.brandRow}>
           <View style={common.row}><View style={styles.logo}><Ionicons name="leaf-outline" size={20} color={colors.ink} /></View><Text style={styles.brand}>a mano<Text style={{ color: colors.selectionBorder }}>.</Text></Text></View>
-          <Text style={common.eyebrow}>COMPRA ACTUAL</Text>
+          <Pressable accessibilityRole="button" accessibilityLabel="Volver al inicio" onPress={() => router.replace('/')} style={styles.back}><Ionicons name="arrow-back" size={19} color={colors.ink} /><Text style={styles.backText}>Inicio</Text></Pressable>
         </View>
         {session.loadState !== 'ready' ? <View style={common.card}>
           {session.loadState === 'loading' ? <><ActivityIndicator color={colors.ink} /><Text style={common.body}>Recuperando tu compra…</Text></> : <>
             <Text accessibilityRole="alert" style={common.body}>No pudimos recuperar tu compra guardada. Volvé a intentar para no perderla.</Text>
             <ActionButton label="Volver a cargar" onPress={session.retryLoad} />
           </>}
-        </View> : <View style={styles.home}>
+        </View> : session.store ? <View style={styles.home}>
+          <Text style={styles.storeLabel}>{storeLabel(session.store)}</Text>
           <TotalBar {...session.totals} />
           <PriceScanner full={full} onManual={openManual} onAdd={addScannedItem} />
           {!!observationError && <Text accessibilityRole="alert" style={styles.observationError}>{observationError}</Text>}
@@ -88,7 +96,7 @@ export function SupermarketScreen() {
             <Text style={styles.storageText}>{session.saveState === 'saved' ? 'Compra guardada en este dispositivo' : session.saveState === 'saving' ? 'Guardando compra…' : 'No se guardaron los últimos cambios.'}</Text>
           </View>
           {session.saveState === 'error' && <ActionButton label="Reintentar guardado" variant="ghost" onPress={session.retrySave} />}
-        </View>}
+        </View> : null}
       </View>
     </ScrollView>
 
@@ -137,6 +145,9 @@ const styles = StyleSheet.create({
   brandRow: { flexDirection: 'row', gap: 12, alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14 },
   logo: { width: 34, height: 34, borderRadius: 12, backgroundColor: colors.surfaceTonal, alignItems: 'center', justifyContent: 'center' },
   brand: { ...typography.screenTitle, letterSpacing: -1, color: colors.ink },
+  back: { minHeight: 48, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 5 },
+  backText: { ...typography.secondary, color: colors.ink },
+  storeLabel: { ...typography.sectionTitle, color: colors.ink },
   home: { gap: 14, paddingTop: 12 },
   purchaseLink: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 18, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   purchaseIcon: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: colors.surfaceTonal },

@@ -15,7 +15,8 @@ El [sistema de marca elegido para implementar](docs/ux/visual/sistema-de-marca.m
 define Lexend Deca, petróleo y lima a partir de la
 [dirección visual vigente](docs/ux/visual/v2/README.md). La interfaz actual ya
 usa esa paleta y tipografía en tema claro; la composición y el recorrido de las
-láminas todavía no están implementados.
+láminas se implementa de forma incremental: inicio y selección de sucursal ya
+están disponibles; cierre e historial siguen pendientes.
 
 ## Ejecutar
 
@@ -28,6 +29,9 @@ Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible c
 
 ## Qué podés probar
 
+- Empezar una compra desde Inicio, agregar una sucursal manualmente y volver a elegirla en visitas posteriores.
+- Continuar una compra abierta desde Inicio, o descartarla explícitamente para empezar otra.
+- Recuperar una compra de la versión anterior sin perder sus productos, asignándole una sucursal al continuar.
 - Agregar un precio manualmente con nombre opcional y cantidad.
 - Editar nombre, precio y cantidad; sumar/restar unidades y eliminar productos.
 - Vaciar la compra con confirmación.
@@ -41,25 +45,29 @@ Los importes se ingresan en pesos argentinos: `3450`, `3450,50` o `3.450,50`. La
 ## Separación de responsabilidades
 
 ```text
-app/index.tsx                         Ruta de entrada
+app/index.tsx                         Inicio
+app/purchase.tsx                      Ruta de compra
 src/features/supermarket/
-  ui/                                 Pantalla, lista, total, escáner y formulario
-  application/useShoppingSession.ts   Estado de compra y coordinación del guardado
+  ui/                                 Inicio, compra, lista, escáner y formularios
+  application/useShoppingSession.tsx  Estado compartido y coordinación del guardado
   application/usePriceScanner.ts      Lectura, elección y confirmación de candidatos
   domain/shopping.ts                  Ítems, acciones, validación y totales
   domain/price.ts                     Conversión de importes y candidatos de precio
   domain/product.ts                   Descriptor inicial y normalización de productos OCR
   domain/priceObservation.ts          Precio elegido, condiciones y referencia por unidad
+  domain/purchaseSession.ts           Sesión activa y migración de compra anterior
+  domain/store.ts                     Sucursal manual
   infrastructure/shoppingStorage.ts  AsyncStorage, formato versionado y escrituras ordenadas
+  infrastructure/storeStorage.ts     Sucursales guardadas localmente
   infrastructure/priceObservationStorage.ts SQLite local y cola de sincronización
   infrastructure/localTextRecognizer.ts Adaptador OCR local (Vision/ML Kit)
 ```
 
-El estado de la compra se administra con `useReducer`; los totales se derivan de los ítems y los importes se almacenan en centavos enteros. El dominio no depende de React ni de APIs del teléfono. Los componentes muestran datos y emiten acciones; los hooks coordinan el flujo. La portada mantiene el total y la cámara a la vista; el detalle de productos se abre bajo demanda para que la tarea repetida de capturar precios no requiera desplazarse.
+El estado de la compra se comparte entre Inicio y la pantalla de captura; las acciones de ítems pasan por un reducer puro. Los totales se derivan de los ítems y los importes se almacenan en centavos enteros. El dominio no depende de React ni de APIs del teléfono. La pantalla de compra mantiene el total y la cámara a la vista; el detalle de productos se abre bajo demanda.
 
-AsyncStorage guarda una única compra bajo `ownapp.supermarket.shopping.v1`, local a cada instalación o navegador/origen. No hay sincronización ni cuentas. La pantalla espera a recuperar los datos antes de habilitar la compra. Si falla la lectura o el guardado, muestra un mensaje y permite reintentar. Las escrituras se serializan para no sobrescribir una compra reciente con una anterior.
+AsyncStorage guarda una sola compra abierta bajo `ownapp.supermarket.shopping.v2` y las sucursales manuales en `ownapp.supermarket.stores.v1`, local a cada instalación o navegador/origen. Las compras previas guardadas en `shopping.v1` se recuperan con sus ítems intactos y piden sucursal al continuar. No hay sincronización ni cuentas. Inicio espera la lectura antes de habilitar la compra. Si falla la lectura o el guardado, muestra un mensaje y permite reintentar. Las escrituras de compra se serializan para no sobrescribir un cambio reciente con uno anterior.
 
-Cada precio confirmado desde una etiqueta también se registra en SQLite local como una observación independiente de la compra: conserva producto, importe, condición detectada, precio por medida publicado cuando es inequívoco y fecha de captura. Al mismo tiempo se agrega a una cola local pendiente de sincronización; esta versión no tiene backend ni envía datos fuera del dispositivo. Vaciar la compra no elimina esas observaciones.
+Cada precio confirmado desde una etiqueta también se registra en SQLite local como una observación independiente de la compra: conserva producto, importe, sucursal elegida, condición detectada, precio por medida publicado cuando es inequívoco y fecha de captura. Las observaciones anteriores conservan su sucursal desconocida. Al mismo tiempo se agrega a una cola local pendiente de sincronización; esta versión no tiene backend ni envía datos fuera del dispositivo. Vaciar o descartar la compra no elimina esas observaciones.
 
 ## Flujo del escáner
 
@@ -83,16 +91,16 @@ pnpm lint
 pnpm test
 ```
 
-Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, cálculos, edición, cantidades e identidad de productos.
+Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, cálculos, edición, cantidades, identidad de productos y migración de compra anterior.
 
 Recorrido manual sugerido:
 
-1. Cargar `Leche`, precio `1500,50`, cantidad `2`: total $ 3.001,00.
-2. Incrementar a 3 unidades: total $ 4.501,50.
-3. Editar precio a `1600`: total $ 4.800,00.
-4. Recargar y verificar que se mantiene la compra.
+1. Desde Inicio, tocar «Empezar compra», cancelar el panel y comprobar que no se creó una compra.
+2. Agregar supermercado y referencia; comprobar que abre la cámara con la sucursal indicada.
+3. Cargar `Leche`, precio `1500,50`, cantidad `2`: total $ 3.001,00. Incrementar a 3 unidades y editar el precio a `1600`: total $ 4.800,00.
+4. Volver a Inicio, continuar la compra y luego cerrar y reabrir la app: se conserva el total y se ofrece continuar, sin entrar automáticamente.
 5. En un teléfono físico con una development build, permitir la cámara, capturar una etiqueta nítida, tocar «Leer etiqueta», elegir el precio detectado y confirmarlo. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
 6. Probar una lectura sin precio: ofrece reintento y carga manual.
-7. Cancelar el vaciado, luego confirmarlo y recargar: la compra queda vacía.
+7. Tocar «Empezar otra compra», cancelar el descarte y comprobar que sigue intacta. Confirmar el descarte y comprobar que se puede elegir una sucursal nueva.
 
 También conviene verificar teclado, áreas seguras, tamaño de texto y persistencia en un teléfono físico antes de la siguiente entrega.
