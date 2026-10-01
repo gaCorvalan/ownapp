@@ -1,6 +1,8 @@
 # Plan de validación · primera ronda
 
-Estado al 24/09/2026: preparado, sin participantes evaluados ni resultados.
+Estado al 26/09/2026: recorridos locales implementados en código; sin prueba
+física completa ni participantes evaluados. Este guion sigue siendo una
+propuesta de validación, no un registro de resultados.
 
 Material vigente: [recorrido visual 02 · Lexend Deca](visual/v2/README.md),
 aceptada como rumbo provisional, y [decisiones por pantalla](pantallas/README.md).
@@ -9,9 +11,9 @@ elegida. El HTML descartado se retiró y no debe usarse para pruebas.
 
 Las láminas son estáticas: permiten conversar sobre jerarquía y recorridos,
 pero no medir duración de tareas ni validar gestos o reconocimiento. Las
-alternativas A/B no fueron un experimento A/B de uso real. El guion siguiente
-requiere un futuro prototipo navegable; probar sólo las tareas que represente,
-sin presentar comparación, inclusión reversible o cierre como interacciones ya disponibles.
+alternativas A/B no fueron un experimento A/B de uso real. La app ya permite
+probar comparación local, inclusión reversible y cierre; las láminas siguen
+siendo referencias estáticas y no validan esas interacciones.
 
 ## Preguntas prioritarias
 
@@ -129,8 +131,7 @@ de uso en contexto. Ninguna de esas comprobaciones reemplaza a las demás.
 - Las revisiones de las láminas y los pares de contraste calculados están en
   [dirección visual 01](visual/v1/README.md#qué-se-comprobó-y-qué-no). No validan
   interacción, cámara real ni accesibilidad completa.
-- Como antecedente del 24/09/2026 se registraron `pnpm typecheck`, `pnpm lint` y
-  12 pruebas correctas del proyecto. No se repitieron por los cambios de diseño
-  y limpieza documental; no certifican el estado de una futura implementación.
-- No hay bundle ni revisión web de la nueva UI. Teléfono físico, OCR en contexto,
-  foco, TalkBack y pruebas con participantes siguen pendientes.
+- Las comprobaciones automáticas vigentes se documentan en el README y en el
+  registro de cambios del repositorio. No sustituyen la prueba de cámara real.
+- Teléfono físico, OCR en contexto, foco, TalkBack y pruebas con participantes
+  siguen pendientes; no se registran resultados supuestos.

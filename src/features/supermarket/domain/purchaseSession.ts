@@ -70,3 +70,20 @@ export function updateTicket(ledger: PurchaseLedger, id: string, ticketCents: nu
 export function completedPurchaseTotals(purchase: CompletedPurchase) {
   return shoppingTotals(purchase.items);
 }
+
+export function monthlySpending(purchases: CompletedPurchase[]) {
+  const months = new Map<string, { year: number; month: number; totalCents: number; tickets: number; estimates: number; purchases: number }>();
+  for (const purchase of purchases) {
+    const date = new Date(purchase.finishedAt);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const key = `${year}-${String(month).padStart(2, '0')}`;
+    const current = months.get(key) ?? { year, month, totalCents: 0, tickets: 0, estimates: 0, purchases: 0 };
+    current.totalCents += purchase.ticketCents ?? completedPurchaseTotals(purchase).priceCents;
+    current.tickets += purchase.ticketCents === null ? 0 : 1;
+    current.estimates += purchase.ticketCents === null ? 1 : 0;
+    current.purchases += 1;
+    months.set(key, current);
+  }
+  return [...months.values()].sort((left, right) => right.year - left.year || right.month - left.month);
+}

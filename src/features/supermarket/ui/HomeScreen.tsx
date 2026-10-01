@@ -119,6 +119,10 @@ export function HomeScreen() {
             <Text style={styles.latestAmount}>{formatMoney(latest.ticketCents ?? completedPurchaseTotals(latest).priceCents)}</Text>
           </Pressable> : <Text style={common.body}>Cuando cierres tu primera compra, vas a poder consultarla acá.</Text>}
         </View>
+        <View style={styles.secondaryLinks}>
+          <Pressable accessibilityRole="button" onPress={() => router.push('/prices')} style={styles.secondaryLink}><Ionicons name="pricetags-outline" size={21} color={colors.ink} /><Text style={styles.secondaryLinkText}>Precios guardados</Text><Ionicons name="chevron-forward" size={18} color={colors.textSecondary} /></Pressable>
+          <Pressable accessibilityRole="button" onPress={() => router.push('/pending')} style={styles.secondaryLink}><Ionicons name="bookmark-outline" size={21} color={colors.ink} /><Text style={styles.secondaryLinkText}>Pendientes por sucursal</Text><Ionicons name="chevron-forward" size={18} color={colors.textSecondary} /></Pressable>
+        </View>
         {session.saveState === 'error' && <View style={common.card}><Text accessibilityRole="alert" style={common.body}>No se guardaron los últimos cambios de la compra.</Text><ActionButton label="Reintentar guardado" onPress={session.retrySave} /></View>}
       </>}
     </ScrollView>
@@ -169,6 +173,9 @@ const styles = StyleSheet.create({
   latestStore: { ...typography.product, color: colors.ink },
   latestLabel: { ...typography.caption, color: colors.textSecondary, letterSpacing: 1, paddingTop: 8 },
   latestAmount: { ...typography.sectionTitle, color: colors.ink, fontVariant: ['tabular-nums'] },
+  secondaryLinks: { gap: 8 },
+  secondaryLink: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 14 },
+  secondaryLinkText: { ...typography.secondary, color: colors.ink, flex: 1 },
   sectionTitle: { ...typography.sectionTitle, color: colors.ink },
   overlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: colors.cameraScrim },
   sheet: { maxHeight: '85%', backgroundColor: colors.canvas, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 28 },

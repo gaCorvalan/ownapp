@@ -1,6 +1,15 @@
 import * as SQLite from 'expo-sqlite';
 import type { PriceObservation } from '../domain/priceObservation';
 
+export type StoredPriceObservation = PriceObservation & { syncStatus: string };
+
+type ObservationRow = {
+  id: string; captured_at: string; product_descriptor_json: string | null;
+  price_cents: number; terms_kind: PriceObservation['terms']['kind']; terms_text: string | null;
+  raw_context: string; published_unit_price_json: string | null;
+  retailer_id: string | null; source: PriceObservation['source']; sync_status: string;
+};
+
 const DATABASE_NAME = 'ownapp-prices.db';
 let databasePromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
@@ -35,9 +44,26 @@ async function openDatabase() {
         );
       `);
       return database;
-    });
+    }).catch(error => { databasePromise = null; throw error; });
   }
   return databasePromise;
+}
+
+export async function loadPriceObservations(): Promise<StoredPriceObservation[]> {
+  const database = await openDatabase();
+  const rows = await database.getAllAsync<ObservationRow>(
+    `SELECT id, captured_at, product_descriptor_json, price_cents, terms_kind, terms_text,
+      raw_context, published_unit_price_json, retailer_id, source, sync_status
+     FROM price_observations ORDER BY captured_at DESC, id DESC`,
+  );
+  return rows.map(row => ({
+    id: row.id, capturedAt: row.captured_at,
+    product: row.product_descriptor_json ? JSON.parse(row.product_descriptor_json) : null,
+    priceCents: row.price_cents,
+    terms: { kind: row.terms_kind, conditionText: row.terms_text, rawContext: row.raw_context },
+    publishedUnitPrice: row.published_unit_price_json ? JSON.parse(row.published_unit_price_json) : null,
+    retailerId: row.retailer_id, source: row.source, syncStatus: row.sync_status,
+  }));
 }
 
 export async function recordPriceObservation(observation: PriceObservation) {

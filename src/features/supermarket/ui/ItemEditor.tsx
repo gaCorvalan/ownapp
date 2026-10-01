@@ -7,7 +7,7 @@ import { ActionButton, colors, common, IconButton } from './primitives';
 
 export function ItemEditor({ item, onSave, onClose }: {
   item: ShoppingItem | null;
-  onSave: (value: { name: string; priceCents: number; quantity: number }) => void;
+  onSave: (value: { name: string; priceCents: number; quantity: number }) => boolean | Promise<boolean>;
   onClose: () => void;
 }) {
   const [name, setName] = useState(item?.name ?? '');
@@ -16,7 +16,7 @@ export function ItemEditor({ item, onSave, onClose }: {
   const [error, setError] = useState('');
   const submitted = useRef(false);
 
-  function submit() {
+  async function submit() {
     if (submitted.current) return;
     const priceCents = parsePrice(price);
     if (priceCents === null) { setError('Ingresá un precio entre $ 0,01 y $ 1.000.000. Usá coma para los centavos, por ejemplo 3450,50.'); return; }
@@ -24,7 +24,16 @@ export function ItemEditor({ item, onSave, onClose }: {
       setError('La cantidad debe ser un número entero entre 1 y 99.'); return;
     }
     submitted.current = true;
-    onSave({ name: name.trim(), priceCents, quantity: Number(quantity) });
+    try {
+      const saved = await onSave({ name: name.trim(), priceCents, quantity: Number(quantity) });
+      if (!saved) {
+        submitted.current = false;
+        setError('No pudimos guardar este precio. Volvé a intentar.');
+      }
+    } catch {
+      submitted.current = false;
+      setError('No pudimos guardar este precio. Volvé a intentar.');
+    }
   }
 
   return <Modal transparent animationType="fade" onRequestClose={onClose} accessibilityViewIsModal>
@@ -49,10 +58,10 @@ export function ItemEditor({ item, onSave, onClose }: {
           <View style={styles.field}>
             <Text style={styles.label}>Cantidad</Text>
             <TextInput accessibilityLabel="Cantidad" value={quantity} onChangeText={setQuantity}
-              maxLength={2} keyboardType="number-pad" style={styles.input} onSubmitEditing={submit} />
+              maxLength={2} keyboardType="number-pad" style={styles.input} onSubmitEditing={() => void submit()} />
           </View>
           {!!error && <Text accessibilityRole="alert" style={styles.error}>{error}</Text>}
-          <ActionButton label={item ? 'Guardar cambios' : 'Agregar a la compra'} icon={item ? 'checkmark' : 'add'} onPress={submit} />
+          <ActionButton label={item ? 'Guardar cambios' : 'Agregar a la compra'} icon={item ? 'checkmark' : 'add'} onPress={() => void submit()} />
           <ActionButton label="Cancelar" variant="ghost" onPress={onClose} />
         </ScrollView>
       </View>

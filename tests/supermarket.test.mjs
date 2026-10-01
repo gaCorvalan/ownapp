@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { parsePrice, parseTicketAmount, extractPriceCandidates, extractPublishedUnitPrices } from '../src/features/supermarket/domain/price.ts';
-import { correctProductDisplayName, extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
+import { correctProductDisplayName, createManualProductDescriptor, extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
 import { classifyPriceTerms, createPriceObservation } from '../src/features/supermarket/domain/priceObservation.ts';
 import { shoppingReducer, shoppingTotals, shoppingCounts, isShoppingItem } from '../src/features/supermarket/domain/shopping.ts';
-import { decodePurchaseLedger, decodePurchaseSession, finishPurchase, updateTicket } from '../src/features/supermarket/domain/purchaseSession.ts';
+import { decodePurchaseLedger, decodePurchaseSession, finishPurchase, monthlySpending, updateTicket } from '../src/features/supermarket/domain/purchaseSession.ts';
 import { normalizeStoreName, storeLabel } from '../src/features/supermarket/domain/store.ts';
+import { comparablePrice, matchesObservation } from '../src/features/supermarket/domain/priceComparison.ts';
+import { createPendingItem, isPendingItem } from '../src/features/supermarket/domain/pending.ts';
 
 test('precios argentinos: pesos, miles y centavos sin redondeo flotante', () => {
   for (const [input, expected] of [['3450', 345000], ['$ 3.450,50', 345050], ['0,01', 1], ['12,5', 1250], ['1.000.000', 100000000]]) {
@@ -179,4 +181,44 @@ test('el cierre rechaza una compra sin incluidos y migra el formato previo sin p
   assert.deepEqual(decodePurchaseLedger(null, previous, null), { active: { id: 'p', storeId: 's', items: [item] }, completed: [] });
   assert.deepEqual(decodePurchaseLedger(null, null, JSON.stringify({ version: 1, items: [item] })), { active: { id: 'legacy-purchase', storeId: null, items: [item] }, completed: [] });
   assert.deepEqual(decodePurchaseLedger(JSON.stringify({ version: 3, active: null, completed: [] }), previous, null), { active: null, completed: [] });
+});
+
+test('una carga manual conserva nombre si se informó y no inventa identidad si falta', () => {
+  assert.equal(createManualProductDescriptor(''), null);
+  assert.deepEqual(createManualProductDescriptor('  Yerba Unión  '), {
+    category: null, brand: null, variant: null, netContent: null,
+    displayName: 'Yerba Unión', rawLabelText: '', source: 'manual',
+  });
+});
+
+test('precio por medida calculado usa enteros y distingue un dato publicado', () => {
+  const base = createPriceObservation({
+    id: 'obs-a', capturedAt: '2026-09-26T12:00:00.000Z',
+    product: { ...createManualProductDescriptor('Yerba 750 g'), netContent: { amount: 750, unit: 'g' } },
+    priceCents: 345000, terms: classifyPriceTerms('Regular'), publishedUnitPrice: null,
+    retailerId: 's', source: 'manual',
+  });
+  assert.deepEqual(comparablePrice(base), { priceCents: 460000, unit: 'kg', origin: 'calculated' });
+  assert.deepEqual(comparablePrice({ ...base, publishedUnitPrice: { priceCents: 455000, unit: 'kilogram', context: 'Por kg' } }), { priceCents: 455000, unit: 'kg', origin: 'published' });
+  assert.equal(comparablePrice({ ...base, product: null }), null);
+  assert.equal(matchesObservation(base, 'YERBA', 's'), true);
+  assert.equal(matchesObservation(base, 'yerba', 'other'), false);
+});
+
+test('un pendiente conserva producto, fecha, origen y sucursal de destino', () => {
+  const product = createManualProductDescriptor('Yerba Unión 1 kg');
+  const pending = createPendingItem({ id: 'pending-1', createdAt: '2026-09-26T12:00:00.000Z',
+    sourceObservationId: 'obs-1', product, targetStoreId: 'target', observedStoreId: 'source',
+    observedPriceCents: 345000, observedAt: '2026-09-25T12:00:00.000Z', terms: classifyPriceTerms('Con tarjeta'),
+  });
+  assert.equal(isPendingItem(pending), true);
+  assert.equal(pending.targetStoreId, 'target');
+  assert.equal(pending.terms.kind, 'loyalty');
+});
+
+test('el resumen mensual cuenta ticket o estimación una sola vez por compra', () => {
+  const store = { id: 's', supermarket: 'Día', reference: 'Centro' };
+  const first = finishPurchase({ active: { id: 'a', storeId: 's', items: [item] }, completed: [] }, store, '2026-09-10T12:00:00.000Z', null).completed[0];
+  const second = finishPurchase({ active: { id: 'b', storeId: 's', items: [item] }, completed: [] }, store, '2026-09-20T12:00:00.000Z', 300000).completed[0];
+  assert.deepEqual(monthlySpending([second, first]), [{ year: 2026, month: 9, totalCents: 645050, tickets: 1, estimates: 1, purchases: 2 }]);
 });

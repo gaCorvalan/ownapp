@@ -6,7 +6,7 @@ import { ActivityIndicator, BackHandler, Pressable, ScrollView, StyleSheet, Text
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShoppingSession } from '../application/useShoppingSession';
 import { formatMoney, parseTicketAmount } from '../domain/price';
-import { completedPurchaseTotals, type CompletedPurchase } from '../domain/purchaseSession';
+import { completedPurchaseTotals, monthlySpending, type CompletedPurchase } from '../domain/purchaseSession';
 import { shoppingCounts } from '../domain/shopping';
 import { storeLabel } from '../domain/store';
 import { ActionButton, colors, common } from './primitives';
@@ -29,8 +29,10 @@ function PurchaseSummary({ purchase, onPress }: { purchase: CompletedPurchase; o
 export function PurchaseHistoryScreen() {
   const router = useRouter();
   const session = useShoppingSession();
+  const months = monthlySpending(session.completed);
   return <SafeAreaView style={styles.safe}><ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.content}>
     <View style={styles.header}><Pressable accessibilityRole="button" accessibilityLabel="Volver al inicio" onPress={() => router.back()} style={styles.back}><Ionicons name="arrow-back" size={22} color={colors.ink} /></Pressable><Text accessibilityRole="header" style={styles.title}>Compras anteriores</Text></View>
+    {months.length > 0 && <View style={styles.monthSection}><Text style={styles.sectionTitle}>Por mes</Text><Text style={common.body}>Cada compra cuenta una vez: ticket si lo informaste; si no, estimación.</Text>{months.map(month => <View key={`${month.year}-${month.month}`} style={styles.monthRow}><View style={{ flex: 1 }}><Text style={styles.itemName}>{new Intl.DateTimeFormat('es-AR', { month: 'long', year: 'numeric' }).format(new Date(month.year, month.month - 1, 1))}</Text><Text style={common.body}>{month.tickets} con ticket · {month.estimates} con estimación</Text></View><Text style={styles.itemAmount}>{formatMoney(month.totalCents)}</Text></View>)}</View>}
     {session.loadState === 'loading' ? <ActivityIndicator color={colors.ink} /> : session.loadState === 'error' ? <View style={common.card}><Text accessibilityRole="alert" style={common.body}>No pudimos recuperar tus compras.</Text><ActionButton label="Volver a cargar" onPress={session.retryLoad} /></View> : session.completed.length === 0 ? <View style={common.card}><Text style={common.body}>Todavía no guardaste ninguna compra.</Text></View> : session.completed.map(purchase => <PurchaseSummary key={purchase.id} purchase={purchase} onPress={() => router.push({ pathname: '/history/[id]', params: { id: purchase.id } })} />)}
   </ScrollView></SafeAreaView>;
 }
@@ -107,6 +109,8 @@ const styles = StyleSheet.create({
   amountLabel: { ...typography.caption, color: colors.textSecondary, letterSpacing: 1, paddingTop: 8 },
   amount: { ...typography.total, color: colors.ink, fontVariant: ['tabular-nums'] },
   detailHero: { backgroundColor: colors.surfaceTonal, borderRadius: 24, padding: 20, gap: 5 },
+  monthSection: { backgroundColor: colors.surfaceTonal, borderRadius: 20, padding: 18, gap: 10 },
+  monthRow: { borderTopWidth: 1, borderColor: colors.border, paddingTop: 10, flexDirection: 'row', alignItems: 'center', gap: 10 },
   ticketCard: { backgroundColor: colors.surface, borderRadius: 20, padding: 18, gap: 12 },
   ticketAmount: { ...typography.sectionTitle, color: colors.ink },
   sectionTitle: { ...typography.sectionTitle, color: colors.ink },

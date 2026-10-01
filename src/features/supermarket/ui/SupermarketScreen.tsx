@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShoppingSession } from '../application/useShoppingSession';
-import { correctProductDisplayName, type ProductDescriptor } from '../domain/product';
+import { correctProductDisplayName, createManualProductDescriptor, type ProductDescriptor } from '../domain/product';
 import { formatMoney, type PublishedUnitPrice } from '../domain/price';
 import { classifyPriceTerms, createPriceObservation } from '../domain/priceObservation';
 import { MAX_ITEMS, shoppingCounts, type ShoppingItem } from '../domain/shopping';
@@ -91,7 +91,7 @@ export function SupermarketScreen() {
             <ActionButton label="Volver a cargar" onPress={session.retryLoad} />
           </>}
         </View> : session.store ? <View style={styles.home}>
-          <PriceScanner full={full} active={isFocused && !purchaseOpen && !editor} onManual={openManual} onAdd={addScannedItem} />
+          <PriceScanner full={full} active={isFocused && !purchaseOpen && !editor} onManual={openManual} onAdd={addScannedItem} onCompare={product => router.push({ pathname: '/prices', params: { q: product?.category ?? product?.displayName ?? '' } })} />
           {!!observationError && <Text accessibilityRole="alert" style={styles.observationError}>{observationError}</Text>}
           <View accessibilityLiveRegion="polite" style={styles.storage}>
             <Ionicons name={session.saveState === 'error' ? 'alert-circle-outline' : 'phone-portrait-outline'} size={15} color={colors.textSecondary} />
@@ -129,16 +129,28 @@ export function SupermarketScreen() {
       </SafeAreaView>
     </Modal>
 
-    {editor && <ItemEditor item={editor.item} onClose={() => setEditor(null)} onSave={value => {
+    {editor && <ItemEditor item={editor.item} onClose={() => setEditor(null)} onSave={async value => {
       if (editor.item) {
         const name = value.name || editor.item.name;
         const product = editor.item.product && name !== editor.item.name
           ? correctProductDisplayName(editor.item.product, name)
           : editor.item.product;
         session.dispatch({ type: 'edit', item: { ...editor.item, ...value, name, product } });
+        setEditor(null);
+        return true;
       }
-      else addItem(value);
+      if (!session.store || full) return false;
+      const observation = createPriceObservation({
+        product: createManualProductDescriptor(value.name), priceCents: value.priceCents,
+        terms: { kind: 'unknown', conditionText: null, rawContext: 'Ingreso manual' },
+        publishedUnitPrice: null, retailerId: session.store.id, source: 'manual',
+      });
+      try {
+        await recordPriceObservation(observation);
+      } catch { return false; }
+      addItem(value);
       setEditor(null);
+      return true;
     }} />}
     <Modal visible={confirmClear} transparent animationType="fade" onRequestClose={() => setConfirmClear(false)} accessibilityViewIsModal>
       <View style={styles.overlay}><View style={[common.card, styles.confirm]}>

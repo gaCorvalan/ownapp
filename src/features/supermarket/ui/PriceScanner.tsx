@@ -11,7 +11,7 @@ import { ActionButton, colors, common, IconButton } from './primitives';
 
 type ScannedAddition = { candidate: PriceCandidate; product: ProductDescriptor | null; publishedUnitPrice: PublishedUnitPrice | null; quantity: number };
 
-export function PriceScanner({ onAdd, onManual, full, active = true }: { onAdd: (value: ScannedAddition) => Promise<boolean>; onManual: () => void; full: boolean; active?: boolean }) {
+export function PriceScanner({ onAdd, onManual, onCompare, full, active = true }: { onAdd: (value: ScannedAddition) => Promise<boolean>; onManual: () => void; onCompare: (product: ProductDescriptor | null) => void; full: boolean; active?: boolean }) {
   const scanner = usePriceScanner();
   const [scanCycle, setScanCycle] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -64,6 +64,7 @@ export function PriceScanner({ onAdd, onManual, full, active = true }: { onAdd: 
           <IconButton label="Sumar una unidad" icon="add" disabled={quantity === MAX_QUANTITY} onPress={() => setQuantity(value => value + 1)} />
         </View></View>
         <ActionButton label={selected ? `Agregar · ${formatMoney(selected.priceCents * quantity)}` : 'Elegí un precio para agregar'} disabled={!selected || full} onPress={addSelected} />
+        <ActionButton label="Consultar precios guardados" variant="secondary" icon="pricetags-outline" onPress={() => onCompare(scanner.product)} />
         <ActionButton label="Volver a encuadrar" variant="ghost" icon="camera-outline" onPress={() => restart()} />
       </>}
       {scanner.status === 'empty' && <View style={styles.notice}>

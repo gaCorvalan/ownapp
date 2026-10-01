@@ -83,6 +83,12 @@ export function correctProductDisplayName(descriptor: ProductDescriptor, display
   return { ...descriptor, displayName: correctedName, source: 'manual' };
 }
 
+export function createManualProductDescriptor(name: string): ProductDescriptor | null {
+  const displayName = name.trim();
+  if (!displayName || displayName.length > 60) return null;
+  return { category: null, brand: null, variant: null, netContent: null, displayName, rawLabelText: '', source: 'manual' };
+}
+
 export function isProductDescriptor(value: unknown): value is ProductDescriptor {
   if (!value || typeof value !== 'object') return false;
   const descriptor = value as ProductDescriptor;

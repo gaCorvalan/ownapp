@@ -15,9 +15,9 @@ El [sistema de marca elegido para implementar](docs/ux/visual/sistema-de-marca.m
 define Lexend Deca, petróleo y lima a partir de la
 [dirección visual vigente](docs/ux/visual/v2/README.md). La interfaz actual ya
 usa esa paleta y tipografía en tema claro; la composición y el recorrido de las
-láminas se implementa de forma incremental: inicio, selección de sucursal y
-revisión reversible, cierre con ticket opcional e historial local ya están
-disponibles.
+láminas se implementan de forma incremental: inicio, selección de sucursal y
+revisión reversible, cierre con ticket opcional, historial local, consulta de
+precios y pendientes por sucursal ya están disponibles.
 
 ## Ejecutar
 
@@ -35,7 +35,10 @@ Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible c
 - Recuperar una compra de la versión anterior sin perder sus productos, asignándole una sucursal al continuar.
 - Finalizar una compra con al menos un producto incluido, conservando los apartados como «No llevaste» y el total del ticket sólo si se informa.
 - Consultar compras anteriores y completar o corregir el total del ticket después.
-- Agregar un precio manualmente con nombre opcional y cantidad.
+- Consultar precios observados por producto y sucursal, con fecha, condición y precio por medida cuando existe información suficiente.
+- Desde una confirmación, buscar precios guardados y volver sin perder la elección actual.
+- Guardar un producto observado como pendiente para otra sucursal, y quitarlo después sin afectar el carrito.
+- Agregar un precio manualmente con nombre opcional y cantidad; el precio también queda registrado como observación local.
 - Editar nombre, precio y cantidad; sumar/restar unidades, apartar productos del total y reincorporarlos.
 - Vaciar la compra con confirmación, eliminando tanto incluidos como apartados.
 - Recuperar la compra después de cerrar y volver a abrir la app.
@@ -52,6 +55,8 @@ app/index.tsx                         Inicio
 app/purchase.tsx                      Ruta de compra
 app/finish.tsx                        Cierre de compra
 app/history/                          Lista y detalle de compras guardadas
+app/prices.tsx                        Historial local de precios y comparación contextual
+app/pending.tsx                       Pendientes por sucursal
 src/features/supermarket/
   ui/                                 Inicio, compra, lista, escáner y formularios
   application/useShoppingSession.tsx  Estado compartido y coordinación del guardado
@@ -60,11 +65,14 @@ src/features/supermarket/
   domain/price.ts                     Conversión de importes y candidatos de precio
   domain/product.ts                   Descriptor inicial y normalización de productos OCR
   domain/priceObservation.ts          Precio elegido, condiciones y referencia por unidad
+  domain/priceComparison.ts           Búsqueda y precio comparable conservador
+  domain/pending.ts                   Intenciones de compra por sucursal
   domain/purchaseSession.ts           Sesión activa, compras guardadas y migraciones
   domain/store.ts                     Sucursal manual
   infrastructure/shoppingStorage.ts  AsyncStorage, formato versionado y escrituras ordenadas
   infrastructure/storeStorage.ts     Sucursales guardadas localmente
   infrastructure/priceObservationStorage.ts SQLite local y cola de sincronización
+  infrastructure/pendingStorage.ts   Pendientes locales en AsyncStorage
   infrastructure/localTextRecognizer.ts Adaptador OCR local (Vision/ML Kit)
 ```
 
@@ -74,7 +82,11 @@ AsyncStorage guarda la compra abierta y las finalizadas juntas bajo `ownapp.supe
 
 El estimado de una compra finalizada se sigue calculando desde sus ítems incluidos. El importe del ticket, cuando se informa, se guarda por separado y puede agregarse después sin alterar los precios de los productos. Una compra vacía o con todos los productos apartados no puede finalizarse por ahora; se conserva abierta para revisarla o descartarla explícitamente.
 
-Cada precio confirmado desde una etiqueta también se registra en SQLite local como una observación independiente de la compra: conserva producto, importe, sucursal elegida, condición detectada, precio por medida publicado cuando es inequívoco y fecha de captura. Las observaciones anteriores conservan su sucursal desconocida. Al mismo tiempo se agrega a una cola local pendiente de sincronización; esta versión no tiene backend ni envía datos fuera del dispositivo. Vaciar o descartar la compra no elimina esas observaciones.
+Cada precio confirmado desde una etiqueta o ingresado manualmente también se registra en SQLite local como una observación independiente de la compra: conserva producto cuando se conoce, importe, sucursal elegida, condición detectada, precio por medida publicado cuando es inequívoco y fecha de captura. Las observaciones anteriores conservan su sucursal desconocida. Al mismo tiempo se agrega a una cola local pendiente de sincronización; esta versión no tiene backend ni envía datos fuera del dispositivo. Vaciar o descartar la compra no elimina esas observaciones.
+
+«Precios guardados» permite buscar y filtrar esas observaciones por sucursal. Desde una confirmación se abre con una búsqueda sugerida por categoría o nombre; al volver, la elección sin agregar sigue disponible. Un precio por litro/kilo/unidad se muestra como publicado si estaba en la etiqueta, o calculado con enteros a partir del contenido neto leído. Es una referencia histórica, no una oferta vigente ni una equivalencia de productos garantizada por OCR. Los pendientes guardan un producto concreto y una sucursal de destino; no suman al carrito ni reservan el precio observado. Si sólo hay una sucursal, puede agregarse otra al crear el pendiente.
+
+El historial de compras muestra un resumen por mes. Cada compra aporta una sola cifra: el ticket informado o, si falta, el total estimado. Se indica cuántos importes de cada origen componen el mes; no se presenta como inflación ni como gasto confirmado cuando faltan tickets.
 
 ## Flujo del escáner
 
@@ -98,7 +110,7 @@ pnpm lint
 pnpm test
 ```
 
-Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, cálculos, edición, cantidades, identidad de productos, migraciones, exclusión reversible del total y cierre con ticket opcional.
+Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, cálculos, edición, cantidades, identidad de productos, migraciones, exclusión reversible del total, cierre con ticket opcional, precios comparables y resúmenes mensuales.
 
 Recorrido manual sugerido:
 
@@ -112,5 +124,8 @@ Recorrido manual sugerido:
 8. Abrir «Finalizar compra», dejar el ticket vacío y guardar: el detalle conserva incluidos y «No llevaste»; Inicio muestra la última compra con «Total estimado». Completar después el ticket desde el detalle y comprobar que muestra «Total del ticket» sin cambiar el estimado.
 9. Probar un ticket inválido y un cierre con todos los productos apartados: no se guarda ni desaparece la compra. Volver con Atrás desde el cierre y comprobar que el borrador del ticket sigue escrito.
 10. Tocar «Empezar otra compra», cancelar el descarte y comprobar que sigue intacta. Elegir finalizar la anterior o confirmar el descarte; después se puede elegir una sucursal nueva.
+11. Registrar un precio manual con nombre, abrir «Precios guardados» y comprobar fecha, sucursal y origen manual; vaciar el carrito y verificar que la observación sigue allí.
+12. Desde una confirmación OCR, abrir «Consultar precios guardados», filtrar por sucursal y volver: la selección pendiente debe seguir intacta y el total no debe haber cambiado.
+13. Guardar un producto observado para otra sucursal (agregándola si hace falta), consultar «Pendientes» y quitarlo. Su precio debe figurar como observado en una fecha, sin sumarse a la compra.
 
 También conviene verificar teclado, áreas seguras, tamaño de texto y persistencia en un teléfono físico antes de la siguiente entrega.

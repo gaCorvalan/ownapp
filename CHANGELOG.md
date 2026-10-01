@@ -7,6 +7,9 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Added
 
+- Historial local de observaciones de precio con búsqueda, filtro por sucursal, fecha, condición, origen y precio por medida publicado o calculado cuando hay contenido neto. La confirmación permite consultarlo sin agregar el producto.
+- Registro de cargas manuales como observaciones locales y pendientes de productos concretos por sucursal, separados del carrito.
+- Resumen mensual en compras anteriores que usa el ticket si existe o el estimado en su ausencia, con recuento de cada origen.
 - Cierre de compra con ticket opcional, conservación de «No llevaste», detalle de la compra guardada e historial local accesible desde Inicio. El ticket puede completarse o corregirse después.
 - Revisión de la compra con inclusión reversible por producto: apartar conserva toda la fila y su cantidad sin sumarla al total; reincorporar recupera el subtotal. El estado persiste en la compra abierta.
 - Inicio con acceso a empezar o continuar una única compra abierta, selección de sucursal y alta manual con supermercado y referencia libre.

@@ -14,43 +14,49 @@ No reemplaza al `CHANGELOG.md`, que sólo describe cambios ya realizados.
   fecha y condición determinadas.
 - El OCR propone datos, pero no sustituye la confirmación de la persona.
 
-## Estado actual · MVP de campo
+## Estado actual · MVP local para validar en campo
 
-- Cámara y scanner disponibles en la portada.
+- Inicio, selección manual de sucursal y una compra abierta recuperable.
+- Cámara dominante durante la compra y resumen del carrito accesible por toque o deslizamiento.
 - OCR local de etiquetas y confirmación explícita del precio.
+- Consulta local de observaciones desde la confirmación, con búsqueda y filtro por sucursal.
 - Nombre de producto sugerido a partir del texto OCR, editable desde la compra.
-- Compra local persistida, cantidades, edición y total estimado.
-- Observaciones de precio persistidas en SQLite local al confirmar un escaneo.
+- Compra local persistida, cantidades, inclusión reversible, cierre con ticket opcional e historial de compras.
+- Observaciones de precio persistidas en SQLite al confirmar un escaneo o una carga manual.
+- Pendientes de productos concretos por sucursal, independientes del carrito.
+- Resumen mensual que distingue importes de ticket de estimaciones.
 - Cola local de sincronización (`pending`), sin backend ni envío de datos.
 
 ### Límites actuales
 
-- No hay selección de supermercado o sucursal.
-- No existe pantalla de historial para consultar las observaciones guardadas.
-- El precio por litro/kilo se conserva si fue publicado en la etiqueta; todavía
-  no se calcula un comparable cuando falta.
+- Las coincidencias de productos se sugieren por texto/categoría; el OCR no
+  verifica identidad ni equivalencia entre presentaciones.
+- El comparable calculado a partir de contenido neto leído requiere comprobación
+  humana; no se usa para declarar automáticamente qué oferta conviene.
 - Las promociones complejas no modifican automáticamente el total.
-- La carga manual todavía no genera una observación de precio.
 - Las observaciones viven sólo en el dispositivo: desinstalar la app o borrar
   sus datos las elimina.
+- La navegación, cámara, OCR y accesibilidad de los nuevos recorridos aún
+  requieren comprobación en un teléfono físico y con compradores.
 
-## Fase 1 · Contexto e historial local
+## Fase 1 · Contexto e historial local · implementada en código
 
 Objetivo: volver útiles los precios recolectados en el dispositivo.
 
-1. Selección manual de supermercado al iniciar una compra.
-   - Asociar supermercado y, más adelante, sucursal a cada observación.
+1. Selección manual de supermercado y sucursal al iniciar una compra.
+   - Asociar la sucursal elegida a cada nueva observación.
    - No intentar deducir el comercio por OCR en esta etapa.
 2. Historial local de observaciones.
-   - Mostrar producto, precio, condición, fecha, supermercado y estado de
-     sincronización.
+   - Mostrar producto, precio, condición, fecha, sucursal y que el dato sigue
+     sólo en el dispositivo.
    - Mantener el historial aunque se vacíe el carrito.
 3. Registrar cargas manuales como observaciones con origen `manual`.
 
-Criterio de salida: una persona puede recuperar y revisar los precios que vio
-en sus compras anteriores, filtrados por supermercado.
+Criterio de salida funcional: se pueden recuperar y revisar los precios vistos,
+filtrados por sucursal, incluso después de vaciar o finalizar una compra.
+Falta comprobarlo en Android con datos reales.
 
-## Fase 2 · Comparación de precios
+## Fase 2 · Comparación de precios · base local implementada
 
 Objetivo: hacer comparables presentaciones distintas sin alterar el precio de
 venta real.
@@ -62,10 +68,14 @@ venta real.
 - Modelar promociones y precios con tarjeta como condiciones de una oferta;
   no aplicar mecánicas como 2×1 automáticamente al total sin datos suficientes.
 
-Criterio de salida: la app puede explicar si un precio es regular, condicionado
-o promocional, y comparar de forma fiable productos equivalentes.
+La app muestra condición, fecha, local, precio por medida publicado y un
+comparable calculado con enteros si el contenido neto fue leído. La consulta
+desde el escaneo conserva la elección al volver. Todavía no se declara que dos
+productos sean equivalentes ni se ordenan ofertas como si fueran precios
+vigentes. Alcanzar ese criterio de fiabilidad requiere probar etiquetas reales
+y resolver identidad de producto y presentaciones.
 
-## Fase 3 · Validación en supermercado
+## Fase 3 · Validación en supermercado · pendiente en teléfono físico
 
 Objetivo: comprobar que el MVP local permite completar una compra real y que
 los datos capturados tienen el contexto necesario para evolucionar.
@@ -80,7 +90,7 @@ los datos capturados tienen el contexto necesario para evolucionar.
 Criterio de salida: se puede completar una compra sin abandonar el flujo de
 scanner, y las diferencias frente al ticket son explicables.
 
-## Fase 4 · Sincronización y base compartida
+## Fase 4 · Sincronización y base compartida · posterior a la validación
 
 Objetivo: convertir observaciones locales consentidas en datos útiles para toda
 la comunidad.
