@@ -24,3 +24,20 @@
 - Al terminar, informá qué cambió, qué verificaste y qué queda pendiente.
   Distinguí las pruebas automáticas, la generación de bundles, la comprobación
   visual en web y la ejecución en un teléfono físico.
+
+## Agent skills
+
+### Issue tracker
+
+Las tareas y especificaciones se registran en GitHub Issues.
+Para crear, consultar o actualizar issues, leé `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Usamos las cinco etiquetas predeterminadas de triage.
+Antes de clasificar issues, leé `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+El dominio usa un layout single-context.
+Antes de explorar el dominio, leé `docs/agents/domain.md`.
