@@ -1,13 +1,14 @@
 # Pantallas y decisiones de experiencia
 
-Actualización: 26 de septiembre de 2026.
+Decisiones de diseño registradas desde el 26 de septiembre de 2026.
 
 Este índice reúne el diseño que estamos definiendo en conversación. Cada
 pantalla tiene un documento propio: propósito, contexto, jerarquía, estructura,
 rol de cada elemento, interacciones, decisiones y preguntas pendientes.
-Documentar una decisión no significa que ya esté implementada ni validada con
-compradores. El código vigente y el README de la aplicación describen el estado
-implementado.
+Documentar una decisión no significa que esté validada con compradores. Las
+propuestas y preguntas conservan su contexto histórico; los enlaces de
+implementación y el [README de la app](../../../README.md) muestran qué existe
+hoy. Una frase fechada como «propuesto» no indica por sí sola que falte código.
 
 ## Cómo leer los documentos
 
@@ -23,19 +24,19 @@ Las decisiones acordadas también necesitan validación de usabilidad.
 
 ## Índice
 
-| Documento | Rol | Grado de definición |
+| Documento | Rol | Implementación principal |
 | --- | --- | --- |
-| [01 · Inicio](01-inicio.md) | Empezar o recuperar una compra | Propósito acordado; composición y estados propuestos |
-| [02 · Captura](02-captura.md) | Capturar etiquetas con el acumulado accesible | Cámara protagonista y acceso al carrito acordados; detalles propuestos |
-| [03 · Confirmación](03-confirmacion.md) | Elegir un precio y agregar el producto | Flujo y composición A elegidos; acabado visual e interacción fina pendientes |
-| [04 · Compra actual](04-compra-actual.md) | Revisar y modificar la compra completa | Pantalla completa y apertura ascendente acordadas; organización en diseño |
-| [05 · Finalización](05-finalizacion.md) | Guardar la compra y lo que no se llevó | Ticket opcional y «No llevaste» acordados; composición propuesta |
-| [06 · Selección de sucursal](06-seleccion-sucursal.md) | Elegir dónde se compra antes de capturar | Secuencia, supermercado y referencia libre acordados; composición pendiente |
+| [01 · Inicio](01-inicio.md) | Empezar o recuperar una compra | [HomeScreen](../../../src/features/supermarket/ui/HomeScreen.tsx) · [ruta](../../../app/index.tsx) |
+| [02 · Captura](02-captura.md) | Capturar etiquetas con el acumulado accesible | [SupermarketScreen](../../../src/features/supermarket/ui/SupermarketScreen.tsx) · [LabelCamera](../../../src/features/supermarket/ui/LabelCamera.tsx) |
+| [03 · Confirmación](03-confirmacion.md) | Elegir un precio y agregar el producto | [PriceScanner](../../../src/features/supermarket/ui/PriceScanner.tsx) · [usePriceScanner](../../../src/features/supermarket/application/usePriceScanner.ts) |
+| [04 · Compra actual](04-compra-actual.md) | Revisar y modificar la compra completa | [SupermarketScreen](../../../src/features/supermarket/ui/SupermarketScreen.tsx) · [ShoppingList](../../../src/features/supermarket/ui/ShoppingList.tsx) |
+| [05 · Finalización](05-finalizacion.md) | Guardar la compra y lo que no se llevó | [FinishScreen](../../../src/features/supermarket/ui/FinishScreen.tsx) · [detalle](../../../app/history/[id].tsx) |
+| [06 · Selección de sucursal](06-seleccion-sucursal.md) | Elegir dónde se compra antes de capturar | [HomeScreen](../../../src/features/supermarket/ui/HomeScreen.tsx) · [storeStorage](../../../src/features/supermarket/infrastructure/storeStorage.ts) |
 
 Confirmación se documenta por separado porque tiene una tarea y jerarquía
-propias. Todavía no se decidió si será una pantalla independiente o un estado
-del espacio de captura. Estos documentos no prescriben rutas ni componentes
-técnicos.
+propias. En la implementación actual es un estado dentro de la pantalla de
+compra. Los enlaces orientan hacia el código, sin convertir las propuestas de
+diseño en requisitos técnicos.
 
 ## Recorrido de referencia
 
@@ -49,30 +50,30 @@ queda para el futuro.
 
 La [lámina de entrada](../visual/v2/README.md#inicio-sucursal-y-cámara) propone la
 composición de Inicio y del panel, incluyendo primer uso y compra abierta.
-Compras anteriores es el acceso secundario priorizado; Pendientes queda fuera
-del inicio por ahora, hasta entender mejor su utilidad cotidiana.
+Compras anteriores es el acceso secundario priorizado; Pendientes tiene un
+acceso secundario en Inicio y su utilidad cotidiana sigue por validar.
 
-Con una compra abierta: al iniciar la app desde cero, mostrar Inicio con sucursal,
-total y Continuar compra; al volver de otra app en la sesión, recuperar directamente
-la pantalla activa. Se acuerda una sola compra abierta para esta versión:
-resolver explícitamente la anterior antes de empezar otra. La presentación de
-esa resolución y el tratamiento de descarte siguen propuestos.
+Con una compra abierta, Inicio muestra sucursal, total y Continuar compra. La
+sesión mantiene la pantalla activa al volver de otra app. Para empezar otra,
+la app ofrece finalizar o descartar la anterior; el descarte pide confirmación.
+Ese recorrido aún requiere pruebas en Android.
 
-Compra actual → Finalización → detalle de la compra guardada (destino propuesto).
+Compra actual → Finalización → detalle de la compra guardada. Si se estaba
+empezando otra compra, vuelve a la selección de sucursal.
 Al cerrar se conservan incluidos y «No llevaste» por separado; sólo los primeros
 suman al total estimado. El ticket no es requisito de cierre.
 
-## Áreas que aún no tienen composición definida
+## Áreas que necesitan revisión de diseño
 
-| Área | Necesidad ya identificada | Qué falta decidir |
+| Área | Implementación actual | Qué falta comprobar o decidir |
 | --- | --- | --- |
-| Supermercado/sucursal | Asociar los precios a los locales habituales | Presentación y validaciones; selección previa y alta con referencia libre acordadas |
-| Comparación | Consultar alternativas desde el escaneo | Superficie, jerarquía y retorno a confirmación |
-| Pendientes | Guardar el producto específico elegido para otro supermercado | Listado por local y uso durante la visita siguiente |
-| Historial | Recuperar compras y completar el ticket después | Navegación entre compras, precios y resumen mensual |
+| Supermercado/sucursal | Selección y alta manual | Presentación y validaciones en teléfono |
+| Comparación | Consulta de precios guardados desde confirmación | Jerarquía y comprensión de precios históricos |
+| Pendientes | Listado por sucursal, alta y retiro | Utilidad durante la siguiente visita |
+| Historial | Compras, detalle, ticket posterior y resumen mensual | Navegación y comprensión de importes estimados |
 
-Se creará un documento por pantalla cuando trabajemos su estructura. No se
-presupone que cada área vaya a necesitar una pantalla independiente.
+Estas áreas ya tienen código; un documento de diseño adicional sólo se abrirá
+cuando haya decisiones de experiencia que registrar.
 
 ## Método de mantenimiento
 
@@ -126,7 +127,11 @@ Es una lámina estática, no un prototipo navegable ni una implementación. El
 del recorrido y la comparación de confirmación; **A ya fue elegida**. Se
 conservan únicamente sus dos láminas PNG y su explicación como antecedente.
 
-## Continuación propuesta
+## Continuación de diseño registrada el 26/09
+
+Los puntos 1, 2 y 4 se implementaron después de formular esta secuencia. Se
+conserva para explicar el orden de las decisiones, no como lista de trabajo
+pendiente.
 
 1. Completar la compra cotidiana: apartar productos sin que desaparezcan,
    reincorporarlos al total, lectura fallida y cierre con ticket opcional.
@@ -140,6 +145,5 @@ conservan únicamente sus dos láminas PNG y su explicación como antecedente.
 4. Desarrollar comparación y pendientes para otra sucursal como segundo recorrido,
    con fecha, presentación y condición del precio visibles; probarlo después.
 
-Esta secuencia es una propuesta, no autorización para implementar la app.
 Mantener una lámina por recorrido y un documento por pantalla; ajustar la
 dirección visual con feedback concreto y separar gusto de facilidad de uso.

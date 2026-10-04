@@ -3,6 +3,9 @@
 Actualización: 26 de septiembre de 2026.
 Estado: recorrido, alta manual con supermercado y referencia libre acordados;
 composición y validaciones pendientes.
+Implementación actual: [HomeScreen](../../../src/features/supermarket/ui/HomeScreen.tsx)
+ofrece selección, alta manual y persistencia local; la composición de la lámina
+registra la propuesta del 26/09 y aún requiere validación en teléfono.
 [Índice de pantallas](README.md).
 
 Representación: [Inicio → sucursal → cámara](../visual/v2/README.md#inicio-sucursal-y-cámara).
@@ -15,8 +18,8 @@ Identificar dónde transcurre una nueva compra antes de capturar el primer
 producto. La persona ya eligió el supermercado en la vida real: este panel no
 recomienda dónde ir ni compara locales; asocia la compra a su sucursal.
 
-Se documenta como superficie con tarea propia, sin decidir una ruta técnica.
-El término «panel» todavía no fija altura, gesto de cierre ni biblioteca.
+Se documenta como superficie con tarea propia. En el código se presenta como
+modal dentro de Inicio; la lámina no fija sus detalles técnicos.
 
 ## Recorrido acordado
 
@@ -47,8 +50,9 @@ no se eligió proveedor ni se autorizó integrar, extraer o importar datos ahora
 
 **Campos acordados:** Supermercado y Referencia de la sucursal como texto simple.
 El usuario acepta una referencia libre, por ejemplo «Del barrio», sin exigir
-dirección exacta. Obligatoriedad, límites y tratamiento de duplicados siguen
-por definir; no inferir ubicación física a partir del alias.
+dirección exacta. El código exige ambos campos y limita supermercado a 40
+caracteres y referencia a 60; el tratamiento de duplicados aún debe revisarse.
+No inferir ubicación física a partir del alias.
 
 Propuesta de composición, pendiente de confirmar:
 
@@ -65,8 +69,9 @@ Propuesta de composición, pendiente de confirmar:
 El local agregado queda disponible para futuras visitas. Su alias no demuestra
 identidad compartida entre usuarios: una futura vinculación al catálogo debe
 resolver esa equivalencia sin asumir que nombres similares son la misma sucursal.
-Persistencia, edición de locales y duplicados requieren definición posterior;
-esta propuesta no modifica todavía el almacenamiento de la app.
+El alta y la persistencia local ya están implementadas. La edición de locales y
+el tratamiento de duplicados requieren definición posterior; esta propuesta de
+composición no modifica el almacenamiento de la app.
 
 ## Registro de decisiones
 
@@ -83,7 +88,8 @@ esta propuesta no modifica todavía el almacenamiento de la app.
 
 - Validaciones del alta manual y presentación de supermercado/referencia en la lista.
 - Orden de habituales y acceso a otro local; información mínima de cada fila.
-- Cancelación, permiso de cámara, persistencia y duplicados del alta manual.
+- Comprobar en teléfono cancelación, permiso de cámara y persistencia; resolver
+  el tratamiento de duplicados del alta manual.
 - Corrección de una sucursal elegida por error.
 
 Retomar no repite la selección: ver [Inicio](01-inicio.md) para la distinción

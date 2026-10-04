@@ -3,10 +3,14 @@
 Actualización: 26 de septiembre de 2026.
 Estado: ticket opcional y conservación de «No llevaste» acordados;
 composición, textos y transición posterior propuestos.
+Implementación actual: [FinishScreen](../../../src/features/supermarket/ui/FinishScreen.tsx)
+guarda la compra con ticket opcional. Abre su detalle o, si se estaba empezando
+otra compra, la selección de sucursal. El recorrido aún necesita comprobación
+en teléfono y con participantes.
 [Índice de pantallas](README.md).
 
 Representación: [recorrido visual 02](../visual/v2/README.md), estado 04.
-Es un diseño estático, no una función implementada ni validada con participantes.
+La lámina es estática y no demuestra el funcionamiento de la app.
 
 ## Rol y contexto
 
@@ -20,14 +24,15 @@ significa intención de comprarlo en otra visita ni ahorro demostrado.
 
 ## Entrada y salida
 
-Propuesta: «Finalizar compra» desde [Compra actual](04-compra-actual.md) abre
+«Finalizar compra» desde [Compra actual](04-compra-actual.md) abre
 un cierre a pantalla completa. Atrás vuelve a la revisión y conserva incluidos,
 apartados y el borrador del ticket, sin finalizar. Abrir el cierre no guarda
 todavía una compra finalizada ni confirma que se pagó el total estimado.
 
-«Guardar compra» confirma el cierre. Propuesta: después de guardar correctamente,
-mostrar el detalle de esa compra con una confirmación breve. Ese destino y su
-composición aún no se diseñaron; no agregar otro botón de confirmación obligatorio.
+«Guardar compra» confirma el cierre. Después de guardar correctamente, la app
+abre el [detalle de la compra](../../../src/features/supermarket/ui/PurchaseHistoryScreen.tsx)
+o vuelve a la selección de sucursal si se había elegido empezar otra compra.
+No hay otro botón de confirmación obligatorio.
 
 ## Estructura propuesta
 
@@ -61,8 +66,9 @@ alcance. Ese comportamiento requiere prototipo y prueba con texto ampliado.
   disponibles. No inventar datos faltantes.
 
 No convertir los apartados automáticamente en Pendientes ni borrar su observación
-de precio. En el futuro detalle de la compra, «No llevaste» debe seguir separado
-de lo comprado; la navegación general del historial aún está pendiente.
+de precio. En el detalle implementado, «No llevaste» sigue separado de lo
+comprado. La experiencia de navegación del historial aún requiere pruebas en
+teléfono.
 
 Ejemplo: leche (2 × $2.350) + pollo ($12.800) + yerba ($5.400) = **$22.900**.
 El arroz apartado ($1.450, una unidad) queda en «No llevaste», fuera de ese total.
@@ -82,12 +88,12 @@ no alterar precios de productos ni presentar los $400 como ahorro identificado.
 - **Error de guardado:** conservar toda la información y permitir reintentar.
 - **Sin apartados:** omitir la sección «No llevaste»; no ocupar espacio con una
   tarjeta vacía.
-- **Todos apartados o compra vacía:** cierre todavía pendiente. No crear un
-  gasto cero automáticamente ni perder los productos visibles.
+- **Todos apartados o compra vacía:** la app no permite finalizar; conserva la
+  compra abierta para revisarla o descartarla explícitamente.
 
 El tratamiento exacto de teclado, Atrás, persistencia del borrador y recuperación
-al cerrar la app se deberá verificar en Android. Este documento no define aún
-una implementación ni una biblioteca de componentes.
+al cerrar la app se deberá verificar en Android. La lámina no prescribe una
+biblioteca de componentes.
 
 ## Registro de decisiones
 

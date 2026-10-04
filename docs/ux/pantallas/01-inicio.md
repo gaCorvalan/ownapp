@@ -3,6 +3,10 @@
 Actualización: 26 de septiembre de 2026.
 Estado: propósito, nueva compra y distinción al retomar acordados;
 estructura detallada propuesta.
+Implementación actual: [HomeScreen](../../../src/features/supermarket/ui/HomeScreen.tsx)
+incluye historial, recuperación de compra, selección de sucursal y resolución
+explícita de una compra abierta. Las propuestas siguientes registran el diseño
+del 26/09; el código enlazado describe el comportamiento actual.
 [Índice de pantallas](README.md).
 
 Representación: [Inicio → sucursal → cámara](../visual/v2/README.md#inicio-sucursal-y-cámara).
@@ -61,14 +65,14 @@ preparación en un formulario largo ni exigir un catálogo remoto.
 Mantener el acceso principal en un lugar consistente. **Acordado:** ofrecer el
 [panel de sucursales](06-seleccion-sucursal.md) al tocar Empezar compra; elegir
 una abre la cámara, sin otro botón de continuar. **Acordado:** priorizar compras
-anteriores como acceso secundario; Pendientes no se desarrolla en este inicio.
+anteriores como acceso secundario; Pendientes tiene un enlace de menor peso.
 
 Propuesta en la lámina: una tarjeta de la última compra con sucursal, fecha,
 cantidad de productos incluidos y un importe con origen explícito. Mostrar
 «Total del ticket» sólo si fue informado; en caso contrario, «Total estimado».
 No sumar apartados al recuento de productos llevados ni mezclar importes de
-distinta procedencia. La tarjeta abre el futuro detalle y «Ver todas» el futuro
-historial; esos destinos aún no tienen composición definida.
+distinta procedencia. La tarjeta abre el detalle implementado y «Ver todas» el
+historial de compras; su uso en teléfono aún requiere validación.
 
 ### Compra abierta
 
@@ -89,10 +93,10 @@ Finalizar reutiliza el cierre con ticket opcional; sólo tras guardarlo
 correctamente se continúa al panel de sucursales de la nueva compra. No
 crear la nueva mientras falle el guardado de la anterior.
 
-Descartar es distinto de apartar un producto: no debe presentarse como compra
-realizada. Su confirmación y qué información conserva siguen pendientes;
-no asumir borrado de observaciones de precios ni descartarla por cancelar el
-panel. Estos controles y textos son propuestas, no acciones ya aprobadas.
+Descartar es distinto de apartar un producto y no se presenta como compra
+realizada. La app solicita confirmación y conserva las observaciones de precios;
+cancelar el diálogo deja la compra abierta. Los textos y controles de la lámina
+son propuestas históricas cuya usabilidad aún debe comprobarse.
 
 ### Regreso desde otra app
 

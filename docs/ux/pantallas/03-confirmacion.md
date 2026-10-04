@@ -3,6 +3,10 @@
 Actualización: 26 de septiembre de 2026.
 Estado: flujo actual y composición A (precios en filas) elegidos;
 acabado visual y detalles de interacción pendientes.
+Implementación actual: [PriceScanner](../../../src/features/supermarket/ui/PriceScanner.tsx)
+permite elegir precio, ajustar cantidad, consultar precios guardados y confirmar
+el subtotal antes de agregar. La composición propuesta de abajo conserva el
+razonamiento del diseño; sus estados de 2026-09-26 no describen el código actual.
 La edición de nombre/precio se pospone en esta etapa por pedido del usuario.
 Los lápices y accesos de corrección de propuestas anteriores no se consideran
 aprobados. No se elimina el editor existente ni se asume OCR infalible;
@@ -28,9 +32,8 @@ bien en cuanto al flujo, y quiere mejorar diseño y componentes.
 Esta aceptación se refiere a su percepción del flujo existente. Todavía no
 hubo una compra real con la app que valide su comodidad repetida.
 
-Se documenta como pantalla de diseño con tarea propia, sin decidir todavía si
-será un estado de captura o un destino separado. No se aprobó una nueva cadena
-de formularios obligatorios.
+Se documentó con tarea propia. En el código es un estado del espacio de captura,
+sin una ruta independiente ni formularios obligatorios adicionales.
 
 ## Flujo que se conserva
 
@@ -51,7 +54,8 @@ presentarse como éxito ni provocar la pérdida silenciosa del resultado.
 
 1. Producto reconocible y precio aplicable: información para decidir.
 2. Agregar: acción principal que compromete la incorporación al carrito.
-3. Correcciones y cantidad: apoyo a esa decisión; detalle de interacción pendiente.
+3. Cantidad y correcciones: apoyo a esa decisión; el control de cantidad ya está
+   implementado y la corrección en esta vista sigue por definir.
 4. Alternativas y reintento: acciones contextuales secundarias.
 
 La selección debe ser reconocible como elección entre opciones y no como
@@ -65,15 +69,14 @@ varios botones de acción de igual peso que «Agregar».
 | Junto al dato corregible | Acceso discreto a edición | Corregir cuando haga falta | Propuesto: evitar campos editables permanentes cuando el dato es correcto |
 | Cuerpo principal | Opciones de precio seleccionables, con condición debajo | Comparar y elegir | Composición en filas elegida (A); no esconder condiciones que cambian aplicabilidad |
 | En la opción elegida | Indicador de selección más borde/fondo | Hacer visible la elección | Propuesto: no depender únicamente del color |
-| Cerca del subtotal | Cantidad mediante control compacto | Llevar varias unidades sin abrir el carrito | Propuesto; el escaneo actual agrega una unidad |
+| Cerca del subtotal | Cantidad mediante control compacto | Llevar varias unidades sin abrir el carrito | Implementado: la cantidad elegida multiplica el subtotal antes de agregar |
 | Zona de acción estable | «Agregar» con posible subtotal | Confirmar lo que se suma | Confirmación separada acordada; texto con subtotal y posición final propuestos |
-| Acceso secundario | Consultar precios guardados | Evaluar alternativas antes de agregar | Necesidad acordada en discovery; ubicación y pantalla de comparación pendientes |
+| Acceso secundario | Consultar precios guardados | Evaluar alternativas antes de agregar | Consulta implementada; jerarquía visual pendiente de validar |
 | Acceso secundario | Volver a encuadrar | Recuperarse de una lectura incorrecta | Flujo actual aceptado; tratamiento visual por definir |
 
-Propuesta: mantener distinguibles el subtotal del producto que se va a agregar
-y el acumulado de la compra ya confirmada. El segundo no cambia al seleccionar
-un precio. Todavía hay que decidir cómo conviven con el resumen del carrito sin
-sobrecargar la pantalla.
+La app muestra por separado el subtotal del producto y el acumulado de la
+compra. El segundo no cambia al seleccionar un precio. Falta comprobar si esa
+convivencia se entiende sin sobrecargar la pantalla.
 
 ## Estados y salidas
 
@@ -90,8 +93,9 @@ sobrecargar la pantalla.
   si el agregado se completó.
 - **Agregado:** volver a [Captura](02-captura.md), actualizar el carrito y dar
   feedback. No abrir automáticamente la compra completa.
-- **Consultar alternativas:** no agregar por consultar. Volver conservando
-  elección y datos; el destino y manejo del regreso todavía se diseñarán.
+- **Consultar alternativas:** la consulta abre Precios guardados sin agregar.
+  Al volver, se conserva la elección pendiente; el recorrido requiere validación
+  en teléfono.
 - **Reintentar:** abandonar la lectura y volver al encuadre sin cambiar el total.
 
 ## Promociones y foto
@@ -143,7 +147,8 @@ El lápiz del producto no resuelve todavía dónde corregir un importe leído.
 ## Qué falta resolver y comprobar
 
 - Superficie del resultado y transición desde cámara, sin apilar paneles.
-- Edición de nombre/precio, cantidad y representación de promociones manuales.
+- Edición de nombre/precio en esta vista y representación de promociones manuales;
+  comprobar la comprensión del control de cantidad existente.
 - Si el carrito puede abrirse desde este estado y cómo se conserva la selección.
 - Que elegir y agregar se entiendan como acciones distintas, con uno o varios precios.
 - Que total de compra y subtotal del agregado no se confundan.

@@ -7,10 +7,10 @@ La dirección del producto y las fases pendientes se detallan en
 
 La propuesta de experiencia y sus hipótesis están en
 [Diseño UX](docs/ux/01-discovery.md), con un
-[plan de validación](docs/ux/02-validation-plan.md). Son documentos de diseño;
-no describen funcionalidades ya implementadas.
-La estructura, el rol de cada elemento y las decisiones vigentes se documentan
-por separado en el [índice de pantallas](docs/ux/pantallas/README.md).
+[plan de validación](docs/ux/02-validation-plan.md). Registran decisiones y
+propuestas fechadas; el [índice de pantallas](docs/ux/pantallas/README.md)
+enlaza además la implementación vigente.
+La estructura y el rol de cada elemento se documentan por pantalla.
 El [sistema de marca elegido para implementar](docs/ux/visual/sistema-de-marca.md)
 define Lexend Deca, petróleo y lima a partir de la
 [dirección visual vigente](docs/ux/visual/v2/README.md). La interfaz actual ya
@@ -26,7 +26,41 @@ pnpm install
 pnpm web
 ```
 
-Para mobile: `pnpm start` y abrir el proyecto en un cliente de Expo compatible con SDK 57. También están disponibles `pnpm android` y `pnpm ios` si tenés el entorno nativo configurado. La captura de etiquetas solicita permiso de cámara y no requiere backend.
+Para mobile, compilá la app nativa: el OCR usa un módulo que no funciona en
+Expo Go. `pnpm android` y `pnpm ios` requieren el entorno nativo de cada
+plataforma. La captura solicita permiso de cámara y no requiere backend.
+
+### Instalar en un teléfono Android
+
+Con Android Studio y el SDK configurados, activá la depuración USB, conectá el
+teléfono y ejecutá:
+
+```sh
+pnpm exec expo run:android --device
+```
+
+Expo compila e instala una versión de desarrollo y arranca Metro. Mantené la
+computadora accesible desde el teléfono mientras la uses. Para salir a comprar
+sin Metro, compilá e instalá una versión autónoma:
+
+```sh
+pnpm exec expo run:android --device --variant release
+```
+
+Consultá la [guía de compilación local de Expo](https://docs.expo.dev/guides/local-app-development/)
+antes de cambiar de variante en un teléfono que ya contiene compras.
+
+**Datos al actualizar:** compras y sucursales se guardan con AsyncStorage;
+precios observados, en SQLite; pendientes, con AsyncStorage. Todo queda en el
+almacenamiento local de esta instalación, sin cuenta, sincronización ni copia
+exportable. Los cambios de JavaScript servidos por Metro no borran esos datos.
+Android conserva los datos al instalar una actualización aceptada de la misma
+app: deben coincidir el identificador (`com.anonymous.ownapp`) y la firma, y el
+código de versión no debe retroceder. Si la firma cambia, Android no la trata
+como actualización. **No desinstales la app para cambiar de compilación si
+querés conservar tus compras:** desinstalarla o borrar sus datos elimina el
+almacenamiento local. Ver [requisitos de actualización](https://developer.android.com/google/play/app-updates)
+y [almacenamiento específico de la app](https://developer.android.com/training/data-storage/app-specific).
 
 ## Qué podés probar
 
