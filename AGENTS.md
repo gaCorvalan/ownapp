@@ -41,3 +41,13 @@ Antes de clasificar issues, leé `docs/agents/triage-labels.md`.
 
 El dominio usa un layout single-context.
 Antes de explorar el dominio, leé `docs/agents/domain.md`.
+
+## Cursor Cloud specific instructions
+
+- Node 22 y pnpm están en el PATH de un shell de login. Instalá con
+  `pnpm install --frozen-lockfile`.
+- El servidor de desarrollo web escucha en el puerto 8081 (`pnpm web`).
+  No definas `CI=1`: Metro desactiva la observación de archivos.
+- `pnpm typecheck`, `pnpm lint` y `pnpm test` son las comprobaciones.
+  La cámara, el OCR y `pnpm android` / `pnpm ios` necesitan un teléfono
+  y el SDK nativo; no forman parte de este entorno.
