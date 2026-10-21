@@ -43,6 +43,8 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Fixed
 
+- La versión web usa salida `single` y envía `COOP`/`COEP` en el servidor de desarrollo para que SQLite local pueda abrir su worker en el navegador. Con Expo SDK 57, la salida `static` no empaqueta el worker de `expo-sqlite`.
+- Guardar una observación de precio usa una transacción compatible con web. `withExclusiveTransactionAsync` no está disponible en el navegador.
 - Imports de navegación incompatibles con Expo Router desde SDK 56.
 - Compatibilidad de los tipos de tema e íconos y de los hooks con las
   comprobaciones de la actualización a SDK 57.
