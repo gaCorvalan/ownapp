@@ -216,6 +216,112 @@ test('un pendiente conserva producto, fecha, origen y sucursal de destino', () =
   assert.equal(pending.terms.kind, 'loyalty');
 });
 
+function eachLabel(lines, assertRead) {
+  assertRead(lines.map(text => ({ text })));
+  assertRead([{ text: lines.join('\n') }]);
+}
+
+test('4250 con centavos .00 no se propone como 4250000', () => {
+  for (const text of ['$ 4250.00', '$ 4.250.00', '$4250.00', '$42504250.00']) {
+    const cents = extractPriceCandidates([{ text }]).map(candidate => candidate.priceCents);
+    assert.deepEqual(cents, [425_000], text);
+  }
+  assert.deepEqual(extractPriceCandidates([{ text: '$ 42.500' }]).map(candidate => candidate.priceCents), [4_250_000]);
+  eachLabel(['$ 4250.00', '4250.00 $ / LT', 'PRECIO SIN IMPUESTOS NACIONALES $3508.26'], blocks => {
+    const cents = extractPriceCandidates(blocks).map(candidate => candidate.priceCents);
+    assert.deepEqual(cents, [425_000]);
+    assert.ok(cents.every(cents => cents !== 4_250_000 && cents !== 42_500_000 && cents !== 425_000_000));
+    assert.deepEqual(extractPublishedUnitPrices(blocks).map(price => price.priceCents), [425_000]);
+  });
+  assert.deepEqual(extractPriceCandidates([{ text: '$ 4250.00 4250.00 $ / LT' }]).map(candidate => candidate.priceCents), [425_000]);
+  assert.equal(parsePrice('4250.00'), null);
+});
+
+test('etiqueta Día de jugo conserva el precio de venta y no el de referencia', () => {
+  const lines = [
+    'JUGO DE LIMON DIA 1LT',
+    'Cod.308878',
+    '24/09/2026',
+    'KI-10-0',
+    '$ 5200.00',
+    '5200.00 $ / LT',
+    'PRECIO SIN IMPUESTOS NACIONALES $4297.52',
+  ];
+  eachLabel(lines, blocks => {
+    assert.deepEqual(extractPriceCandidates(blocks).map(candidate => candidate.priceCents), [520_000]);
+    assert.deepEqual(extractPublishedUnitPrices(blocks), [
+      { priceCents: 520_000, unit: 'liter', context: '5200.00 $ / LT' },
+    ]);
+    assert.equal(extractProductDescriptor(blocks)?.category, 'Jugo');
+  });
+  assert.deepEqual(extractPriceCandidates([{ text: 'Cod.' }, { text: '308878' }, { text: '$ 5200' }]).map(candidate => candidate.priceCents), [520_000]);
+});
+
+test('cartel MODO ofrece el descuento y el precio anterior sin aplicar la promo al total', () => {
+  const lines = [
+    'APROVECHÁ EL REINTEGRO',
+    'MODO',
+    'Precio con descuento',
+    '$ 1672',
+    'CERV LAGER PET',
+    'OSLAVA 1LT',
+    'ANTES',
+    '$ 2090',
+    '2090.00 $ / LT',
+    'PRECIO SIN IMPUESTOS NACIONALES $1576.99',
+  ];
+  eachLabel(lines, blocks => {
+    const candidates = extractPriceCandidates(blocks);
+    assert.deepEqual(candidates.map(candidate => candidate.priceCents), [167_200, 209_000]);
+    assert.match(candidates[0].context, /modo/i);
+    assert.match(candidates[0].context, /descuento/i);
+    assert.equal(classifyPriceTerms(candidates[0].context).kind, 'promotion');
+    assert.match(candidates[1].context, /antes/i);
+    assert.match(candidates[1].context, /regular/i);
+    assert.equal(classifyPriceTerms(candidates[1].context).kind, 'regular');
+    assert.deepEqual(extractPublishedUnitPrices(blocks).map(price => [price.priceCents, price.unit]), [[209_000, 'liter']]);
+    const chosen = shoppingReducer([], { type: 'add', item: { id: 'beer', name: 'Cerveza', priceCents: candidates[0].priceCents, quantity: 2 } });
+    assert.deepEqual(shoppingTotals(chosen), { priceCents: 334_400, quantity: 2 });
+  });
+});
+
+test('etiqueta Club Día ofrece el regular y el precio con tarjeta para elegir', () => {
+  const lines = [
+    'CERVEZA RUBIA ST WENDELER 500ML',
+    '$ 2100',
+    'Tu precio con Club Día',
+    '1250',
+    '4200.00 $ / LT',
+    '2500.00 $ / LT',
+    'PRECIO SIN IMPUESTOS NACIONALES $1492.56',
+  ];
+  const sameRow = [
+    'CERVEZA RUBIA ST WENDELER 500ML',
+    '$ 2100 Tu precio con Club Día 1250',
+    '4200.00 $ / LT 2500.00 $ / LT',
+    'PRECIO SIN IMPUESTOS NACIONALES $1492.56',
+  ];
+  for (const variant of [lines, sameRow]) {
+    eachLabel(variant, blocks => {
+      const candidates = extractPriceCandidates(blocks);
+      assert.deepEqual(candidates.map(candidate => candidate.priceCents), [210_000, 125_000]);
+      assert.match(candidates[0].context, /regular/i);
+      assert.equal(classifyPriceTerms(candidates[0].context).kind, 'regular');
+      assert.match(candidates[1].context, /club/i);
+      assert.equal(classifyPriceTerms(candidates[1].context).kind, 'loyalty');
+      assert.deepEqual(extractPublishedUnitPrices(blocks).map(price => price.priceCents), [420_000, 250_000]);
+    });
+  }
+});
+
+test('un bloque con precio de venta y precio por kilo no mezcla los importes', () => {
+  const text = 'YERBA 500 g\n$ 3.450,00\nPrecio por kg: $ 6.900,00';
+  assert.deepEqual(extractPriceCandidates([{ text }]).map(candidate => candidate.priceCents), [345_000]);
+  assert.deepEqual(extractPublishedUnitPrices([{ text }]), [
+    { priceCents: 690_000, unit: 'kilogram', context: 'Precio por kg: $ 6.900,00' },
+  ]);
+});
+
 test('el resumen mensual cuenta ticket o estimación una sola vez por compra', () => {
   const store = { id: 's', supermarket: 'Día', reference: 'Centro' };
   const first = finishPurchase({ active: { id: 'a', storeId: 's', items: [item] }, completed: [] }, store, '2026-09-10T12:00:00.000Z', null).completed[0];

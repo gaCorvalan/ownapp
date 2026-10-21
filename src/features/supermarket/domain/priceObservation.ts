@@ -18,15 +18,23 @@ export type PriceObservation = {
   source: 'label-ocr' | 'manual';
 };
 
+const promotionTerms = /2\s*[x×]\s*1|segunda\s+unidad|llevando\s+\d|promo(?:ción)?|oferta|descuento|reintegro|\bmodo\b/i;
+const loyaltyTerms = /tarjeta|club|beneficio|socios|mi\s*cuenta/i;
+const regularTerms = /regular|lista|contado|\bantes\b/i;
+
+export function isPriceConditionText(text: string): boolean {
+  return promotionTerms.test(text) || loyaltyTerms.test(text) || regularTerms.test(text);
+}
+
 export function classifyPriceTerms(context: string): PriceTerms {
   const normalized = context.trim();
-  if (/2\s*[x×]\s*1|segunda\s+unidad|llevando\s+\d|promo(?:ción)?|oferta/i.test(normalized)) {
+  if (promotionTerms.test(normalized)) {
     return { kind: 'promotion', conditionText: normalized, rawContext: normalized };
   }
-  if (/tarjeta|club|beneficio|socios|mi\s*cuenta/i.test(normalized)) {
+  if (loyaltyTerms.test(normalized)) {
     return { kind: 'loyalty', conditionText: normalized, rawContext: normalized };
   }
-  if (/regular|lista|contado/i.test(normalized)) {
+  if (regularTerms.test(normalized)) {
     return { kind: 'regular', conditionText: null, rawContext: normalized };
   }
   return { kind: 'unknown', conditionText: null, rawContext: normalized };
