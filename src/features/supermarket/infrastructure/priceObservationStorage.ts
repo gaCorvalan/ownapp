@@ -71,8 +71,8 @@ export async function recordPriceObservation(observation: PriceObservation) {
   const product = observation.product ? JSON.stringify(observation.product) : null;
   const publishedUnitPrice = observation.publishedUnitPrice ? JSON.stringify(observation.publishedUnitPrice) : null;
   const payload = JSON.stringify(observation);
-  await database.withExclusiveTransactionAsync(async transaction => {
-    await transaction.runAsync(
+  await database.withTransactionAsync(async () => {
+    await database.runAsync(
       `INSERT INTO price_observations (
         id, captured_at, product_descriptor_json, price_cents, terms_kind, terms_text,
         raw_context, published_unit_price_json, retailer_id, source, sync_status
@@ -83,7 +83,7 @@ export async function recordPriceObservation(observation: PriceObservation) {
         observation.retailerId, observation.source,
       ],
     );
-    await transaction.runAsync(
+    await database.runAsync(
       `INSERT INTO sync_outbox (id, observation_id, payload_json, status, created_at)
        VALUES (?, ?, ?, 'pending', ?)`,
       [`outbox-${observation.id}`, observation.id, payload, observation.capturedAt],
