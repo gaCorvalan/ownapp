@@ -91,7 +91,7 @@ export function SupermarketScreen() {
             <ActionButton label="Volver a cargar" onPress={session.retryLoad} />
           </>}
         </View> : session.store ? <View style={styles.home}>
-          <PriceScanner full={full} active={isFocused && !purchaseOpen && !editor} onManual={openManual} onAdd={addScannedItem} onCompare={product => router.push({ pathname: '/prices', params: { q: product?.category ?? product?.displayName ?? '' } })} />
+          <PriceScanner supermarket={session.store.supermarket} full={full} active={isFocused && !purchaseOpen && !editor} onManual={openManual} onAdd={addScannedItem} onCompare={product => router.push({ pathname: '/prices', params: { q: product?.category ?? product?.displayName ?? '' } })} />
           {!!observationError && <Text accessibilityRole="alert" style={styles.observationError}>{observationError}</Text>}
           <View accessibilityLiveRegion="polite" style={styles.storage}>
             <Ionicons name={session.saveState === 'error' ? 'alert-circle-outline' : 'phone-portrait-outline'} size={15} color={colors.textSecondary} />

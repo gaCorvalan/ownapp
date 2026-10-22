@@ -19,7 +19,7 @@ const categories = [
   ['cerveza', 'Cerveza'], ['agua', 'Agua'], ['detergente', 'Detergente'],
   ['lavandina', 'Lavandina'], ['shampoo', 'Shampoo'], ['papel higiénico', 'Papel higiénico'],
 ];
-const ignoredLine = /\$|precio|tarjeta|descuento|promo|oferta|válido|valido|por\s+(?:kg|kilo|litro)|iva|reintegro|\bmodo\b|\bantes\b|impuestos|club\s*d[ií]a/i;
+const ignoredLine = /\$|precio|tarjeta|descuento|promo|oferta|válido|valido|por\s+(?:kg|kilo|litro)|iva/i;
 const contentPattern = /(\d+(?:[.,]\d+)?)\s*(ml|l|cc|g|gr|kg|un(?:idad(?:es)?)?|u)(?=\b|\s|$)/i;
 
 function titleCase(value: string) {
@@ -59,8 +59,7 @@ function lineScore(text: string) {
 
 export function extractProductDescriptor(blocks: TextBlock[]): ProductDescriptor | null {
   const rawLabelText = blocks.map(block => block.text.trim()).filter(Boolean).join('\n').slice(0, 500);
-  const lines = blocks.flatMap(block => block.text.split(/\n+/).map(line => line.trim()).filter(Boolean));
-  const productLine = lines.sort((left, right) => lineScore(right) - lineScore(left))[0];
+  const productLine = blocks.map(block => block.text.trim()).sort((left, right) => lineScore(right) - lineScore(left))[0];
   if (!productLine || lineScore(productLine) < 0) return null;
 
   const netContent = parseNetContent(rawLabelText);

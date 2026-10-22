@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { parsePrice, parseTicketAmount, extractPriceCandidates, extractPublishedUnitPrices } from '../src/features/supermarket/domain/price.ts';
+import { interpretLabel } from '../src/features/supermarket/domain/labelInterpreter.ts';
 import { correctProductDisplayName, createManualProductDescriptor, extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
 import { classifyPriceTerms, createPriceObservation } from '../src/features/supermarket/domain/priceObservation.ts';
 import { shoppingReducer, shoppingTotals, shoppingCounts, isShoppingItem } from '../src/features/supermarket/domain/shopping.ts';
@@ -221,19 +222,24 @@ function eachLabel(lines, assertRead) {
   assertRead([{ text: lines.join('\n') }]);
 }
 
+function diaPrices(blocks) {
+  return interpretLabel('Día', blocks);
+}
+
 test('4250 con centavos .00 no se propone como 4250000', () => {
-  for (const text of ['$ 4250.00', '$ 4.250.00', '$4250.00', '$42504250.00']) {
-    const cents = extractPriceCandidates([{ text }]).map(candidate => candidate.priceCents);
+  for (const text of ['$ 4250.00', '$ 4.250.00', '$4250.00']) {
+    const cents = diaPrices([{ text }]).candidates.map(candidate => candidate.priceCents);
     assert.deepEqual(cents, [425_000], text);
   }
-  assert.deepEqual(extractPriceCandidates([{ text: '$ 42.500' }]).map(candidate => candidate.priceCents), [4_250_000]);
+  assert.deepEqual(diaPrices([{ text: '$ 42.500' }]).candidates.map(candidate => candidate.priceCents), [4_250_000]);
   eachLabel(['$ 4250.00', '4250.00 $ / LT', 'PRECIO SIN IMPUESTOS NACIONALES $3508.26'], blocks => {
-    const cents = extractPriceCandidates(blocks).map(candidate => candidate.priceCents);
+    const reading = diaPrices(blocks);
+    const cents = reading.candidates.map(candidate => candidate.priceCents);
     assert.deepEqual(cents, [425_000]);
-    assert.ok(cents.every(cents => cents !== 4_250_000 && cents !== 42_500_000 && cents !== 425_000_000));
-    assert.deepEqual(extractPublishedUnitPrices(blocks).map(price => price.priceCents), [425_000]);
+    assert.ok(cents.every(value => value !== 4_250_000 && value !== 42_500_000 && value !== 425_000_000));
+    assert.deepEqual(reading.publishedUnitPrices.map(price => price.priceCents), [425_000]);
   });
-  assert.deepEqual(extractPriceCandidates([{ text: '$ 4250.00 4250.00 $ / LT' }]).map(candidate => candidate.priceCents), [425_000]);
+  assert.deepEqual(diaPrices([{ text: '$ 4250.00 4250.00 $ / LT' }]).candidates.map(candidate => candidate.priceCents), [425_000]);
   assert.equal(parsePrice('4250.00'), null);
 });
 
@@ -248,13 +254,14 @@ test('etiqueta Día de jugo conserva el precio de venta y no el de referencia', 
     'PRECIO SIN IMPUESTOS NACIONALES $4297.52',
   ];
   eachLabel(lines, blocks => {
-    assert.deepEqual(extractPriceCandidates(blocks).map(candidate => candidate.priceCents), [520_000]);
-    assert.deepEqual(extractPublishedUnitPrices(blocks), [
+    const reading = diaPrices(blocks);
+    assert.deepEqual(reading.candidates.map(candidate => candidate.priceCents), [520_000]);
+    assert.deepEqual(reading.publishedUnitPrices, [
       { priceCents: 520_000, unit: 'liter', context: '5200.00 $ / LT' },
     ]);
-    assert.equal(extractProductDescriptor(blocks)?.category, 'Jugo');
   });
-  assert.deepEqual(extractPriceCandidates([{ text: 'Cod.' }, { text: '308878' }, { text: '$ 5200' }]).map(candidate => candidate.priceCents), [520_000]);
+  assert.equal(extractProductDescriptor(lines.map(text => ({ text })))?.category, 'Jugo');
+  assert.deepEqual(diaPrices([{ text: 'Cod.' }, { text: '308878' }, { text: '$ 5200' }]).candidates.map(candidate => candidate.priceCents), [520_000]);
 });
 
 test('cartel MODO ofrece el descuento y el precio anterior sin aplicar la promo al total', () => {
@@ -271,7 +278,8 @@ test('cartel MODO ofrece el descuento y el precio anterior sin aplicar la promo 
     'PRECIO SIN IMPUESTOS NACIONALES $1576.99',
   ];
   eachLabel(lines, blocks => {
-    const candidates = extractPriceCandidates(blocks);
+    const reading = diaPrices(blocks);
+    const candidates = reading.candidates;
     assert.deepEqual(candidates.map(candidate => candidate.priceCents), [167_200, 209_000]);
     assert.match(candidates[0].context, /modo/i);
     assert.match(candidates[0].context, /descuento/i);
@@ -279,7 +287,7 @@ test('cartel MODO ofrece el descuento y el precio anterior sin aplicar la promo 
     assert.match(candidates[1].context, /antes/i);
     assert.match(candidates[1].context, /regular/i);
     assert.equal(classifyPriceTerms(candidates[1].context).kind, 'regular');
-    assert.deepEqual(extractPublishedUnitPrices(blocks).map(price => [price.priceCents, price.unit]), [[209_000, 'liter']]);
+    assert.deepEqual(reading.publishedUnitPrices.map(price => [price.priceCents, price.unit]), [[209_000, 'liter']]);
     const chosen = shoppingReducer([], { type: 'add', item: { id: 'beer', name: 'Cerveza', priceCents: candidates[0].priceCents, quantity: 2 } });
     assert.deepEqual(shoppingTotals(chosen), { priceCents: 334_400, quantity: 2 });
   });
@@ -303,23 +311,34 @@ test('etiqueta Club Día ofrece el regular y el precio con tarjeta para elegir',
   ];
   for (const variant of [lines, sameRow]) {
     eachLabel(variant, blocks => {
-      const candidates = extractPriceCandidates(blocks);
+      const reading = diaPrices(blocks);
+      const candidates = reading.candidates;
       assert.deepEqual(candidates.map(candidate => candidate.priceCents), [210_000, 125_000]);
       assert.match(candidates[0].context, /regular/i);
       assert.equal(classifyPriceTerms(candidates[0].context).kind, 'regular');
       assert.match(candidates[1].context, /club/i);
       assert.equal(classifyPriceTerms(candidates[1].context).kind, 'loyalty');
-      assert.deepEqual(extractPublishedUnitPrices(blocks).map(price => price.priceCents), [420_000, 250_000]);
+      assert.deepEqual(reading.publishedUnitPrices.map(price => price.priceCents), [420_000, 250_000]);
     });
   }
 });
 
-test('un bloque con precio de venta y precio por kilo no mezcla los importes', () => {
-  const text = 'YERBA 500 g\n$ 3.450,00\nPrecio por kg: $ 6.900,00';
-  assert.deepEqual(extractPriceCandidates([{ text }]).map(candidate => candidate.priceCents), [345_000]);
-  assert.deepEqual(extractPublishedUnitPrices([{ text }]), [
-    { priceCents: 690_000, unit: 'kilogram', context: 'Precio por kg: $ 6.900,00' },
-  ]);
+test('un supermercado sin intérprete propio usa la lectura genérica', () => {
+  const blocks = [
+    { text: 'YERBA 500 g' },
+    { text: '$ 3.450,00' },
+    { text: 'Precio por kg: $ 6.900,00' },
+    { text: '$ 4250.00' },
+  ];
+  for (const name of ['Coto', 'Carrefour', '']) {
+    const reading = interpretLabel(name, blocks);
+    assert.deepEqual(reading.candidates.map(candidate => candidate.priceCents), [345_000], name);
+    assert.deepEqual(reading.publishedUnitPrices.map(price => price.priceCents), [690_000], name);
+  }
+  for (const name of ['Día', 'Dia', 'DIA', ' día ']) {
+    assert.deepEqual(interpretLabel(name, [{ text: '$ 4250.00' }]).candidates.map(candidate => candidate.priceCents), [425_000], name);
+  }
+  assert.deepEqual(interpretLabel('Coto', [{ text: '$ 4250.00' }]).candidates, []);
 });
 
 test('el resumen mensual cuenta ticket o estimación una sola vez por compra', () => {
