@@ -144,6 +144,8 @@ pnpm lint
 pnpm test
 ```
 
+GitHub Actions ejecuta esos tres comandos en cada pull request y en cada push a `main`.
+
 Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, cálculos, edición, cantidades, identidad de productos, migraciones, exclusión reversible del total, cierre con ticket opcional, precios comparables y resúmenes mensuales.
 
 Recorrido manual sugerido:
