@@ -44,7 +44,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Fixed
 
-- La lectura de una etiqueta usa el intérprete de la cadena de la sucursal elegida. En Día, `$ 4250.00` se propone como $ 4.250,00 y no como 4250000; el precio por litro y el precio sin impuestos quedan fuera de la elección, y MODO o Club Día se ofrecen junto al precio regular. Las demás cadenas conservan la lectura genérica anterior.
+- La lectura de una etiqueta usa el intérprete de la cadena de la sucursal elegida. Día se reconoce como palabra entera dentro del nombre («Supermercado Día», «Día Market»), no como fragmento («Diarco», «Mediana»). En Día, `$ 4250.00` se propone como $ 4.250,00 y no como 4250000; el precio por litro y el precio sin impuestos quedan fuera de la elección, y MODO o Club Día se ofrecen junto al precio regular. Las demás cadenas conservan la lectura genérica anterior.
 - Imports de navegación incompatibles con Expo Router desde SDK 56.
 - Compatibilidad de los tipos de tema e íconos y de los hooks con las
   comprobaciones de la actualización a SDK 57.

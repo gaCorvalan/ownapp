@@ -335,10 +335,17 @@ test('un supermercado sin intérprete propio usa la lectura genérica', () => {
     assert.deepEqual(reading.candidates.map(candidate => candidate.priceCents), [345_000], name);
     assert.deepEqual(reading.publishedUnitPrices.map(price => price.priceCents), [690_000], name);
   }
-  for (const name of ['Día', 'Dia', 'DIA', ' día ']) {
-    assert.deepEqual(interpretLabel(name, [{ text: '$ 4250.00' }]).candidates.map(candidate => candidate.priceCents), [425_000], name);
-  }
   assert.deepEqual(interpretLabel('Coto', [{ text: '$ 4250.00' }]).candidates, []);
+});
+
+test('el nombre de la sucursal elige Día sólo cuando es una palabra entera', () => {
+  const cents = name => interpretLabel(name, [{ text: '$ 4250.00' }]).candidates.map(candidate => candidate.priceCents);
+  for (const name of ['Día', 'Dia', 'DIA', ' día ', 'Supermercado Día', 'DIA %', 'Día Market']) {
+    assert.deepEqual(cents(name), [425_000], name);
+  }
+  for (const name of ['Coto', 'Mediana', 'Diarco', '']) {
+    assert.deepEqual(cents(name), [], name);
+  }
 });
 
 test('el resumen mensual cuenta ticket o estimación una sola vez por compra', () => {

@@ -5,14 +5,21 @@ import {
 
 export type LabelReading = { candidates: PriceCandidate[]; publishedUnitPrices: PublishedUnitPrice[] };
 
-// Distinct from store identity: "Día" and "Dia" stay different stores, but both
-// select this chain. The photo is never used to guess the supermarket.
-function chainName(supermarket: string) {
-  return supermarket.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase('es-AR').replace(/\s+/g, ' ').trim();
+// One entry per chain. A name matches as a whole word inside the free-text
+// store name, so "Día Market" selects Día and "Diarco" does not. This does
+// not change store identity, and the photo never chooses the chain.
+const chainReaders = [
+  { name: 'dia', read: readDiaLabel },
+];
+
+function normalizeChainText(supermarket: string) {
+  return supermarket.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase('es-AR');
 }
 
 export function interpretLabel(supermarket: string, blocks: TextBlock[]): LabelReading {
-  if (chainName(supermarket) === 'dia') return readDiaLabel(blocks);
+  const text = normalizeChainText(supermarket);
+  const chain = chainReaders.find(item => new RegExp(`\\b${item.name}\\b`).test(text));
+  if (chain) return chain.read(blocks);
   return { candidates: extractPriceCandidates(blocks), publishedUnitPrices: extractPublishedUnitPrices(blocks) };
 }
 
