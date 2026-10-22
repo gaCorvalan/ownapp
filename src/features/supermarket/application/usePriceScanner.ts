@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { extractPriceCandidates, extractPublishedUnitPrices, type PriceCandidate, type PublishedUnitPrice, type TextBlock } from '../domain/price';
+import { interpretLabel } from '../domain/labelInterpreter';
+import type { PriceCandidate, PublishedUnitPrice, TextBlock } from '../domain/price';
 import { extractProductDescriptor, type ProductDescriptor } from '../domain/product';
 import { recognizeLocalText } from '../infrastructure/localTextRecognizer';
 
-export function usePriceScanner() {
+export function usePriceScanner(supermarket: string) {
   const [status, setStatus] = useState<'idle' | 'reading' | 'result' | 'empty' | 'added'>('idle');
   const [candidates, setCandidates] = useState<PriceCandidate[]>([]);
   const [publishedUnitPrices, setPublishedUnitPrices] = useState<PublishedUnitPrice[]>([]);
@@ -34,13 +35,13 @@ export function usePriceScanner() {
     setSelectedId(null);
     try {
       const blocks = await recognize();
-      const result = extractPriceCandidates(blocks);
+      const reading = interpretLabel(supermarket, blocks);
       if (current !== request.current) return;
-      setCandidates(result);
-      setPublishedUnitPrices(extractPublishedUnitPrices(blocks));
+      setCandidates(reading.candidates);
+      setPublishedUnitPrices(reading.publishedUnitPrices);
       setProduct(extractProductDescriptor(blocks));
-      setSelectedId(result.length === 1 ? result[0].id : null);
-      setStatus(result.length ? 'result' : 'empty');
+      setSelectedId(reading.candidates.length === 1 ? reading.candidates[0].id : null);
+      setStatus(reading.candidates.length ? 'result' : 'empty');
     } catch {
       if (current === request.current) setStatus('empty');
     } finally {

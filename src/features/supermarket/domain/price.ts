@@ -1,12 +1,17 @@
 // The MVP explicitly uses Argentine pesos and Argentine number formatting.
 export const MAX_PRICE_CENTS = 100_000_000;
 
+export function amountToCents(whole: string, fraction = ''): number | null {
+  if (!/^\d+$/.test(whole) || !/^\d{0,2}$/.test(fraction)) return null;
+  const cents = Number(whole) * 100 + Number(fraction.padEnd(2, '0'));
+  return Number.isSafeInteger(cents) && cents > 0 && cents <= MAX_PRICE_CENTS ? cents : null;
+}
+
 export function parsePrice(input: string): number | null {
   const value = input.trim().replace(/^\$\s*/, '');
   if (!/^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/.test(value)) return null;
   const [whole, fraction = ''] = value.replaceAll('.', '').split(',');
-  const cents = Number(whole) * 100 + Number(fraction.padEnd(2, '0'));
-  return Number.isSafeInteger(cents) && cents > 0 && cents <= MAX_PRICE_CENTS ? cents : null;
+  return amountToCents(whole, fraction);
 }
 
 export function parseTicketAmount(input: string): number | null {

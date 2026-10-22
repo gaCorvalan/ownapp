@@ -75,7 +75,7 @@ productos sean equivalentes ni se ordenan ofertas como si fueran precios
 vigentes. Alcanzar ese criterio de fiabilidad requiere probar etiquetas reales
 y resolver identidad de producto y presentaciones.
 
-## Fase 3 · Validación en supermercado · pendiente en teléfono físico
+## Fase 3 · Validación en supermercado · primera prueba hecha
 
 Objetivo: comprobar que el MVP local permite completar una compra real y que
 los datos capturados tienen el contexto necesario para evolucionar.
@@ -89,6 +89,12 @@ los datos capturados tienen el contexto necesario para evolucionar.
 
 Criterio de salida: se puede completar una compra sin abandonar el flujo de
 scanner, y las diferencias frente al ticket son explicables.
+
+Gabriel la probó en un supermercado Día con un teléfono físico. La lectura de
+etiquetas Día fallaba: 4250 se leía como 4250000, o el precio no se detectaba,
+y tuvo que cargar varios a mano. Este cambio corrige esa lectura. Falta
+confirmar el arreglo en el teléfono. Quedan otras mejoras que todavía no
+detalló.
 
 ## Fase 4 · Sincronización y base compartida · posterior a la validación
 
