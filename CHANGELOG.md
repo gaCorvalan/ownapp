@@ -7,6 +7,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Added
 
+- Exportación DTCG de la paleta actual y de dos paletas experimentales, para importarlas como modos de una colección de variables de Figma.
 - Integración continua en GitHub Actions: cada pull request y cada push a `main` ejecutan `pnpm typecheck`, `pnpm lint` y `pnpm test`.
 - Historial local de observaciones de precio con búsqueda, filtro por sucursal, fecha, condición, origen y precio por medida publicado o calculado cuando hay contenido neto. La confirmación permite consultarlo sin agregar el producto.
 - Registro de cargas manuales como observaciones locales y pendientes de productos concretos por sucursal, separados del carrito.
