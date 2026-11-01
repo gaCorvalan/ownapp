@@ -1,0 +1,381 @@
+{
+  "primitivo": {
+    "ink": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.027450980392156862,
+          0.24705882352941178,
+          0.25098039215686274
+        ],
+        "alpha": 1,
+        "hex": "#073F40"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9529411764705882,
+          0.9686274509803922,
+          0.9490196078431372
+        ],
+        "alpha": 1,
+        "hex": "#F3F7F2"
+      },
+      "$description": "En Actual coincide con un color de constants/brand.ts para poder separarlo en otra paleta. Valor experimental: no está en la app."
+    },
+    "onAccent": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.06274509803921569,
+          0.1411764705882353,
+          0.12941176470588237
+        ],
+        "alpha": 1,
+        "hex": "#102421"
+      },
+      "$description": "En Actual coincide con un color de constants/brand.ts para poder separarlo en otra paleta. Valor experimental: no está en la app."
+    },
+    "onSecondary": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9529411764705882,
+          0.9686274509803922,
+          0.9490196078431372
+        ],
+        "alpha": 1,
+        "hex": "#F3F7F2"
+      },
+      "$description": "En Actual coincide con un color de constants/brand.ts para poder separarlo en otra paleta. Valor experimental: no está en la app."
+    },
+    "accent": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.7764705882352941,
+          0.9411764705882353,
+          0.47843137254901963
+        ],
+        "alpha": 1,
+        "hex": "#C6F07A"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "canvas": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.06274509803921569,
+          0.09411764705882353,
+          0.08627450980392157
+        ],
+        "alpha": 1,
+        "hex": "#101816"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "surface": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.10980392156862745,
+          0.16862745098039217,
+          0.15294117647058825
+        ],
+        "alpha": 1,
+        "hex": "#1C2B27"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "surfaceTonal": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.16470588235294117,
+          0.25098039215686274,
+          0.2196078431372549
+        ],
+        "alpha": 1,
+        "hex": "#2A4038"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "textSecondary": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.7725490196078432,
+          0.8352941176470589,
+          0.796078431372549
+        ],
+        "alpha": 1,
+        "hex": "#C5D5CB"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "selection": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1411764705882353,
+          0.2196078431372549,
+          0.17254901960784313
+        ],
+        "alpha": 1,
+        "hex": "#24382C"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "selectionBorder": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.615686274509804,
+          0.8117647058823529,
+          0.4470588235294118
+        ],
+        "alpha": 1,
+        "hex": "#9DCF72"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "inverseBorder": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.615686274509804,
+          0.8117647058823529,
+          0.4470588235294118
+        ],
+        "alpha": 1,
+        "hex": "#9DCF72"
+      },
+      "$description": "En Actual coincide con un color de constants/brand.ts para poder separarlo en otra paleta. Valor experimental: no está en la app."
+    },
+    "border": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.22745098039215686,
+          0.3215686274509804,
+          0.2823529411764706
+        ],
+        "alpha": 1,
+        "hex": "#3A5248"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "onInk": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9568627450980393,
+          0.984313725490196,
+          0.9411764705882353
+        ],
+        "alpha": 1,
+        "hex": "#F4FBF0"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "onInkSecondary": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8352941176470589,
+          0.9019607843137255,
+          0.8313725490196079
+        ],
+        "alpha": 1,
+        "hex": "#D5E6D4"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "danger": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          0.7058823529411765,
+          0.6588235294117647
+        ],
+        "alpha": 1,
+        "hex": "#FFB4A8"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "dangerSurface": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.23529411764705882,
+          0.1411764705882353,
+          0.13333333333333333
+        ],
+        "alpha": 1,
+        "hex": "#3C2422"
+      },
+      "$description": "Valor experimental: no está en la app."
+    },
+    "scrim": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.027450980392156862,
+          0.24705882352941178,
+          0.25098039215686274
+        ],
+        "alpha": 0.8,
+        "hex": "#073F40"
+      },
+      "$description": "Derivado del primitivo ink al 80 % de opacidad. Valor experimental: no está en la app."
+    }
+  },
+  "surface": {
+    "canvas": {
+      "$type": "color",
+      "$value": "{primitivo.canvas}",
+      "$description": "Fondo de las pantallas. Código: colors.canvas."
+    },
+    "default": {
+      "$type": "color",
+      "$value": "{primitivo.surface}",
+      "$description": "Filas, campos y superficies elevadas. Código: colors.surface."
+    },
+    "tonal": {
+      "$type": "color",
+      "$value": "{primitivo.surfaceTonal}",
+      "$description": "Resumen claro y fondo de acciones secundarias. Código: colors.surfaceTonal."
+    },
+    "selection": {
+      "$type": "color",
+      "$value": "{primitivo.selection}",
+      "$description": "Fondo de una opción elegida. Código: colors.selection."
+    },
+    "inverse": {
+      "$type": "color",
+      "$value": "{primitivo.ink}",
+      "$description": "Bloque de marca, filtro elegido y otras superficies oscuras. Código: colors.ink."
+    },
+    "danger": {
+      "$type": "color",
+      "$value": "{primitivo.dangerSurface}",
+      "$description": "Fondo de error. Código: colors.dangerSurface."
+    },
+    "scrim": {
+      "$type": "color",
+      "$value": "{primitivo.scrim}",
+      "$description": "Velo sobre la cámara. Se deriva del color inverso al 80 %. Código: colors.cameraScrim."
+    }
+  },
+  "text": {
+    "primary": {
+      "$type": "color",
+      "$value": "{primitivo.text}",
+      "$description": "Texto e íconos principales. En Actual es el mismo valor que surface/inverse. Código: colors.ink."
+    },
+    "secondary": {
+      "$type": "color",
+      "$value": "{primitivo.textSecondary}",
+      "$description": "Condiciones, unidades y contexto. Código: colors.textSecondary."
+    },
+    "inverse": {
+      "$type": "color",
+      "$value": "{primitivo.onInk}",
+      "$description": "Texto e íconos sobre surface/inverse. Código: colors.onInk."
+    },
+    "inverse-secondary": {
+      "$type": "color",
+      "$value": "{primitivo.onInkSecondary}",
+      "$description": "Texto de apoyo sobre surface/inverse. Código: colors.onInkSecondary."
+    },
+    "danger": {
+      "$type": "color",
+      "$value": "{primitivo.danger}",
+      "$description": "Errores, también cuando no tienen fondo danger. Código: colors.danger."
+    },
+    "on-primary": {
+      "$type": "color",
+      "$value": "{primitivo.onAccent}",
+      "$description": "Texto de la acción principal. Código: colors.ink."
+    },
+    "on-secondary": {
+      "$type": "color",
+      "$value": "{primitivo.onSecondary}",
+      "$description": "Texto de la acción secundaria y de los botones fantasma sobre fondo claro. Código: colors.ink."
+    },
+    "on-danger": {
+      "$type": "color",
+      "$value": "{primitivo.danger}",
+      "$description": "Texto de la acción destructiva. Código: colors.danger."
+    }
+  },
+  "action": {
+    "primary": {
+      "$type": "color",
+      "$value": "{primitivo.accent}",
+      "$description": "Fondo de la acción principal. Código: colors.accent."
+    },
+    "secondary": {
+      "$type": "color",
+      "$value": "{primitivo.surfaceTonal}",
+      "$description": "Fondo de la acción secundaria. Código: colors.surfaceTonal."
+    },
+    "danger": {
+      "$type": "color",
+      "$value": "{primitivo.dangerSurface}",
+      "$description": "Fondo de la acción destructiva. Código: colors.dangerSurface."
+    }
+  },
+  "border": {
+    "default": {
+      "$type": "color",
+      "$value": "{primitivo.border}",
+      "$description": "Divisiones decorativas. No comunica estado por sí solo. Código: colors.border."
+    },
+    "selection": {
+      "$type": "color",
+      "$value": "{primitivo.selectionBorder}",
+      "$description": "Borde de la opción elegida y marca del nombre. Código: colors.selectionBorder."
+    },
+    "inverse": {
+      "$type": "color",
+      "$value": "{primitivo.inverseBorder}",
+      "$description": "Divisor dentro de surface/inverse. Código: colors.selectionBorder."
+    }
+  },
+  "state": {
+    "pressed": {
+      "$type": "number",
+      "$value": 0.75,
+      "$description": "Opacidad de ActionButton al presionar. Igual en las tres paletas."
+    },
+    "disabled": {
+      "$type": "number",
+      "$value": 0.45,
+      "$description": "Opacidad de ActionButton deshabilitado. Igual en las tres paletas."
+    }
+  }
+}
