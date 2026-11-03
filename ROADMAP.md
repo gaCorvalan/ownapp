@@ -11,7 +11,8 @@ No reemplaza al `CHANGELOG.md`, que sólo describe cambios ya realizados.
   los ítems de la compra.
 - Una observación de precio no es lo mismo que un ítem del carrito: el carrito
   es temporal y editable; la observación representa un precio visto en una
-  fecha y condición determinadas.
+  fecha y condición determinadas. Si ese precio se corrige en el carrito, al
+  finalizar la compra la observación queda con el precio vigente.
 - El OCR propone datos, pero no sustituye la confirmación de la persona.
 
 ## Estado actual · MVP local para validar en campo
@@ -22,7 +23,7 @@ No reemplaza al `CHANGELOG.md`, que sólo describe cambios ya realizados.
 - Consulta local de observaciones desde la confirmación, con búsqueda y filtro por sucursal.
 - Nombre de producto sugerido a partir del texto OCR, editable desde la compra.
 - Compra local persistida, cantidades, inclusión reversible, cierre con ticket opcional e historial de compras.
-- Observaciones de precio persistidas en SQLite al confirmar un escaneo o una carga manual.
+- Observaciones de precio persistidas en SQLite al confirmar un escaneo o una carga manual. Al finalizar, el importe queda en el precio vigente del carrito.
 - Pendientes de productos concretos por sucursal, independientes del carrito.
 - Resumen mensual que distingue importes de ticket de estimaciones.
 - Cola local de sincronización (`pending`), sin backend ni envío de datos.

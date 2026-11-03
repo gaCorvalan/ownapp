@@ -117,7 +117,7 @@ AsyncStorage guarda la compra abierta y las finalizadas juntas bajo `ownapp.supe
 
 El estimado de una compra finalizada se sigue calculando desde sus ítems incluidos. El importe del ticket, cuando se informa, se guarda por separado y puede agregarse después sin alterar los precios de los productos. Una compra vacía o con todos los productos apartados no puede finalizarse por ahora; se conserva abierta para revisarla o descartarla explícitamente.
 
-Cada precio confirmado desde una etiqueta o ingresado manualmente también se registra en SQLite local como una observación independiente de la compra: conserva producto cuando se conoce, importe, sucursal elegida, condición detectada, precio por medida publicado cuando es inequívoco y fecha de captura. Las observaciones anteriores conservan su sucursal desconocida. Al mismo tiempo se agrega a una cola local pendiente de sincronización; esta versión no tiene backend ni envía datos fuera del dispositivo. Vaciar o descartar la compra no elimina esas observaciones.
+Cada precio confirmado desde una etiqueta o ingresado manualmente también se registra en SQLite local como una observación independiente de la compra: conserva producto cuando se conoce, importe, sucursal elegida, condición detectada, precio por medida publicado cuando es inequívoco y fecha de captura. Las observaciones anteriores conservan su sucursal desconocida. Si después se corrige el precio en el carrito, al finalizar la compra esa observación queda con el precio vigente. Si esa actualización falla, la compra se finaliza igual. Al mismo tiempo se agrega a una cola local pendiente de sincronización; esta versión no tiene backend ni envía datos fuera del dispositivo. Vaciar o descartar la compra no elimina esas observaciones.
 
 «Precios guardados» permite buscar y filtrar esas observaciones por sucursal. Desde una confirmación se abre con una búsqueda sugerida por categoría o nombre; al volver, la elección sin agregar sigue disponible. Un precio por litro/kilo/unidad se muestra como publicado si estaba en la etiqueta, o calculado con enteros a partir del contenido neto leído. Es una referencia histórica, no una oferta vigente ni una equivalencia de productos garantizada por OCR. Los pendientes guardan un producto concreto y una sucursal de destino; no suman al carrito ni reservan el precio observado. Si sólo hay una sucursal, puede agregarse otra al crear el pendiente.
 
@@ -147,7 +147,7 @@ pnpm test
 
 GitHub Actions ejecuta esos tres comandos en cada pull request y en cada push a `main`.
 
-Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, el intérprete genérico y el de Día, cálculos, edición, cantidades, identidad de productos, migraciones, exclusión reversible del total, cierre con ticket opcional, precios comparables y resúmenes mensuales.
+Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, el intérprete genérico y el de Día, cálculos, edición, cantidades, identidad de productos, migraciones, exclusión reversible del total, cierre con ticket opcional, el precio observado al finalizar, precios comparables y resúmenes mensuales.
 
 Recorrido manual sugerido:
 

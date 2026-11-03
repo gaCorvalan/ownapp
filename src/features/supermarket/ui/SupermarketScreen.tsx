@@ -50,7 +50,7 @@ export function SupermarketScreen() {
     router.push('/finish');
   }
 
-  function addItem(value: { name: string; priceCents: number; quantity: number; product?: ProductDescriptor }) {
+  function addItem(value: { name: string; priceCents: number; quantity: number; product?: ProductDescriptor; observationId?: string }) {
     if (full) return;
     session.dispatch({ type: 'add', item: { ...value, id: createId(), name: value.name || `Producto ${session.items.length + 1}` } });
   }
@@ -72,7 +72,7 @@ export function SupermarketScreen() {
         source: 'label-ocr',
       });
       await recordPriceObservation(observation);
-      addItem({ name: value.product?.displayName ?? '', product: value.product ?? undefined, priceCents: value.candidate.priceCents, quantity: value.quantity });
+      addItem({ name: value.product?.displayName ?? '', product: value.product ?? undefined, priceCents: value.candidate.priceCents, quantity: value.quantity, observationId: observation.id });
       setObservationError('');
       return true;
     } catch {
@@ -148,7 +148,7 @@ export function SupermarketScreen() {
       try {
         await recordPriceObservation(observation);
       } catch { return false; }
-      addItem(value);
+      addItem({ ...value, observationId: observation.id });
       setEditor(null);
       return true;
     }} />}
