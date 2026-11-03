@@ -43,3 +43,12 @@ export function createPriceObservation(value: Omit<PriceObservation, 'id' | 'cap
     capturedAt: value.capturedAt ?? new Date().toISOString(),
   };
 }
+
+export function savedObservationAfterFinish(
+  observation: PriceObservation,
+  finishedItems: readonly { observationId?: string; priceCents: number }[],
+): PriceObservation {
+  const line = finishedItems.find(item => item.observationId === observation.id);
+  if (!line || line.priceCents === observation.priceCents) return observation;
+  return { ...observation, priceCents: line.priceCents };
+}

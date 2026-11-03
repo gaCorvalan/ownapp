@@ -90,3 +90,24 @@ export async function recordPriceObservation(observation: PriceObservation) {
     );
   });
 }
+
+export async function reviseObservedPrice(observation: PriceObservation) {
+  const database = await openDatabase();
+  const payload = JSON.stringify({
+    id: observation.id, capturedAt: observation.capturedAt, product: observation.product,
+    priceCents: observation.priceCents, terms: observation.terms,
+    publishedUnitPrice: observation.publishedUnitPrice, retailerId: observation.retailerId,
+    source: observation.source,
+  });
+  await database.withExclusiveTransactionAsync(async transaction => {
+    const price = await transaction.runAsync(
+      `UPDATE price_observations SET price_cents = ? WHERE id = ?`,
+      [observation.priceCents, observation.id],
+    );
+    const outbox = await transaction.runAsync(
+      `UPDATE sync_outbox SET payload_json = ? WHERE observation_id = ?`,
+      [payload, observation.id],
+    );
+    if (price.changes !== 1 || outbox.changes !== 1) throw new Error('No encontramos el precio guardado.');
+  });
+}

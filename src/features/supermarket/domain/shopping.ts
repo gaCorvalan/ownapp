@@ -1,6 +1,6 @@
 import type { ProductDescriptor } from './product';
 
-export type ShoppingItem = { id: string; name: string; priceCents: number; quantity: number; included?: boolean; product?: ProductDescriptor };
+export type ShoppingItem = { id: string; name: string; priceCents: number; quantity: number; included?: boolean; product?: ProductDescriptor; observationId?: string };
 export const MAX_QUANTITY = 99;
 export const MAX_ITEMS = 100;
 
@@ -34,7 +34,8 @@ export function isShoppingItem(value: unknown): value is ShoppingItem {
     Number.isSafeInteger(item.priceCents) && item.priceCents > 0 && item.priceCents <= 100_000_000 &&
     Number.isInteger(item.quantity) && item.quantity >= 1 && item.quantity <= MAX_QUANTITY &&
     (item.included === undefined || typeof item.included === 'boolean') &&
-    (item.product === undefined || isStoredProductDescriptor(item.product));
+    (item.product === undefined || isStoredProductDescriptor(item.product)) &&
+    (item.observationId === undefined || (typeof item.observationId === 'string' && item.observationId.length > 0));
 }
 
 export function shoppingReducer(items: ShoppingItem[], action: ShoppingAction): ShoppingItem[] {

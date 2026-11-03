@@ -1,7 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { savedObservationAfterFinish } from '../domain/priceObservation';
 import { finishPurchase, updateTicket, type CompletedPurchase, type PurchaseLedger, type PurchaseSession } from '../domain/purchaseSession';
 import { shoppingReducer, shoppingTotals, type ShoppingAction } from '../domain/shopping';
 import { normalizeStoreName, type Store } from '../domain/store';
+import { loadPriceObservations, reviseObservedPrice } from '../infrastructure/priceObservationStorage';
 import { loadShopping, saveShopping } from '../infrastructure/shoppingStorage';
 import { loadStores, saveStores } from '../infrastructure/storeStorage';
 
@@ -126,13 +128,19 @@ export function ShoppingSessionProvider({ children }: { children: ReactNode }) {
   }, [commit]);
 
   const finishCurrentPurchase = useCallback(async (ticketCents: number | null) => {
-    const current = ledgerRef.current.active;
+    const observations = await loadPriceObservations();
+    const ledger = ledgerRef.current;
+    const current = ledger.active;
     const store = storesRef.current.find(item => item.id === current?.storeId);
-    if (!store) throw new Error('No encontramos la sucursal de esta compra.');
-    const next = finishPurchase(ledgerRef.current, store, new Date().toISOString(), ticketCents);
+    if (!store || !current) throw new Error('No encontramos la sucursal de esta compra.');
+    for (const observation of observations) {
+      const revised = savedObservationAfterFinish(observation, current.items);
+      if (revised.priceCents !== observation.priceCents) await reviseObservedPrice(revised);
+    }
+    const next = finishPurchase(ledger, store, new Date().toISOString(), ticketCents);
     await commit(next);
     setTicketDraft('');
-    return current!.id;
+    return current.id;
   }, [commit]);
 
   const updateCompletedTicket = useCallback(async (id: string, ticketCents: number) => {
