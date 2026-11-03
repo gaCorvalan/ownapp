@@ -11,8 +11,8 @@ import { ActionButton, colors, common, IconButton } from './primitives';
 
 type ScannedAddition = { candidate: PriceCandidate; product: ProductDescriptor | null; publishedUnitPrice: PublishedUnitPrice | null; quantity: number };
 
-export function PriceScanner({ onAdd, onManual, onCompare, full, active = true }: { onAdd: (value: ScannedAddition) => Promise<boolean>; onManual: () => void; onCompare: (product: ProductDescriptor | null) => void; full: boolean; active?: boolean }) {
-  const scanner = usePriceScanner();
+export function PriceScanner({ supermarket, onAdd, onManual, onCompare, full, active = true }: { supermarket: string; onAdd: (value: ScannedAddition) => Promise<boolean>; onManual: () => void; onCompare: (product: ProductDescriptor | null) => void; full: boolean; active?: boolean }) {
+  const scanner = usePriceScanner(supermarket);
   const [scanCycle, setScanCycle] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [lastAdded, setLastAdded] = useState('');

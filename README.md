@@ -96,7 +96,8 @@ src/features/supermarket/
   application/useShoppingSession.tsx  Estado compartido y coordinación del guardado
   application/usePriceScanner.ts      Lectura, elección y confirmación de candidatos
   domain/shopping.ts                  Ítems, acciones, validación y totales
-  domain/price.ts                     Conversión de importes y candidatos de precio
+  domain/price.ts                     Conversión de importes y lectura genérica
+  domain/labelInterpreter.ts          Intérprete de etiqueta según la cadena
   domain/product.ts                   Descriptor inicial y normalización de productos OCR
   domain/priceObservation.ts          Precio elegido, condiciones y referencia por unidad
   domain/priceComparison.ts           Búsqueda y precio comparable conservador
@@ -125,10 +126,10 @@ El historial de compras muestra un resumen por mes. Cada compra aporta una sola 
 ## Flujo del escáner
 
 ```text
-Foto → bloques de texto → candidatos → elección/confirmación → ítem de compra
+Foto → bloques de texto → intérprete de la cadena → candidatos → elección/confirmación → ítem de compra
 ```
 
-La foto capturada se entrega al OCR local: Vision en iOS y ML Kit en Android. El reconocimiento se hace en el dispositivo; la foto no se envía a un servidor y queda temporalmente mientras la pantalla está abierta. El OCR devuelve bloques de texto con sus coordenadas. `extractPriceCandidates` reconoce importes con símbolo `$` y descarta bloques que indican precios de referencia por kilo/litro. Conserva el contexto de cada candidato. Con varios candidatos no selecciona ninguno automáticamente; con uno, lo preselecciona, pero todavía requiere tocar Agregar. La cantidad elegida multiplica el subtotal mostrado sin alterar el carrito hasta confirmar. La confirmación se consume una sola vez para impedir duplicados por doble toque.
+La foto capturada se entrega al OCR local: Vision en iOS y ML Kit en Android. El reconocimiento es uno solo para todas las cadenas y se hace en el dispositivo; la foto no se envía a un servidor y queda temporalmente mientras la pantalla está abierta. El OCR devuelve bloques de texto con sus coordenadas. `interpretLabel` elige cómo leerlos según el supermercado de la sucursal ya elegida al empezar la compra, y no lo infiere de la foto. Si el nombre contiene la palabra Día («Supermercado Día», «Día Market»; no «Diarco» ni «Mediana») usa el intérprete de esa cadena: acepta centavos con punto (`$ 4250.00` queda en $ 4.250,00), deja afuera el precio por litro o kilo con el signo detrás (`5200.00 $ / LT`) y el precio sin impuestos, y ofrece el precio regular junto con MODO o Club Día para elegir. El resto de los supermercados usa el intérprete genérico, que sólo acepta un peso delante del número en formato argentino (`$ 3.450,50`). Con varios candidatos no selecciona ninguno automáticamente; con uno, lo preselecciona, pero todavía requiere tocar Agregar. La cantidad elegida multiplica el subtotal mostrado sin alterar el carrito hasta confirmar. La confirmación se consume una sola vez para impedir duplicados por doble toque.
 
 Estas reglas son deliberadamente limitadas: el OCR extrae texto, pero no es un intérprete fiable de cualquier etiqueta real. El reducer, la lista, el formulario y el cálculo del total se reutilizan.
 
@@ -146,7 +147,7 @@ pnpm test
 
 GitHub Actions ejecuta esos tres comandos en cada pull request y en cada push a `main`.
 
-Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, cálculos, edición, cantidades, identidad de productos, migraciones, exclusión reversible del total, cierre con ticket opcional, precios comparables y resúmenes mensuales.
+Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, el intérprete genérico y el de Día, cálculos, edición, cantidades, identidad de productos, migraciones, exclusión reversible del total, cierre con ticket opcional, precios comparables y resúmenes mensuales.
 
 Recorrido manual sugerido:
 
