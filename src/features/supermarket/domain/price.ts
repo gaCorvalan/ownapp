@@ -33,6 +33,15 @@ export function formatMoney(cents: number): string {
 export type TextBounds = { x: number; y: number; width: number; height: number };
 export type TextBlock = { text: string; bounds?: TextBounds };
 export type PriceCandidate = { id: string; priceCents: number; context: string };
+
+// A read price can be replaced before it becomes a cart item. The condition
+// stays with the candidate; only a valid positive amount in cents is accepted.
+export function correctReadPrice(candidate: PriceCandidate, input: string): PriceCandidate | null {
+  const priceCents = parsePrice(input);
+  if (priceCents === null) return null;
+  return { ...candidate, priceCents };
+}
+
 export type PublishedUnitPrice = { priceCents: number; unit: 'liter' | 'kilogram' | 'unit'; context: string };
 
 // Preserve alternatives and their context; never choose the cheapest/largest

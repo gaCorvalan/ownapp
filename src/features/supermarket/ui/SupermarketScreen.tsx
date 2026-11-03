@@ -82,7 +82,7 @@ export function SupermarketScreen() {
   }
 
   return <SafeAreaView style={styles.safe}>
-    <ScrollView style={styles.mainScroll} contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+    <ScrollView style={styles.mainScroll} contentInsetAdjustmentBehavior="automatic" automaticallyAdjustKeyboardInsets contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
         <View style={styles.captureHeader}><Pressable accessibilityRole="button" accessibilityLabel="Volver al inicio" onPress={() => router.replace('/')} style={styles.back}><Ionicons name="arrow-back" size={22} color={colors.onInk} /></Pressable><View style={{ flex: 1 }}><Text style={styles.storeLabel}>{session.store ? storeLabel(session.store) : 'Compra en curso'}</Text><Text style={styles.headerCaption}>COMPRA EN CURSO</Text></View></View>
         {session.loadState !== 'ready' ? <View style={common.card}>

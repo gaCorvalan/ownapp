@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parsePrice, parseTicketAmount, extractPriceCandidates, extractPublishedUnitPrices } from '../src/features/supermarket/domain/price.ts';
+import { parsePrice, parseTicketAmount, extractPriceCandidates, extractPublishedUnitPrices, correctReadPrice } from '../src/features/supermarket/domain/price.ts';
 import { interpretLabel } from '../src/features/supermarket/domain/labelInterpreter.ts';
 import { correctProductDisplayName, createManualProductDescriptor, extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
 import { classifyPriceTerms, createPriceObservation } from '../src/features/supermarket/domain/priceObservation.ts';
@@ -22,6 +22,26 @@ test('precios argentinos: pesos, miles y centavos sin redondeo flotante', () => 
 test('lectura simple excluye peso y precio por kilo', () => {
   const candidates = extractPriceCandidates([{ text: 'YERBA 500 g' }, { text: '$ 3.450,00' }, { text: 'Precio por kg: $ 6.900,00' }]);
   assert.deepEqual(candidates.map(value => value.priceCents), [345000]);
+});
+
+test('el precio corregido en la lectura es el que entra al carrito', () => {
+  const [read, loyalty] = extractPriceCandidates([{ text: 'Regular: $ 3.450,00' }, { text: 'Con tarjeta: $ 2.900,00' }]);
+  assert.equal(read.priceCents, 345000);
+  for (const invalid of ['', '   ', '-20', '0', '-1,00']) assert.equal(correctReadPrice(read, invalid), null, invalid);
+  const corrected = correctReadPrice(read, '3.200,50');
+  assert.ok(corrected);
+  assert.equal(corrected.priceCents, 320050);
+  assert.equal(corrected.context, read.context);
+  assert.equal(loyalty.priceCents, 290000);
+  const items = shoppingReducer([], { type: 'add', item: { id: 'scan-1', name: 'Yerba', priceCents: corrected.priceCents, quantity: 2 } });
+  assert.equal(items[0].priceCents, 320050);
+  assert.equal(shoppingTotals(items).priceCents, 640100);
+  const observation = createPriceObservation({
+    id: 'obs-corrected', capturedAt: '2026-11-03T12:00:00.000Z', product: null, priceCents: corrected.priceCents,
+    terms: classifyPriceTerms(corrected.context), publishedUnitPrice: null, retailerId: 'store-1', source: 'label-ocr',
+  });
+  assert.equal(observation.priceCents, items[0].priceCents);
+  assert.equal(observation.terms.kind, 'regular');
 });
 
 test('promoción conserva ambas alternativas y sus condiciones', () => {

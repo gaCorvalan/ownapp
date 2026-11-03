@@ -78,6 +78,7 @@ y [almacenamiento específico de la app](https://developer.android.com/training/
 - Recuperar la compra después de cerrar y volver a abrir la app.
 - Escanear una etiqueta como acción principal y leer su texto localmente en el teléfono para detectar precios y un nombre de producto sugerido.
 - Elegir explícitamente entre precio regular y precio condicionado a una tarjeta, ajustar la cantidad y confirmar el subtotal antes de sumar.
+- Corregir el precio leído en esa misma pantalla, antes de agregarlo. El importe corregido es el que entra a la compra.
 - Resolver una lectura fallida con carga manual.
 
 Los importes se ingresan en pesos argentinos: `3450`, `3450,50` o `3.450,50`. La coma separa los centavos. Cada ítem admite entre 1 y 99 unidades y un precio de hasta $ 1.000.000; cada compra admite 100 ítems. El total es una estimación, sin descuentos ni cálculo por peso.
@@ -129,7 +130,7 @@ El historial de compras muestra un resumen por mes. Cada compra aporta una sola 
 Foto → bloques de texto → intérprete de la cadena → candidatos → elección/confirmación → ítem de compra
 ```
 
-La foto capturada se entrega al OCR local: Vision en iOS y ML Kit en Android. El reconocimiento es uno solo para todas las cadenas y se hace en el dispositivo; la foto no se envía a un servidor y queda temporalmente mientras la pantalla está abierta. El OCR devuelve bloques de texto con sus coordenadas. `interpretLabel` elige cómo leerlos según el supermercado de la sucursal ya elegida al empezar la compra, y no lo infiere de la foto. Si el nombre contiene la palabra Día («Supermercado Día», «Día Market»; no «Diarco» ni «Mediana») usa el intérprete de esa cadena: acepta centavos con punto (`$ 4250.00` queda en $ 4.250,00), deja afuera el precio por litro o kilo con el signo detrás (`5200.00 $ / LT`) y el precio sin impuestos, y ofrece el precio regular junto con MODO o Club Día para elegir. El resto de los supermercados usa el intérprete genérico, que sólo acepta un peso delante del número en formato argentino (`$ 3.450,50`). Con varios candidatos no selecciona ninguno automáticamente; con uno, lo preselecciona, pero todavía requiere tocar Agregar. La cantidad elegida multiplica el subtotal mostrado sin alterar el carrito hasta confirmar. La confirmación se consume una sola vez para impedir duplicados por doble toque.
+La foto capturada se entrega al OCR local: Vision en iOS y ML Kit en Android. El reconocimiento es uno solo para todas las cadenas y se hace en el dispositivo; la foto no se envía a un servidor y queda temporalmente mientras la pantalla está abierta. El OCR devuelve bloques de texto con sus coordenadas. `interpretLabel` elige cómo leerlos según el supermercado de la sucursal ya elegida al empezar la compra, y no lo infiere de la foto. Si el nombre contiene la palabra Día («Supermercado Día», «Día Market»; no «Diarco» ni «Mediana») usa el intérprete de esa cadena: acepta centavos con punto (`$ 4250.00` queda en $ 4.250,00), deja afuera el precio por litro o kilo con el signo detrás (`5200.00 $ / LT`) y el precio sin impuestos, y ofrece el precio regular junto con MODO o Club Día para elegir. El resto de los supermercados usa el intérprete genérico, que sólo acepta un peso delante del número en formato argentino (`$ 3.450,50`). Con varios candidatos no selecciona ninguno automáticamente; con uno, lo preselecciona, pero todavía requiere tocar Agregar. En esa pantalla se puede tocar el precio: el importe queda seleccionado para reemplazarlo. Un valor vacío, nulo o negativo no se acepta y el aviso queda junto al campo. El valor corregido es el que se suma. La cantidad elegida multiplica el subtotal mostrado sin alterar el carrito hasta confirmar. La confirmación se consume una sola vez para impedir duplicados por doble toque.
 
 Estas reglas son deliberadamente limitadas: el OCR extrae texto, pero no es un intérprete fiable de cualquier etiqueta real. El reducer, la lista, el formulario y el cálculo del total se reutilizan.
 
@@ -147,7 +148,7 @@ pnpm test
 
 GitHub Actions ejecuta esos tres comandos en cada pull request y en cada push a `main`.
 
-Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, el intérprete genérico y el de Día, cálculos, edición, cantidades, identidad de productos, migraciones, exclusión reversible del total, cierre con ticket opcional, precios comparables y resúmenes mensuales.
+Las pruebas cubren importes argentinos, centavos, entradas inválidas, precios por kilo, promociones, el intérprete genérico y el de Día, la corrección del precio leído antes de agregarlo, cálculos, edición, cantidades, identidad de productos, migraciones, exclusión reversible del total, cierre con ticket opcional, precios comparables y resúmenes mensuales.
 
 Recorrido manual sugerido:
 
@@ -155,7 +156,7 @@ Recorrido manual sugerido:
 2. Agregar supermercado y referencia; comprobar que abre la cámara con la sucursal indicada.
 3. Cargar `Leche`, precio `1500,50`, cantidad `2`: total $ 3.001,00. Incrementar a 3 unidades y editar el precio a `1600`: total $ 4.800,00.
 4. Volver a Inicio, continuar la compra y luego cerrar y reabrir la app: se conserva el total y se ofrece continuar, sin entrar automáticamente.
-5. En un teléfono físico con una development build, permitir la cámara, capturar una etiqueta nítida, elegir el precio detectado, ajustar la cantidad y confirmar. Antes de Agregar, el total del resumen no debe cambiar; después debe sumar el subtotal y volver a cámara. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
+5. En un teléfono físico con una development build, permitir la cámara, capturar una etiqueta nítida, elegir el precio detectado, ajustar la cantidad y confirmar. Si el precio leído no coincide, tocarlo, escribir el correcto (por ejemplo `3200,50`) y agregar: la compra debe mostrar ese importe. Antes de Agregar, el total del resumen no debe cambiar; después debe sumar el subtotal y volver a cámara. Al enviar la app al fondo, la vista previa se libera; al volver, puede abrirse de nuevo.
 6. Probar una lectura sin precio: ofrece reintento y carga manual.
 7. En «Ver compra», apartar un producto con varias unidades: la fila y su cantidad siguen visibles, pero el total y el recuento de incluidos bajan. Reincorporarlo y comprobar que recupera el subtotal original. Volver a capturar y reabrir la compra; el estado debe persistir al reiniciar la app.
 8. Abrir «Finalizar compra», dejar el ticket vacío y guardar: el detalle conserva incluidos y «No llevaste»; Inicio muestra la última compra con «Total estimado». Completar después el ticket desde el detalle y comprobar que muestra «Total del ticket» sin cambiar el estimado.
