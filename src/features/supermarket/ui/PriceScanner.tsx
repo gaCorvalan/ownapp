@@ -11,7 +11,12 @@ import { ActionButton, colors, common, IconButton } from './primitives';
 
 type ScannedAddition = { candidate: PriceCandidate; product: ProductDescriptor | null; publishedUnitPrice: PublishedUnitPrice | null; quantity: number };
 
-const priceErrorMessage = 'Ingresá un precio entre $ 0,01 y $ 1.000.000. Usá coma para los centavos, por ejemplo 3450,50.';
+const priceErrorMessage = 'Escribí el precio con coma. Ejemplo: 3450,50.';
+
+function priceDraft(value: string) {
+  const compact = value.replace(/\s/g, '');
+  return /^\d+\.\d{1,2}$/.test(compact) ? compact.replace('.', ',') : value;
+}
 
 export function PriceScanner({ supermarket, onAdd, onManual, onCompare, full, active = true }: { supermarket: string; onAdd: (value: ScannedAddition) => Promise<boolean>; onManual: () => void; onCompare: (product: ProductDescriptor | null) => void; full: boolean; active?: boolean }) {
   const scanner = usePriceScanner(supermarket);
@@ -21,6 +26,7 @@ export function PriceScanner({ supermarket, onAdd, onManual, onCompare, full, ac
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
   const [priceError, setPriceError] = useState('');
+  const [replaceAll, setReplaceAll] = useState(false);
   const [corrections, setCorrections] = useState<Record<string, number>>({});
   const selected = scanner.candidates.find(candidate => candidate.id === scanner.selectedId);
 
@@ -32,6 +38,7 @@ export function PriceScanner({ supermarket, onAdd, onManual, onCompare, full, ac
     setEditingId(null);
     setDraft('');
     setPriceError('');
+    setReplaceAll(false);
     setCorrections({});
   }
 
@@ -39,31 +46,7 @@ export function PriceScanner({ supermarket, onAdd, onManual, onCompare, full, ac
     return corrections[candidate.id] ?? candidate.priceCents;
   }
 
-  function keepDraftIfValid() {
-    const previous = scanner.candidates.find(value => value.id === editingId);
-    const corrected = previous ? correctReadPrice(previous, draft) : null;
-    if (corrected && previous) setCorrections(current => ({ ...current, [previous.id]: corrected.priceCents }));
-    return corrected;
-  }
-
-  function selectCandidate(id: string) {
-    if (editingId && editingId !== id) {
-      keepDraftIfValid();
-      setEditingId(null);
-      setPriceError('');
-    }
-    scanner.setSelectedId(id);
-  }
-
-  function beginEdit(candidate: PriceCandidate) {
-    if (editingId && editingId !== candidate.id) keepDraftIfValid();
-    scanner.setSelectedId(candidate.id);
-    setDraft((shownCents(candidate) / 100).toFixed(2).replace('.', ','));
-    setEditingId(candidate.id);
-    setPriceError('');
-  }
-
-  function commitEdit() {
+  function closeEdit() {
     const candidate = scanner.candidates.find(value => value.id === editingId);
     if (!candidate) return false;
     const corrected = correctReadPrice(candidate, draft);
@@ -71,7 +54,22 @@ export function PriceScanner({ supermarket, onAdd, onManual, onCompare, full, ac
     setCorrections(current => ({ ...current, [candidate.id]: corrected.priceCents }));
     setEditingId(null);
     setPriceError('');
+    setReplaceAll(false);
     return true;
+  }
+
+  function selectCandidate(id: string) {
+    if (editingId && editingId !== id && !closeEdit()) return;
+    scanner.setSelectedId(id);
+  }
+
+  function beginEdit(candidate: PriceCandidate) {
+    if (editingId && editingId !== candidate.id && !closeEdit()) return;
+    scanner.setSelectedId(candidate.id);
+    setDraft((shownCents(candidate) / 100).toFixed(2).replace('.', ','));
+    setEditingId(candidate.id);
+    setPriceError('');
+    setReplaceAll(true);
   }
 
   function resolvedCandidate(candidate: PriceCandidate) {
@@ -88,6 +86,7 @@ export function PriceScanner({ supermarket, onAdd, onManual, onCompare, full, ac
     if (resolved.priceCents !== current.priceCents) setCorrections(map => ({ ...map, [current.id]: resolved.priceCents }));
     setEditingId(null);
     setPriceError('');
+    setReplaceAll(false);
     const consumed = scanner.consumeSelected();
     if (!consumed) return;
     const publishedUnitPrice = scanner.publishedUnitPrices.length === 1 ? scanner.publishedUnitPrices[0] : null;
@@ -98,7 +97,7 @@ export function PriceScanner({ supermarket, onAdd, onManual, onCompare, full, ac
   }
 
   const addCents = !selected ? null : editingId === selected.id ? parsePrice(draft) : shownCents(selected);
-  const addLabel = !selected ? 'Elegí un precio para agregar' : addCents === null ? 'Revisá el precio para agregar' : `Agregar · ${formatMoney(addCents * quantity)}`;
+  const addLabel = !selected ? 'Elegí un precio para agregar' : addCents === null ? 'Agregar' : `Agregar · ${formatMoney(addCents * quantity)}`;
 
   return <View style={styles.root}>
     <View accessibilityLiveRegion="polite" style={styles.content}>
@@ -119,28 +118,28 @@ export function PriceScanner({ supermarket, onAdd, onManual, onCompare, full, ac
           const corrected = corrections[candidate.id] !== undefined && corrections[candidate.id] !== candidate.priceCents;
           const editing = editingId === candidate.id;
           return <View key={candidate.id} style={[styles.candidate, scanner.selectedId === candidate.id && styles.selectedCandidate]}>
-            <Pressable accessibilityRole="radio" accessibilityLabel={`${formatMoney(cents)}. ${candidate.context}`}
+            {scanner.candidates.length > 1 && <Pressable accessibilityRole="radio" accessibilityLabel={`${formatMoney(cents)}. ${candidate.context}`}
               accessibilityState={{ checked: scanner.selectedId === candidate.id }}
               onPress={() => selectCandidate(candidate.id)}
               style={styles.radioHit}>
               <Ionicons name={scanner.selectedId === candidate.id ? 'checkmark-circle' : 'ellipse-outline'} size={24} color={colors.ink} />
-            </Pressable>
+            </Pressable>}
             <View style={styles.candidateBody}>
               {editing ? <View style={styles.editRow}>
-                <TextInput accessibilityLabel="Precio corregido en pesos" value={draft} onChangeText={value => { setDraft(value); setPriceError(''); }}
-                  keyboardType="decimal-pad" autoFocus maxLength={18} style={styles.priceInput} onSubmitEditing={commitEdit} />
-                <IconButton label="Confirmar precio corregido" icon="checkmark" onPress={commitEdit} />
-              </View> : <Pressable accessibilityRole="button" accessibilityLabel={`Corregir precio ${formatMoney(cents)}`} onPress={() => beginEdit(candidate)} style={styles.priceHit}>
-                <Text style={styles.candidatePrice}>{formatMoney(cents)}</Text>
-                <Text style={styles.correctHint}>{corrected ? 'Precio corregido · tocar para cambiar' : 'Tocar para corregir'}</Text>
+                <TextInput accessibilityLabel="Precio en pesos" accessibilityHint="Usá coma para los centavos. Ejemplo: 3450,50." value={draft}
+                  onChangeText={value => { setReplaceAll(false); setDraft(priceDraft(value)); setPriceError(''); }}
+                  keyboardType="decimal-pad" autoFocus selectTextOnFocus maxLength={18} style={styles.priceInput}
+                  {...(replaceAll ? { selection: { start: 0, end: draft.length } } : {})} onSubmitEditing={closeEdit} />
+                <Pressable accessibilityRole="button" accessibilityLabel="Listo" onPress={closeEdit} style={styles.done}><Text style={styles.doneText}>Listo</Text></Pressable>
+              </View> : <Pressable accessibilityRole="button" accessibilityLabel={corrected ? `Precio corregido ${formatMoney(cents)}. Tocar para cambiar` : `Corregir precio ${formatMoney(cents)}`} onPress={() => beginEdit(candidate)} style={styles.priceHit}>
+                <View style={styles.priceLine}><Text style={styles.candidatePrice}>{formatMoney(cents)}</Text><Ionicons name="create-outline" size={22} color={colors.ink} /></View>
+                <Text style={[styles.correctHint, corrected && styles.correctedHint]}>{corrected ? 'Precio corregido' : 'Corregir'}</Text>
               </Pressable>}
-              <Pressable accessibilityRole="button" accessibilityLabel={`Elegir ${candidate.context}`} onPress={() => selectCandidate(candidate.id)}>
-                <Text style={common.body}>{candidate.context}</Text>
-              </Pressable>
+              {editing && !!priceError && <Text accessibilityRole="alert" style={styles.priceError}>{priceError}</Text>}
+              <Text style={common.body}>{candidate.context}</Text>
             </View>
           </View>;
         })}
-        {!!priceError && <Text accessibilityRole="alert" style={styles.priceError}>{priceError}</Text>}
         <View style={styles.quantityRow}><Text style={styles.quantityLabel}>Cantidad</Text><View style={styles.stepper}>
           <IconButton label="Restar una unidad" icon="remove" disabled={quantity === 1} onPress={() => setQuantity(value => value - 1)} />
           <Text accessibilityLabel={`${quantity} unidades`} style={styles.quantity}>{quantity}</Text>
@@ -173,11 +172,15 @@ const styles = StyleSheet.create({
   selectedCandidate: { borderColor: colors.selectionBorder, backgroundColor: colors.selection },
   radioHit: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   candidateBody: { flex: 1, gap: 4 },
-  priceHit: { minHeight: 44, justifyContent: 'center', gap: 2 },
+  priceHit: { minHeight: 48, justifyContent: 'center', gap: 2 },
+  priceLine: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   candidatePrice: { fontFamily: fontFamilies.bold, fontSize: 22, lineHeight: 29, color: colors.ink },
   correctHint: { ...typography.caption, color: colors.textSecondary },
+  correctedHint: { color: colors.selectionBorder },
   editRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   priceInput: { flex: 1, minHeight: 48, borderWidth: 1, borderColor: colors.selectionBorder, borderRadius: 12, paddingHorizontal: 12, color: colors.ink, fontFamily: fontFamilies.bold, fontSize: 22, backgroundColor: colors.surface },
+  done: { minWidth: 72, minHeight: 48, borderRadius: 12, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
+  doneText: { ...typography.action, color: colors.ink },
   priceError: { ...typography.secondary, color: colors.danger },
   quantityRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   quantityLabel: { ...typography.secondary, color: colors.ink },

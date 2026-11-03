@@ -7,7 +7,7 @@ Cambios relevantes de Ownapp. Se sigue la convención de
 
 ### Added
 
-- Corrección del precio leído en la confirmación, antes de agregarlo a la compra. El importe corregido, en centavos, es el que entra al carrito.
+- Corrección del precio leído en la confirmación, antes de agregarlo a la compra. El importe queda seleccionado para reemplazarlo; si no es válido, el aviso aparece junto al campo y no entra al carrito. El importe corregido, en centavos, es el que se agrega.
 - Skills de ingeniería y productividad de Matt Pocock en `.agents/skills`, en la última versión recomendada, para que cualquier agente del repositorio pueda usarlas. `skills-lock.json` queda alineado con esas copias; se retira `resolving-merge-conflicts`, que upstream ya no publica.
 - Integración continua en GitHub Actions: cada pull request y cada push a `main` ejecutan `pnpm typecheck`, `pnpm lint` y `pnpm test`.
 - Historial local de observaciones de precio con búsqueda, filtro por sucursal, fecha, condición, origen y precio por medida publicado o calculado cuando hay contenido neto. La confirmación permite consultarlo sin agregar el producto.
