@@ -19,6 +19,7 @@ No reemplaza al `CHANGELOG.md`, que sólo describe cambios ya realizados.
 - Inicio, selección manual de sucursal y una compra abierta recuperable.
 - Cámara dominante durante la compra y resumen del carrito accesible por toque o deslizamiento.
 - OCR local de etiquetas y confirmación explícita del precio.
+- Corrección del precio leído en esa confirmación, antes de sumarlo a la compra.
 - Consulta local de observaciones desde la confirmación, con búsqueda y filtro por sucursal.
 - Nombre de producto sugerido a partir del texto OCR, editable desde la compra.
 - Compra local persistida, cantidades, inclusión reversible, cierre con ticket opcional e historial de compras.
