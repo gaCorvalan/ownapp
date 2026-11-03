@@ -3,7 +3,7 @@ import test from 'node:test';
 import { parsePrice, parseTicketAmount, extractPriceCandidates, extractPublishedUnitPrices } from '../src/features/supermarket/domain/price.ts';
 import { interpretLabel } from '../src/features/supermarket/domain/labelInterpreter.ts';
 import { correctProductDisplayName, createManualProductDescriptor, extractProductDescriptor, formatNetContent } from '../src/features/supermarket/domain/product.ts';
-import { classifyPriceTerms, createPriceObservation, savedObservationAfterFinish } from '../src/features/supermarket/domain/priceObservation.ts';
+import { applySavedPricesBeforeFinish, classifyPriceTerms, createPriceObservation, savedObservationAfterFinish } from '../src/features/supermarket/domain/priceObservation.ts';
 import { shoppingReducer, shoppingTotals, shoppingCounts, isShoppingItem } from '../src/features/supermarket/domain/shopping.ts';
 import { decodePurchaseLedger, decodePurchaseSession, finishPurchase, monthlySpending, updateTicket } from '../src/features/supermarket/domain/purchaseSession.ts';
 import { normalizeStoreName, storeLabel } from '../src/features/supermarket/domain/store.ts';
@@ -197,6 +197,35 @@ test('al finalizar la compra, el precio guardado es el vigente en el carrito y n
   assert.equal(finished.completed[0].items[0].priceCents, 320050);
   assert.equal(finished.completed[0].items[0].observationId, 'obs-yerba');
   assert.equal(savedObservationAfterFinish(other, finished.completed[0].items).priceCents, 199000);
+});
+
+test('finalizar sigue si no se puede actualizar un precio guardado', async () => {
+  const terms = classifyPriceTerms('Yerba $ 3.450,00');
+  const scanned = createPriceObservation({
+    id: 'obs-yerba', capturedAt: '2026-11-03T15:00:00.000Z', product: null, priceCents: 345000,
+    terms, publishedUnitPrice: null, retailerId: 'store-1', source: 'label-ocr',
+  });
+  const other = createPriceObservation({
+    id: 'obs-otra', capturedAt: '2026-11-02T15:00:00.000Z', product: null, priceCents: 100000,
+    terms, publishedUnitPrice: null, retailerId: 'store-1', source: 'label-ocr',
+  });
+  const items = [
+    { id: 'line-1', name: 'Yerba', priceCents: 320050, quantity: 1, observationId: 'obs-yerba' },
+    { id: 'line-2', name: 'Pan', priceCents: 150000, quantity: 1, observationId: 'obs-otra' },
+  ];
+  const revised = [];
+  await applySavedPricesBeforeFinish([scanned, other], items, async observation => {
+    revised.push(observation.priceCents);
+    if (observation.id === 'obs-yerba') throw new Error('No encontramos el precio guardado.');
+  });
+  assert.deepEqual(revised, [320050, 150000]);
+  const store = { id: 'store-1', supermarket: 'Día', reference: 'Del barrio' };
+  const finished = finishPurchase(
+    { active: { id: 'purchase-1', storeId: store.id, items }, completed: [] },
+    store, '2026-11-03T16:00:00.000Z', null,
+  );
+  assert.equal(finished.active, null);
+  assert.equal(finished.completed[0].items[0].priceCents, 320050);
 });
 
 test('el cierre rechaza una compra sin incluidos y migra el formato previo sin perder ítems', () => {

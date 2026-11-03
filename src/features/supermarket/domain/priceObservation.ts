@@ -52,3 +52,19 @@ export function savedObservationAfterFinish(
   if (!line || line.priceCents === observation.priceCents) return observation;
   return { ...observation, priceCents: line.priceCents };
 }
+
+export async function applySavedPricesBeforeFinish(
+  observations: readonly PriceObservation[],
+  finishedItems: readonly { observationId?: string; priceCents: number }[],
+  revise: (observation: PriceObservation) => Promise<unknown>,
+): Promise<void> {
+  for (const observation of observations) {
+    const revised = savedObservationAfterFinish(observation, finishedItems);
+    if (revised.priceCents === observation.priceCents) continue;
+    try {
+      await revise(revised);
+    } catch {
+      // Un precio que no se puede reescribir no frena el cierre.
+    }
+  }
+}
